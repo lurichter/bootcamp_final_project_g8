@@ -4,8 +4,8 @@
 
 spring:
   datasource:
-    host: proxysql.master.meliseginf.com:6612
-    db: dambetandb
+    host: localhost:3306
+    db: dambetandb?serverTimezone=UTC&useLegacyDatetimeCode=false
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASS}
     initialization-mode: always
