@@ -5,7 +5,7 @@
 spring:
   datasource:
     host: localhost:3306
-    db: dambetandb?serverTimezone=UTC&useLegacyDatetimeCode=false
+    db: dambetandb?createDatabaseIfNotExist=true&serverTimezone=UTC&useLegacyDatetimeCode=false
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASS}
     initialization-mode: always
