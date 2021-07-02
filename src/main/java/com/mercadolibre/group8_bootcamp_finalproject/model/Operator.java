@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
@@ -19,4 +20,10 @@ public class Operator {
 
     @OneToOne
     private User user;
+
+    @OneToMany(mappedBy = "inbound_order")
+    private Set<InboundOrder> inboundOrders;
+
+    @OneToMany(mappedBy = "operator")
+    private Set<WarehouseOperator> warehouseOperators;
 }

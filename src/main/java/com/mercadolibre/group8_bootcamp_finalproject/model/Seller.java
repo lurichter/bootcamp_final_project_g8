@@ -22,7 +22,6 @@ public class Seller {
     private User user;
 
     @OneToMany(mappedBy = "seller")
-    private Set<FreshProduct> products;
-
+    private Set<Product> products;
 
 }

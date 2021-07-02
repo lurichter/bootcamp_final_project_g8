@@ -5,19 +5,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FreshProduct {
+public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long id;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name", nullable = false, unique = true, length = 45)
     private String name;
 
     @Column(name = "product_description", nullable = false)
@@ -29,8 +30,17 @@ public class FreshProduct {
     @Column(name = "maximum_temperature", nullable = false, precision = 4, scale = 2)
     private Double max_temperature;
 
+    @Column(name = "price", nullable = false, precision = 8, scale = 2)
+    private Double price;
+
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private Seller seller;
 
+    @OneToMany(mappedBy = "batch")
+    private Set<Batch> batch;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ProductCategory productCategory;
 }

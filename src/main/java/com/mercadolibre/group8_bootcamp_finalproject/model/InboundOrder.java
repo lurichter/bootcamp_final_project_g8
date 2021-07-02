@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import com.mercadolibre.group8_bootcamp_finalproject.model.enums.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,23 +13,20 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PurchaseOrder {
+public class InboundOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Long id;
 
+    @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(name = "order_datetime", nullable = false)
-    private LocalDateTime dateTime = LocalDateTime.now();
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    private Status status;
+    private LocalDateTime date_time = LocalDateTime.now();
 
     @ManyToOne
-    @JoinColumn(name = "buyer_id")
-    private Buyer buyer;
+    @JoinColumn(name = "operator_id")
+    private Operator operator;
 
-    @OneToMany(mappedBy = "purchase_order_item")
-    private Set<PurchaseOrderItem> purchaseOrderItems;
+    @OneToMany(mappedBy = "batch")
+    private Set<Batch> batch;
 }
