@@ -48,6 +48,7 @@
                 <configuration>
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
+                    <!--suppress UnresolvedMavenProperty -->
                     <argLine>${argLine} -Xmx1g -Xms1g</argLine>
                     <useFile>false</useFile>
                     <trimStackTrace>false</trimStackTrace>
@@ -412,6 +413,32 @@
         <dependency>
             <groupId>com.mercadolibre</groupId>
             <artifactId>routing</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+        </dependency>
+
+        <!-- Security -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
+        <!-- Develop -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
