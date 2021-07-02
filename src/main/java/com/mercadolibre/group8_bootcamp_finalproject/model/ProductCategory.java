@@ -22,6 +22,6 @@ public class ProductCategory {
     @Column(name = "category_name", nullable = false)
     private Category name;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "productCategory")
     private Set<Product> products;
 }

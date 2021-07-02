@@ -21,7 +21,7 @@ public class Operator {
     @OneToOne
     private User user;
 
-    @OneToMany(mappedBy = "inbound_order")
+    @OneToMany(mappedBy = "operator")
     private Set<InboundOrder> inboundOrders;
 
     @OneToMany(mappedBy = "operator")

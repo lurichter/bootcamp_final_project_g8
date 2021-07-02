@@ -34,6 +34,6 @@ public class WarehouseSection {
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "batch")
+    @OneToMany(mappedBy = "warehouseSection")
     private Set<Batch> batch;
 }

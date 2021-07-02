@@ -30,6 +30,6 @@ public class PurchaseOrder {
     @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
-    @OneToMany(mappedBy = "purchase_order_item")
+    @OneToMany(mappedBy = "purchaseOrder")
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }

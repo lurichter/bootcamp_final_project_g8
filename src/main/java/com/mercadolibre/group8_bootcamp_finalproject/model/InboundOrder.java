@@ -27,6 +27,6 @@ public class InboundOrder {
     @JoinColumn(name = "operator_id")
     private Operator operator;
 
-    @OneToMany(mappedBy = "batch")
+    @OneToMany(mappedBy = "inboundOrder")
     private Set<Batch> batch;
 }

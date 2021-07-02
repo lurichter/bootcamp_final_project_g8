@@ -37,10 +37,10 @@ public class Product {
     @JoinColumn(name = "seller_id")
     private Seller seller;
 
-    @OneToMany(mappedBy = "batch")
+    @OneToMany(mappedBy = "product")
     private Set<Batch> batch;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "product")
     private ProductCategory productCategory;
 }

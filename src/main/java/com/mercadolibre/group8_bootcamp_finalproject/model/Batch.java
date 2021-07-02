@@ -53,6 +53,6 @@ public class Batch {
     @JoinColumn(name = "section_id")
     private WarehouseSection warehouseSection;
 
-    @OneToMany(mappedBy = "purchase_order_item")
+    @OneToMany(mappedBy = "purchaseOrder")
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }

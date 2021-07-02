@@ -21,6 +21,6 @@ public class Buyer {
     @OneToOne
     private User user;
 
-    @OneToMany(mappedBy = "purchase")
+    @OneToMany(mappedBy = "buyer")
     private Set<PurchaseOrder> purchaseOrders;
 }
