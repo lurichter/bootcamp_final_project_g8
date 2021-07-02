@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.FutureOrPresent;
@@ -29,6 +30,7 @@ public class BatchDTO {
     @PastOrPresent(message = "manufacturing date is in the future")
     private LocalDate manufacturingDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @PastOrPresent(message = "manufacturing date is in the future")
     private LocalDateTime manufacturingTime;
 
