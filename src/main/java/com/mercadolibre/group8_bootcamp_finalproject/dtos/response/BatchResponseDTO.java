@@ -1,11 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder

@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.AccountResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiException;
 import com.mercadolibre.group8_bootcamp_finalproject.security.JWTAuthorizationFilter;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ISessionService;

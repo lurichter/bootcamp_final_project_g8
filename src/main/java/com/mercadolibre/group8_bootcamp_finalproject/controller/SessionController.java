@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.AccountResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ISessionService;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,7 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.AccountResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 
 public interface ISessionService {
