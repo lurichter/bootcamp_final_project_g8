@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrderItem, Long> {
 
-//    @Query(value = "SELECT * FROM fresh.purchase_order_item WHERE batch_id = :batchId", nativeQuery = true)
-    @Query(value = "SELECT p FROM PurchaseOrderItem.batch p WHERE p.id = :batchId")
-    List<PurchaseOrderItem> findByBatchId (@Param("batchId") Integer batchId);
+    @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.batch.id = :batchId")
+    List<PurchaseOrderItem> findByBatchId (@Param("batchId") Long batchId);
 }

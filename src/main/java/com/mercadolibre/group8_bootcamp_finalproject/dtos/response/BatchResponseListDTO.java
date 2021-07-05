@@ -20,11 +20,11 @@ public class BatchResponseListDTO {
             BatchResponseDTO batchResponseDTO = BatchResponseDTO.builder()
                     .batchNumber(batch.getNumber())
                     .productId(batch.getProduct().getId().intValue())
-                    .currentTemperature(batch.getCurrent_temperature())
+                    .currentTemperature(batch.getCurrentTemperature())
                     .quantity(batch.getQuantity())
-                    .manufacturingDate(batch.getManufacturing_date())
-                    .manufacturingTime(batch.getManufacturing_time())
-                    .dueDate(batch.getDue_date())
+                    .manufacturingDate(batch.getManufacturingDate())
+                    .manufacturingTime(batch.getManufacturingTime())
+                    .dueDate(batch.getDueDate())
                     .build();
 
             batchResponseDTOList.add(batchResponseDTO);

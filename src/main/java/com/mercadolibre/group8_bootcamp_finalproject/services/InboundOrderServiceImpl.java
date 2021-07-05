@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -70,12 +71,10 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
         List<Product> productList = this.getProductList(productIds);
 
-
         // get section code -> returning data from Warehouse_Section (table)
         WarehouseSection warehouseSection = this.getWarehouseSectionByCode(inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue());
 
         // verify if operator exists
-
 
         // with section data, we can get Warehouse (table) code
         Long wareHouseCode = warehouseSection.getWarehouse().getId();
@@ -128,39 +127,78 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     }
 
     @Override
-    public BatchResponseDTO updateInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
+    public BatchResponseListDTO updateInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
 
         List<Batch> batches = new ArrayList<>();
+        List<Batch> batchesResponse = new ArrayList<>();
         Batch batch;
 
 	    for ( BatchDTO batchRequest : inboundOrderRequest.getInboundOrder().getBatchStock() ) {
 
-	        // valid if has some occurrence in purchase order item
-            if ( purchaseOrderItemRepository.findByBatchId(batchRequest.getBatchId()) != null ) {
+            List<PurchaseOrderItem> p = purchaseOrderItemRepository.findByBatchId(batchRequest.getBatchId().longValue());
+
+            if (!p.isEmpty()) {
                 // already some occurence
                 // type some exception here
-
+                System.out.println("entrou no if, pois tem registro");
                 return null;
-            }
+            } else {
 
-//            batch = new Batch();
-//
-//            batch.setId(batchRequest.getBatchId().longValue());
-//            batch.setNumber(batchRequest.getBatchNumber());
-//            batch.setProduct(productRepository.getOne(batchRequest.getProductId().longValue()));
-//            batch.setQuantity(batchRequest.getQuantity());
-//            batch.setCurrent_temperature(batchRequest.getCurrentTemperature());
-//            batch.setManufacturing_date(batchRequest.getManufacturingDate());
-//            batch.setManufacturing_time(batchRequest.getManufacturingTime().toLocalTime());
-//            batch.setDue_date(batchRequest.getDueDate());
-//            batch.setInboundOrder(inboundOrderResponse);
-//            batch.setWarehouseSection(warehouseSection);
-//
-//            batches.add(batch);
+                // verify if seller exists
+                List<Integer> productIds = inboundOrderRequest.getInboundOrder()
+                        .getBatchStock()
+                        .stream().map(BatchDTO::getProductId).collect(Collectors.toList());
+
+                List<Product> productList = this.getProductList(productIds);
+
+
+                // get section code -> returning data from Warehouse_Section (table)
+                WarehouseSection warehouseSection = this.getWarehouseSectionByCode(inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue());
+
+                // verify if operator exists
+
+
+                // with section data, we can get Warehouse (table) code
+                Long wareHouseCode = warehouseSection.getWarehouse().getId();
+
+                // validating in Warehouse_Operator has access to determinate warehouse
+                List<WarehouseOperator> warehouseOperatorList = warehouseOperatorRepository.findByWarehouseCode(wareHouseCode);
+
+                // verify section accepts product category
+                this.verifySectionAcceptsProductCategory(productList, inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue());
+
+                // verify quantity from request is less than warehouse section current_availability
+                Integer allQuantityProductBatchStock = this.verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability(inboundOrderRequest);
+
+                if ( warehouseSection.getCurrentAvailability() <= allQuantityProductBatchStock ) {
+                    throw new NotFoundException("WarehouseSection current capability is less than all quantity products from batch stock");
+                }
+
+                // get inbound order request
+                Long inboundOrderId = batchRepository.getOne(batchRequest.getBatchId().longValue()).getInboundOrder().getId();
+
+                InboundOrder inboundOrderFromBatch = inboundOrderRepository.getOne(inboundOrderId);
+
+                batch = new Batch();
+
+                batch.setId(batchRequest.getBatchId().longValue());
+                batch.setNumber(batchRequest.getBatchNumber());
+                batch.setProduct(productRepository.getOne(batchRequest.getProductId().longValue()));
+                batch.setQuantity(batchRequest.getQuantity());
+                batch.setCurrentTemperature(batchRequest.getCurrentTemperature());
+                batch.setManufacturingDate(batchRequest.getManufacturingDate());
+                batch.setManufacturingTime(batchRequest.getManufacturingTime().toLocalTime());
+                batch.setDueDate(batchRequest.getDueDate());
+                batch.setInboundOrder(inboundOrderFromBatch);
+                batch.setWarehouseSection(warehouseSection);
+
+                batches.add(batch);
+
+            }
+            batchesResponse = batchRepository.saveAll(batches);
 
         }
-
-	    return null;
+        return new BatchResponseListDTO(batchesResponse);
     }
 
 

@@ -8,5 +8,5 @@ public interface InboundOrderService {
 
     BatchResponseListDTO createInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
 
-    BatchResponseDTO updateInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
+    BatchResponseListDTO updateInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
 }
