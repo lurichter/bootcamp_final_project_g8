@@ -25,7 +25,7 @@ public class Warehouse {
     private String address;
 
     @Column(name = "accept_fresh", nullable = false)
-    private Boolean accept_fresh;
+    private Boolean acceptFresh;
 
     @OneToMany(mappedBy = "warehouse")
     private Set<WarehouseSection> warehouseSections;
