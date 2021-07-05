@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderRequest;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderService;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +18,12 @@ public class InboundOrderController {
     private final InboundOrderService inboundOrderService;
 
     @PostMapping
-    public ResponseEntity<BatchResponseDTO> createInboundOrder(@RequestBody @Valid InboundOrderRequest inboundOrder) {
+    public ResponseEntity<BatchResponseDTO> createInboundOrder(@RequestBody @Valid InboundOrderRequestDTO inboundOrder) {
         return new ResponseEntity(inboundOrderService.createInboundOrder(inboundOrder), HttpStatus.CREATED);
     }
 
     @PutMapping
-    public ResponseEntity<BatchResponseDTO> updateInboundOrder (@RequestBody @Valid InboundOrderRequest inboundOrder) {
+    public ResponseEntity<BatchResponseDTO> updateInboundOrder (@RequestBody @Valid InboundOrderRequestDTO inboundOrder) {
 
         return new ResponseEntity(inboundOrderService.updateInboundOrder(inboundOrder), HttpStatus.CREATED);
     }

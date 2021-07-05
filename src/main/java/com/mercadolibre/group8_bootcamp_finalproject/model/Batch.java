@@ -28,18 +28,18 @@ public class Batch {
     private Integer quantity;
 
     @Column(name = "current_temperature", nullable = false, precision = 4, scale = 2)
-    private Double current_temperature;
+    private Double currentTemperature;
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(name = "manufacturing_date", nullable = false)
-    private LocalDate manufacturing_date = LocalDate.now();
+    private LocalDate manufacturingDate = LocalDate.now();
 
     @Column(name = "manufacturing_time", nullable = false)
-    private LocalTime manufacturing_time = LocalTime.now();
+    private LocalTime manufacturingTime = LocalTime.now();
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(name = "due_date", nullable = false)
-    private LocalDate due_date;
+    private LocalDate dueDate;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -53,6 +53,6 @@ public class Batch {
     @JoinColumn(name = "section_id")
     private WarehouseSection warehouseSection;
 
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "batch")
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }

@@ -20,7 +20,7 @@ public class PurchaseOrderItem {
     private Integer quantity;
 
     @Column(name = "total_price" , nullable = false, precision = 8, scale = 2)
-    private Double total_price;
+    private Double totalPrice;
 
     @ManyToOne
     @JoinColumn(name = "batch_id")

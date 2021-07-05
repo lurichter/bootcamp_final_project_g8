@@ -15,6 +15,12 @@ public class ApiError {
 		this.status = status;
 	}
 
+	public ApiError(String error, String message) {
+		super();
+		this.error = error;
+		this.message = message;
+	}
+
 	public String getError() {
 		return this.error;
 	}

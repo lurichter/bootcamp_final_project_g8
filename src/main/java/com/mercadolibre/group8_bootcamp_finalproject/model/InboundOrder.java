@@ -21,7 +21,7 @@ public class InboundOrder {
 
     @JsonFormat(pattern = "dd/MM/yyyy")
     @Column(name = "order_datetime", nullable = false)
-    private LocalDateTime date_time = LocalDateTime.now();
+    private LocalDateTime dateTime = LocalDateTime.now();
 
     @ManyToOne
     @JoinColumn(name = "operator_id")

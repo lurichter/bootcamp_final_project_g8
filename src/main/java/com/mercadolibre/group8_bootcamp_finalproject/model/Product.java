@@ -25,10 +25,10 @@ public class Product {
     private String description;
 
     @Column(name = "minimum_temperature", nullable = false, precision = 4, scale = 2)
-    private Double min_temperature;
+    private Double minTemperature;
 
     @Column(name = "maximum_temperature", nullable = false, precision = 4, scale = 2)
-    private Double max_temperature;
+    private Double maxTemperature;
 
     @Column(name = "price", nullable = false, precision = 8, scale = 2)
     private Double price;

@@ -17,9 +17,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/sign-in").permitAll()
-                //.antMatchers(HttpMethod.GET, "/ping").permitAll()
                 .antMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                .anyRequest().authenticated();
+                //TESTEEEEEEEEEEE
+                //.anyRequest().authenticated();
+                .anyRequest().permitAll();
     }
 }

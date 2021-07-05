@@ -1,4 +1,4 @@
-package com.mercadolibre.group8_bootcamp_finalproject.dtos;
+package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 import lombok.*;
 
 @Data

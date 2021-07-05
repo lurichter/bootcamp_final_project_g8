@@ -1,7 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.services;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderRequest;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,13 +55,13 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         );
     }
 
-    private Integer verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability (InboundOrderRequest inboundOrderRequest) {
+    private Integer verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability (InboundOrderRequestDTO inboundOrderRequest) {
         return inboundOrderRequest.getInboundOrder().getBatchStock().stream().mapToInt(BatchDTO::getQuantity).sum();
     }
 
     @Override
     @Transactional
-    public BatchResponseListDTO createInboundOrder(InboundOrderRequest inboundOrderRequest) {
+    public BatchResponseListDTO createInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
 
         // verify if seller exists
         List<Integer> productIds = inboundOrderRequest.getInboundOrder()
@@ -91,7 +89,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         // verify quantity from request is less than warehouse section current_availability
         Integer allQuantityProductBatchStock = this.verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability(inboundOrderRequest);
 
-        if ( warehouseSection.getCurrent_availability() <= allQuantityProductBatchStock ) {
+        if ( warehouseSection.getCurrentAvailability() <= allQuantityProductBatchStock ) {
             throw new NotFoundException("WarehouseSection current capability is less than all quantity products from batch stock");
         }
 
@@ -114,10 +112,10 @@ public class InboundOrderServiceImpl implements InboundOrderService {
             batch.setNumber(batchRequest.getBatchNumber());
             batch.setProduct(productRepository.getOne(batchRequest.getProductId().longValue()));
             batch.setQuantity(batchRequest.getQuantity());
-            batch.setCurrent_temperature(batchRequest.getCurrentTemperature());
-            batch.setManufacturing_date(batchRequest.getManufacturingDate());
-            batch.setManufacturing_time(batchRequest.getManufacturingTime().toLocalTime());
-            batch.setDue_date(batchRequest.getDueDate());
+            batch.setCurrentTemperature(batchRequest.getCurrentTemperature());
+            batch.setManufacturingDate(batchRequest.getManufacturingDate());
+            batch.setManufacturingTime(batchRequest.getManufacturingTime().toLocalTime());
+            batch.setDueDate(batchRequest.getDueDate());
             batch.setInboundOrder(inboundOrderResponse);
             batch.setWarehouseSection(warehouseSection);
 
@@ -130,7 +128,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     }
 
     @Override
-    public BatchResponseDTO updateInboundOrder(InboundOrderRequest inboundOrderRequest) {
+    public BatchResponseDTO updateInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
 
         List<Batch> batches = new ArrayList<>();
         Batch batch;
