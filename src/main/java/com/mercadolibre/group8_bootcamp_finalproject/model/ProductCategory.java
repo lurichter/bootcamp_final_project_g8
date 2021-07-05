@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import com.mercadolibre.group8_bootcamp_finalproject.model.enums.Category;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,8 +20,11 @@ public class ProductCategory {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category_name", nullable = false)
-    private Category name;
+    private ProductCategoryEnum name;
 
     @OneToMany(mappedBy = "productCategory")
     private Set<Product> products;
+
+    @OneToMany(mappedBy = "productCategory")
+    private Set<WarehouseSection> warehouseSections;
 }

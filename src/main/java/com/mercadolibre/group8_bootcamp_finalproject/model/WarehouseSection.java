@@ -25,7 +25,7 @@ public class WarehouseSection {
     private Integer capacity;
 
     @Column(name = "current_availability", nullable = false)
-    private Integer current_availability;
+    private Integer currentAvailability;
 
     @Column(name = "temperature", nullable = false, precision = 4, scale = 2)
     private Double temperature;
@@ -36,4 +36,8 @@ public class WarehouseSection {
 
     @OneToMany(mappedBy = "warehouseSection")
     private Set<Batch> batch;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ProductCategory productCategory;
 }

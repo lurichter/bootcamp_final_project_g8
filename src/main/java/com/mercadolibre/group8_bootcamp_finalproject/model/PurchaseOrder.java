@@ -1,6 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import com.mercadolibre.group8_bootcamp_finalproject.model.enums.Status;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ public class PurchaseOrder {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Status status;
+    private OrderStatusEnum orderStatusEnum;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id")
