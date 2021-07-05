@@ -23,7 +23,8 @@ public class InboundOrderController {
     }
 
     @PutMapping
-    public ResponseEntity<BatchResponseDTO> updateInboundOrder () {
-        return new ResponseEntity(null, HttpStatus.CREATED);
+    public ResponseEntity<BatchResponseDTO> updateInboundOrder (@RequestBody @Valid InboundOrderRequest inboundOrder) {
+
+        return new ResponseEntity(inboundOrderService.updateInboundOrder(inboundOrder), HttpStatus.CREATED);
     }
 }

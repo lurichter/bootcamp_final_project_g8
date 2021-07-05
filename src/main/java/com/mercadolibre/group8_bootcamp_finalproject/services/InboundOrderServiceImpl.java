@@ -27,6 +27,40 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 	private final WarehouseSectionRepository warehouseSectionRepository;
 	private final WarehouseOperatorRepository warehouseOperatorRepository;
 
+	// put method
+    private final PurchaseOrderItemRepository purchaseOrderItemRepository;
+
+	private List<Product> getProductList (List<Integer> productIds) {
+        List<Product> productList = new ArrayList<>();
+
+        productIds.stream().map( product_id ->
+                productList.add(productRepository.findById(product_id.longValue()).orElseThrow(() -> new NotFoundException("Product not found")))
+        );
+
+        return productList;
+    }
+
+    private WarehouseSection getWarehouseSectionByCode ( Long sectionCode ) {
+	    return warehouseSectionRepository
+                .findById(sectionCode)
+                .orElseThrow(() -> new NotFoundException("Warehouse Section not found"));
+    }
+    // verify section accepts product category
+
+    private void verifySectionAcceptsProductCategory (List<Product> productList, Long wareHouseCode) {
+        productList.stream().map(product ->
+                (product.getProductCategory() == this.getWarehouseSectionByCode(wareHouseCode).getProductCategory()) ?
+                        null :
+                        new NotFoundException("Product category is invalid to Warehouse Section Category. productId: "
+                                + product.getId()  +
+                                ", WarehouseSection: " + this.getWarehouseSectionByCode(wareHouseCode).getWarehouse().getId())
+        );
+    }
+
+    private Integer verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability (InboundOrderRequest inboundOrderRequest) {
+        return inboundOrderRequest.getInboundOrder().getBatchStock().stream().mapToInt(BatchDTO::getQuantity).sum();
+    }
+
     @Override
     @Transactional
     public BatchResponseListDTO createInboundOrder(InboundOrderRequest inboundOrderRequest) {
@@ -36,16 +70,11 @@ public class InboundOrderServiceImpl implements InboundOrderService {
                                 .getBatchStock()
                                 .stream().map(BatchDTO::getProductId).collect(Collectors.toList());
 
-        List<Product> productList = new ArrayList<>();
+        List<Product> productList = this.getProductList(productIds);
 
-        productIds.stream().map( product_id ->
-            productList.add(productRepository.findById(product_id.longValue()).orElseThrow(() -> new NotFoundException("Product not found")))
-        );
 
         // get section code -> returning data from Warehouse_Section (table)
-        WarehouseSection warehouseSection = warehouseSectionRepository
-                                .findById(inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue())
-                                .orElseThrow(() -> new NotFoundException("Warehouse Section not found"));
+        WarehouseSection warehouseSection = this.getWarehouseSectionByCode(inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue());
 
         // verify if operator exists
 
@@ -57,17 +86,10 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         List<WarehouseOperator> warehouseOperatorList = warehouseOperatorRepository.findByWarehouseCode(wareHouseCode);
 
         // verify section accepts product category
-        productList.stream().map(product ->
-                (product.getProductCategory() == warehouseSection.getProductCategory()) ?
-                        null :
-                        new NotFoundException("Product category is invalid to Warehouse Section Category. productId: "
-                                + product.getId()  +
-                                ", WarehouseSection: " + warehouseSection.getWarehouse().getId())
-        );
-
+        this.verifySectionAcceptsProductCategory(productList, inboundOrderRequest.getInboundOrder().getSection().getSectionCode().longValue());
 
         // verify quantity from request is less than warehouse section current_availability
-        Integer allQuantityProductBatchStock = inboundOrderRequest.getInboundOrder().getBatchStock().stream().mapToInt(BatchDTO::getQuantity).sum();
+        Integer allQuantityProductBatchStock = this.verifySumOfProductsQuantitiesIsLessThanWarehouseSectionCapability(inboundOrderRequest);
 
         if ( warehouseSection.getCurrent_availability() <= allQuantityProductBatchStock ) {
             throw new NotFoundException("WarehouseSection current capability is less than all quantity products from batch stock");
@@ -109,7 +131,38 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
     @Override
     public BatchResponseDTO updateInboundOrder(InboundOrderRequest inboundOrderRequest) {
-        return null;
+
+        List<Batch> batches = new ArrayList<>();
+        Batch batch;
+
+	    for ( BatchDTO batchRequest : inboundOrderRequest.getInboundOrder().getBatchStock() ) {
+
+	        // valid if has some occurrence in purchase order item
+            if ( purchaseOrderItemRepository.findByBatchId(batchRequest.getBatchId()) != null ) {
+                // already some occurence
+                // type some exception here
+
+                return null;
+            }
+
+//            batch = new Batch();
+//
+//            batch.setId(batchRequest.getBatchId().longValue());
+//            batch.setNumber(batchRequest.getBatchNumber());
+//            batch.setProduct(productRepository.getOne(batchRequest.getProductId().longValue()));
+//            batch.setQuantity(batchRequest.getQuantity());
+//            batch.setCurrent_temperature(batchRequest.getCurrentTemperature());
+//            batch.setManufacturing_date(batchRequest.getManufacturingDate());
+//            batch.setManufacturing_time(batchRequest.getManufacturingTime().toLocalTime());
+//            batch.setDue_date(batchRequest.getDueDate());
+//            batch.setInboundOrder(inboundOrderResponse);
+//            batch.setWarehouseSection(warehouseSection);
+//
+//            batches.add(batch);
+
+        }
+
+	    return null;
     }
 
 
