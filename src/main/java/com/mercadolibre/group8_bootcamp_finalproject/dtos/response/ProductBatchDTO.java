@@ -9,6 +9,6 @@ import java.util.List;
 @Builder
 public class ProductBatchDTO {
     private SectionDTO section;
-    private int productId;
+    private Long productId;
     private List<BatchStockDTO> batchStock;
 }
