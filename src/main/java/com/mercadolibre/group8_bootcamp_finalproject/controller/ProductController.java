@@ -3,10 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,8 +20,8 @@ public class ProductController {
         return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/list")
-    public ResponseEntity<List<ProductDTO>> listProducts(@RequestParam String productCategory) {
+    @GetMapping(path = "/list/{productCategory}")
+    public ResponseEntity<List<ProductDTO>> listProductsByCategory(@PathVariable String productCategory) {
         return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
     }
 
