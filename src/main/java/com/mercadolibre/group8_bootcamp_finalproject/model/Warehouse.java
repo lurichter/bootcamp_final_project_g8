@@ -3,6 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Set;
