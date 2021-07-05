@@ -39,7 +39,7 @@ public class SpringDocConfig {
 								)
 				);
 
-		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:8080" : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
+		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:8082" : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
 				.description(format("Scope %s", SCOPE_VALUE)));
 		return api;
 	}

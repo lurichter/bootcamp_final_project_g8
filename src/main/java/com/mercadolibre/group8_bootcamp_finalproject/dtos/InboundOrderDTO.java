@@ -8,9 +8,6 @@ import java.util.List;
 @Data
 public class InboundOrderDTO {
 
-//    @NotNull(message = "order number is required")
-//    private Integer orderNumber;
-//    private LocalDate orderDate;
     @Valid
     private WarehouseSectionDTO section;
 
