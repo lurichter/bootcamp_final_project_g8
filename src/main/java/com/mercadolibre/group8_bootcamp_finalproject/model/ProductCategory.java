@@ -24,4 +24,7 @@ public class ProductCategory {
 
     @OneToMany(mappedBy = "productCategory")
     private Set<Product> products;
+
+    @OneToMany(mappedBy = "productCategory")
+    private Set<WarehouseSection> warehouseSections;
 }

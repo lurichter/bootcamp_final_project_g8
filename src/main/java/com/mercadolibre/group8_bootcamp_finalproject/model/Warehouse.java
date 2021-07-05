@@ -24,7 +24,7 @@ public class Warehouse {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "accept_fresh", nullable = false)
+    @Column(name = "accept_fresh", nullable = true, columnDefinition = "boolean")
     private Boolean accept_fresh;
 
     @OneToMany(mappedBy = "warehouse")

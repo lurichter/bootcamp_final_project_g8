@@ -36,4 +36,8 @@ public class WarehouseSection {
 
     @OneToMany(mappedBy = "warehouseSection")
     private Set<Batch> batch;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private ProductCategory productCategory;
 }

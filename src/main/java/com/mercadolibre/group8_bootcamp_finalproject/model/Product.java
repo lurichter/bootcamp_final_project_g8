@@ -41,6 +41,6 @@ public class Product {
     private Set<Batch> batch;
 
     @ManyToOne
-    @JoinColumn(name = "product")
+    @JoinColumn(name = "category_id")
     private ProductCategory productCategory;
 }
