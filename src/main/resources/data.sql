@@ -29,9 +29,9 @@ INSERT INTO warehouse_operator (operator_id, warehouse_id) VALUES (1, 1);
 INSERT INTO warehouse_operator (operator_id, warehouse_id) VALUES (1, 2);
 
 -- Insert product categories
-INSERT INTO product_category (category_name) VALUES ("Fresh");
-INSERT INTO product_category (category_name) VALUES ("Chilled");
-INSERT INTO product_category (category_name) VALUES ("Frozen");
+INSERT INTO product_category (category_name) VALUES ("FS");
+INSERT INTO product_category (category_name) VALUES ("RF");
+INSERT INTO product_category (category_name) VALUES ("FF");
 
 -- Insert Warehouse Sections
 INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (100000, 100000, "CAJAMAR01FRESH", 10.0, 1, 1);
