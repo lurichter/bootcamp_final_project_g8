@@ -18,7 +18,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/sign-in").permitAll()
                 .antMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .antMatchers("**").permitAll() // PARA TESTE, REMOVER DPS
+//                .antMatchers("**").permitAll() // PARA TESTE, REMOVER DPS
                 .anyRequest().authenticated();
     }
 }
