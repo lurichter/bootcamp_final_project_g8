@@ -1,7 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.mercadolibre.group8_bootcamp_finalproject.config.SpringConfig;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import javax.validation.constraints.FutureOrPresent;
@@ -11,10 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchDTO {
 
+    private Integer batchId;
+
     @NotNull(message = "batch number is required")
-    private Long batchNumber;
+    private String batchNumber;
 
     @NotNull(message = "product id is required")
     private Integer productId;
@@ -31,7 +33,6 @@ public class BatchDTO {
     @PastOrPresent(message = "manufacturing date is in the future")
     private LocalDate manufacturingDate;
 
-    //@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = SpringConfig.DATE_FORMAT)
     @PastOrPresent(message = "manufacturing date is in the future")
     private LocalDateTime manufacturingTime;
 

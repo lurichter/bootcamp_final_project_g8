@@ -3,6 +3,9 @@ package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Data
 @Builder
 public class BatchResponseDTO {
@@ -11,7 +14,9 @@ public class BatchResponseDTO {
     private Double currentTemperature;
     private Double minimumTemperature;
     private Integer quantity;
-    private String manufacturingDate;
-    private String manufacturingTime;
-    private String dueDate;
+    private LocalDate manufacturingDate;
+    private LocalTime manufacturingTime;
+    private LocalDate dueDate;
+
+
 }
