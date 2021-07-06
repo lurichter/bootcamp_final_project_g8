@@ -1,12 +1,12 @@
 USE fresh;
 
 # Insert users
-INSERT INTO user (name, password) VALUES ("operador1@mercadolivre.com", "123456");
-INSERT INTO user (name, password) VALUES ("operador2@mercadolivre.com", "123456");
-INSERT INTO user (name, password) VALUES ("vendedor1@gmail.com", "123456");
-INSERT INTO user (name, password) VALUES ("vendedor2@gmail.com", "123456");
-INSERT INTO user (name, password) VALUES ("comprador1@gmail.com", "123456");
-INSERT INTO user (name, password) VALUES ("comprador2@gmail.com", "123456");
+INSERT INTO user (name, password) VALUES ("operador1@mercadolivre.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+INSERT INTO user (name, password) VALUES ("operador2@mercadolivre.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+INSERT INTO user (name, password) VALUES ("vendedor1@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+INSERT INTO user (name, password) VALUES ("vendedor2@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+INSERT INTO user (name, password) VALUES ("comprador1@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+INSERT INTO user (name, password) VALUES ("comprador2@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
 
 
 # Insert operators

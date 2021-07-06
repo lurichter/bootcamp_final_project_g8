@@ -2,39 +2,63 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.model.User;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.UserRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.security.JWTAuthorizationFilter;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ISessionService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Configuration
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl implements ISessionService {
-    //private final AccountRepository accountRepository;
+    private final UserRepository userRepository;
 
-    /**
-     * Perform the validation of the user and password entered.
-     * If correct, return the account with the necessary token to carry out the other queries.
-     *
-     * @param username
-     * @param password
-     * @return
-                            //     * @throws NotFoundException
-     */
+    @Autowired
+    private PasswordEncoder encoder;
+
+//    /**
+//     * Perform the validation of the user and password entered.
+//     * If correct, return the account with the necessary token to carry out the other queries.
+//     *
+//     * @param username
+//     * @param password
+//     * @return
+//                            //     * @throws NotFoundException
+//     */
+    @Bean
+    public PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Override
     public AccountResponseDTO login(String username, String password) throws ApiException {
-        //TODO
-        //Account account = accountRepository.findByUsernameAndPassword(username, password);
-        Object account = new Object(); //remover
+        String passEncoded = encoder.encode(password);
+
+        User account = userRepository.findByName(username);
+
+        if ( account.getName().isBlank() ) throw new NotFoundException("User not found");
+
+        boolean isPassword = encoder.matches(account.getPassword(), passEncoded);
+
+        if ( !isPassword ) throw new NotFoundException("Incorrect password");
+
         if (account != null) {
             String token = getJWTToken(username);
             AccountResponseDTO user = new AccountResponseDTO();
