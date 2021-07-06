@@ -32,6 +32,6 @@ public class PurchaseOrder {
     @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
-    @OneToMany(mappedBy = "purchaseOrder")
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.PERSIST)
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }
