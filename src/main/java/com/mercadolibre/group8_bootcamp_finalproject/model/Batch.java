@@ -1,8 +1,10 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -14,6 +16,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Batch {
 
     @Id
@@ -41,15 +44,18 @@ public class Batch {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "inbound_order_id")
     private InboundOrder inboundOrder;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "section_id")
     private WarehouseSection warehouseSection;
 
