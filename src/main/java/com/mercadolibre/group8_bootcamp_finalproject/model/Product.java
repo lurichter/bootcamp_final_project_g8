@@ -1,7 +1,9 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -11,6 +13,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
 
     @Id
@@ -33,14 +36,16 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 8, scale = 2)
     private Double price;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private Seller seller;
 
     @OneToMany(mappedBy = "product")
     private Set<Batch> batch;
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private ProductCategory productCategory;
 }
