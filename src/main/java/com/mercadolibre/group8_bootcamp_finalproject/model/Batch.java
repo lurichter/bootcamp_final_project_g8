@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Batch {
+public class Batch implements Comparable<Batch>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,4 +55,9 @@ public class Batch {
 
     @OneToMany(mappedBy = "batch")
     private Set<PurchaseOrderItem> purchaseOrderItems;
+
+    @Override
+    public int compareTo(Batch o) {
+        return this.getDueDate().compareTo(o.getDueDate());
+    }
 }
