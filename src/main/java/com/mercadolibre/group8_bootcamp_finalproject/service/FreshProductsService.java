@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service;
 
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantityRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
@@ -20,6 +21,9 @@ public class FreshProductsService {
     private ProductRepository productRepository;
 
     @Autowired
+    private ProductCategoryRepository productCategoryRepository;
+
+    @Autowired
     private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
     @Autowired
@@ -31,29 +35,31 @@ public class FreshProductsService {
     @Autowired
     private BuyerRepository buyerRepository;
 
-    public List<Product> getAllProducts(){
+    public Set<ProductDTO> getAllProducts(){
 
         List<Product> products = productRepository.findAll();
         verifyIfListIsEmpty(products);
-        return products;
+        return convertProductListToProductDTOList(products);
     }
 
-    public List<Product> getAllProductsByCategory(String category){
-        List<Product> products = productRepository.findAllByProductCategory(category);
+    public Set<ProductDTO> getAllProductsByCategory(String category){
+
+        ProductCategory productCategory = productCategoryRepository.findByCategoryName(category);
+        List<Product> products = productRepository.findAllByProductCategory(productCategory.getId());
         verifyIfListIsEmpty(products);
-        return products;
+        return convertProductListToProductDTOList(products);
     }
 
     //@Transactional Implementar baixa no estoque após salvar uma ordem de compra
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrderRepository.save(purchaseOrder);
-
+        updateOrdemItems(purchaseOrder);
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
 
-    public List<Product> getAllProductsFromPurchaseOrder(Long orderId){
+    public Set<ProductDTO> getAllProductsFromPurchaseOrder(Long orderId){
         verifyIfPurchaseOrderExists(orderId);
         List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrder(orderId);
         List<Product> productsFromPurchaseOrder = new ArrayList<>();
@@ -61,7 +67,14 @@ public class FreshProductsService {
             Batch batch = verifyIfBatchExists(purchaseOrderItem.getBatch().getId());
             productsFromPurchaseOrder.add(productRepository.findById(batch.getProduct().getId()).get());
         }
-        return productsFromPurchaseOrder;
+        return convertProductListToProductDTOList(productsFromPurchaseOrder);
+    }
+
+    private void updateOrdemItems(PurchaseOrder purchaseOrder){
+        for (PurchaseOrderItem purchaseOrderItem: purchaseOrder.getPurchaseOrderItems()){
+            purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+            purchaseOrderItemRepository.save(purchaseOrderItem);
+        }
     }
 
     private PurchaseOrder createPurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
@@ -150,6 +163,23 @@ public class FreshProductsService {
 
     private Double getPrice(Integer quantity, Double price){
         return price * quantity;
+    }
+
+    private Set<ProductDTO> convertProductListToProductDTOList(List<Product> products){
+        Set<ProductDTO> productDTOS = new LinkedHashSet<>();
+        for(Product product: products){
+            ProductDTO productDTO = ProductDTO.builder()
+                    .id(product.getId())
+                    .name(product.getName())
+                    .description(product.getDescription())
+                    .minTemperature(product.getMinTemperature())
+                    .maxTemperature(product.getMaxTemperature())
+                    .price(product.getPrice())
+                    .build();
+            productDTOS.add(productDTO);
+        }
+
+        return productDTOS;
     }
 
     private void verifyIfListIsEmpty(List<Product> products){
