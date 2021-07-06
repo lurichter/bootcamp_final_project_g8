@@ -3,6 +3,8 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductBatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.SectionDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IBatchService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,11 +13,14 @@ import java.util.Collections;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/batch")
+@RequiredArgsConstructor
 public class BatchController {
 
+    private final IBatchService batchService;
+
     @GetMapping(path = "/list/{productId}")
-    public ResponseEntity<ProductBatchDTO> listProductPerBatch(@PathVariable String productId) {
-        return ResponseEntity.ok(createProductsForTest());
+    public ResponseEntity<ProductBatchDTO> listProductPerBatch(@PathVariable Long productId) {
+        return ResponseEntity.ok(batchService.listProductBatches(productId));
     }
 
     @GetMapping(path = "/list/{productId}/{orderType}")

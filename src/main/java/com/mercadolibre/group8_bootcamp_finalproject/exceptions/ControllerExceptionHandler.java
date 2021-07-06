@@ -37,7 +37,8 @@ public class ControllerExceptionHandler {
 		LOGGER.info("executing exception handler (REST)");
 		return new ApiError(
 				ex.getClass().getName(),
-				ex.getMessage()
+				ex.getMessage(),
+				HttpStatus.BAD_REQUEST.value()
 		);
 	}
 
@@ -66,7 +67,8 @@ public class ControllerExceptionHandler {
 	public ApiError notFoundRequest(Exception ex) {
 		return new ApiError(
 				ex.getClass().getName(),
-				ex.getMessage()
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value()
 		);
 	}
 

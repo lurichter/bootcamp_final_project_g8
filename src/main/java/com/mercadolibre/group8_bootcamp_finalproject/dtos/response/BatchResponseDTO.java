@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import java.time.LocalTime;
 
 @Data
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchResponseDTO {
     private String batchNumber;
     private Integer productId;
@@ -17,6 +19,5 @@ public class BatchResponseDTO {
     private LocalDate manufacturingDate;
     private LocalTime manufacturingTime;
     private LocalDate dueDate;
-
 
 }
