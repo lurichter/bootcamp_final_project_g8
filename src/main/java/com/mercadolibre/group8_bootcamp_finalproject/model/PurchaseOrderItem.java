@@ -1,18 +1,17 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
 public class PurchaseOrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,12 +24,10 @@ public class PurchaseOrderItem {
     @Column(name = "total_price" , nullable = false, precision = 8, scale = 2)
     private Double totalPrice;
 
-    @JsonIgnore
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "batch_id")
     private Batch batch;
 
-    @JsonIgnore
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private PurchaseOrder purchaseOrder;
