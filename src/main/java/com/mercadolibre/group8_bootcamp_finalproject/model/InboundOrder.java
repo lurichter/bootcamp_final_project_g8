@@ -1,8 +1,10 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,6 +15,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class InboundOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +26,8 @@ public class InboundOrder {
     @Column(name = "order_datetime", nullable = false)
     private LocalDateTime dateTime = LocalDateTime.now();
 
-    @ManyToOne
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "operator_id")
     private Operator operator;
 
