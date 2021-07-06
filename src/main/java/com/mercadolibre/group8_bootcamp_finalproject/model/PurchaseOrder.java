@@ -1,9 +1,10 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +29,10 @@ public class PurchaseOrder {
     @Column(name = "status", nullable = false)
     private OrderStatusEnum orderStatusEnum;
 
-    @ManyToOne
-    @JoinColumn(name = "buyer_id")
+    @JsonIgnore
+    @ManyToOne(fetch=FetchType.LAZY)    @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "purchaseOrder")
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }

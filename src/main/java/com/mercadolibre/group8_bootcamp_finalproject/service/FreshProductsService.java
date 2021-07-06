@@ -2,6 +2,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantityRequestDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
@@ -43,11 +44,11 @@ public class FreshProductsService {
         return products;
     }
 
-
-    public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderDTO purchaseOrderDTO){
-        PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderDTO);
+    //@Transactional Implementar baixa no estoque após salvar uma ordem de compra
+    public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
+        PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrderRepository.save(purchaseOrder);
-        //realizar a baixa no estoque
+
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
@@ -63,37 +64,32 @@ public class FreshProductsService {
         return productsFromPurchaseOrder;
     }
 
-    //comprador registrado -> verificar se o usuário está na tabela de comprador (token)
-
-    //produto no estoque
-
-    //prazo de validade do produto não seja inferior a 3 semanas
-
-    private PurchaseOrder createPurchaseOrder(PurchaseOrderDTO purchaseOrderDTO){
+    private PurchaseOrder createPurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
+        PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
         Buyer buyer = verifyIfBuyerExists(purchaseOrderDTO.getBuyerId());
 
-        return PurchaseOrder.builder()
-                .dateTime(purchaseOrderDTO.getDate())
-                .orderStatusEnum(purchaseOrderDTO.getOrderStatus().getStatusCode())
-                .buyer(buyer)
-                .purchaseOrderItems(createPurchaseOrderItems(purchaseOrderDTO))
-                .build();
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setOrderStatusEnum(purchaseOrderDTO.getOrderStatus().getStatusCode());
+        purchaseOrder.setBuyer(buyer);
+        purchaseOrder.setPurchaseOrderItems(createPurchaseOrderItems(purchaseOrderRequestDTO));
+
+        return purchaseOrder;
     }
 
-    private Set<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrderDTO purchaseOrderDTO){
-        Set<PurchaseOrderItem> purchaseOrderItems = new HashSet<>();
-        Map<Batch, Integer> batchesFromOrderItem;
+    private List<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
+        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
+        Map<Long, Integer> batchesFromOrderItem;
 
-        for(ProductQuantityRequestDTO product: purchaseOrderDTO.getProducts()){
+        for(ProductQuantityRequestDTO product: purchaseOrderRequestDTO.getPurchaseOrder().getProducts()){
             checkQuantityInBatches(product);
             batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
-            for(Map.Entry<Batch, Integer> map: batchesFromOrderItem.entrySet()){
+            for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
                 if(productDueDateIsValid(map.getKey())){
-                    PurchaseOrderItem purchaseOrderItem = PurchaseOrderItem.builder()
-                            .quantity(map.getValue())
-                            .totalPrice(getPrice(map.getValue(), map.getKey().getProduct().getPrice()))
-                            .batch(map.getKey())
-                            .build();
+                    PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+                    purchaseOrderItem.setQuantity(map.getValue());
+                    purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
+                    purchaseOrderItem.setBatch(getBatch(map.getKey()));
+
                     purchaseOrderItems.add(purchaseOrderItem);
                 }
             }
@@ -101,20 +97,28 @@ public class FreshProductsService {
         return purchaseOrderItems;
     }
 
-    private Map<Batch, Integer> getBatchsAndQuantityToOrderItem(ProductQuantityRequestDTO productQuantityRequestDTO){
+    private Double getPriceFromProduct(Long batchId){
+        return batchRepository.findById(batchId).get().getProduct().getPrice();
+    }
+
+    private Batch getBatch(Long bachId){
+        return batchRepository.findById(bachId).get();
+    }
+
+    private Map<Long, Integer> getBatchsAndQuantityToOrderItem(ProductQuantityRequestDTO productQuantityRequestDTO){
         List<Batch> batches = batchRepository.findAllByProduct(productQuantityRequestDTO.getProductId());
-        Map<Batch, Integer> batchesAndQuantityFromOrderItem = new HashMap<>();
+        Map<Long, Integer> batchesAndQuantityFromOrderItem = new HashMap<>();
         Collections.sort(batches);
 
         int neededQuantity = productQuantityRequestDTO.getQuantity();
 
         for(Batch batch: batches){
             if(batch.getQuantity() >= neededQuantity){
-                batchesAndQuantityFromOrderItem.put(batch, neededQuantity);
+                batchesAndQuantityFromOrderItem.put(batch.getId(), neededQuantity);
                 break;
             }
             else{
-                batchesAndQuantityFromOrderItem.put(batch, batch.getQuantity());
+                batchesAndQuantityFromOrderItem.put(batch.getId(), batch.getQuantity());
                 neededQuantity = neededQuantity - batch.getQuantity();
             }
         }
@@ -129,8 +133,9 @@ public class FreshProductsService {
         }
     }
 
-    private Boolean productDueDateIsValid(Batch batch){
-        return batch.getDueDate().plusWeeks(3).compareTo(LocalDate.now()) <= 0;
+    private Boolean productDueDateIsValid(Long batchId){
+        Batch batch = batchRepository.findById(batchId).get();
+        return batch.getDueDate().plusWeeks(-3).compareTo(LocalDate.now()) >= 0;
     }
 
     private Integer productQuantityInBatches(Long productId){
