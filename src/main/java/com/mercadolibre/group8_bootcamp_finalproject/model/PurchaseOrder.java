@@ -2,13 +2,11 @@ package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,9 +28,10 @@ public class PurchaseOrder {
     private OrderStatusEnum orderStatusEnum;
 
     @JsonIgnore
-    @ManyToOne(fetch=FetchType.LAZY)    @JoinColumn(name = "buyer_id")
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
-    @OneToMany(mappedBy = "purchaseOrder")
-    private Set<PurchaseOrderItem> purchaseOrderItems;
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.PERSIST)
+    private List<PurchaseOrderItem> purchaseOrderItems;
 }
