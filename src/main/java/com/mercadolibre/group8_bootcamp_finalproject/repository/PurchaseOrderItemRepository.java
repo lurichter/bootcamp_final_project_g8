@@ -11,4 +11,7 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
 
     @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.batch.id = :batchId")
     List<PurchaseOrderItem> findByBatchId (@Param("batchId") Long batchId);
+
+    @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.purchaseOrder.id = :purchaseOrderId")
+    List<PurchaseOrderItem> findAllByPurchaseOrder(@Param("purchaseOrderId") Long purchaseOrderId);
 }
