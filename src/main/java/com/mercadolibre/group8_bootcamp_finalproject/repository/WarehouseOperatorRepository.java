@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface WarehouseOperatorRepository extends JpaRepository<WarehouseOperator, Long> {
 
-    @Query(value = "SELECT * FROM fresh.warehouse_operator WHERE warehouse_id = :id", nativeQuery = true)
+    @Query("select w from WarehouseOperator w where w.warehouse.id = :id")
     List<WarehouseOperator> findByWarehouseCode(@Param("id") Long id);
 }
