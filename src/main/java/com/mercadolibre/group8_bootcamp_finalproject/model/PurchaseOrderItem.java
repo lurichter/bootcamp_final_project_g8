@@ -31,7 +31,7 @@ public class PurchaseOrderItem {
     private Batch batch;
 
     @JsonIgnore
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id")
     private PurchaseOrder purchaseOrder;
 }
