@@ -4,5 +4,5 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductBatchD
 
 public interface IBatchService {
 
-    ProductBatchDTO listProductBatches(Long productId);
+    ProductBatchDTO listProductBatches(Long productId, String[] order);
 }

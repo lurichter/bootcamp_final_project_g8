@@ -4,12 +4,14 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDTO
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductBatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.SectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotInBatchException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Batch;
 import com.mercadolibre.group8_bootcamp_finalproject.model.WarehouseSection;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IBatchService;
+import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +27,14 @@ public class BatchServiceImpl implements IBatchService {
     private final ProductRepository productRepository;
 
     @Override
-    public ProductBatchDTO listProductBatches(Long productId) {
-        Set<Batch> batches = productRepository.findById(productId)
-                .orElseThrow(() -> new NotFoundException("Product not found")).getBatch();
+    public ProductBatchDTO listProductBatches(Long productId, String[] order) {
 
-        if (batches.isEmpty()) throw new ProductNotInBatchException();
+        if (!productRepository.existsById(productId)) throw new ProductNotFoundException();
+
+        Set<Batch> batches = batchRepository.findBatchByProductId(productId, SortUtil.sortStringToSort(order));
+
+        if (batches.isEmpty()) throw new ProductNotInBatchException("The Product isn't in a Batch");
+
         return toProductBatchDTO(productId, batches);
     }
 
