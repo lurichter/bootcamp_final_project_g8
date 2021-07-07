@@ -2,9 +2,12 @@ package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
+
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -12,10 +15,11 @@ import java.time.LocalTime;
 import java.util.Set;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class Batch {
 
     @Id
@@ -43,13 +47,16 @@ public class Batch {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-    @ManyToOne
+
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @ManyToOne
+
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "inbound_order_id")
     private InboundOrder inboundOrder;
+
 
     @ManyToOne
     @JoinColumn(name = "section_id")

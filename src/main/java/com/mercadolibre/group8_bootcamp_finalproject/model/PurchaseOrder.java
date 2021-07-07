@@ -2,17 +2,19 @@ package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +28,7 @@ public class PurchaseOrder {
     @Column(name = "status", nullable = false)
     private OrderStatusEnum orderStatusEnum;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 

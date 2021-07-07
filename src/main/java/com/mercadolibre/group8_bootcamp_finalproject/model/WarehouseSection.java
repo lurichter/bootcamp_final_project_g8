@@ -1,18 +1,22 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import lombok.AllArgsConstructor;
+
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Builder
+@AllArgsConstructor
 public class WarehouseSection {
 
     @Id
@@ -32,14 +36,14 @@ public class WarehouseSection {
     @Column(name = "temperature", nullable = false, precision = 4, scale = 2)
     private Double temperature;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
 
-    @OneToMany(mappedBy = "warehouseSection")
+    @OneToMany(mappedBy = "warehouseSection", fetch=FetchType.LAZY)
     private Set<Batch> batch;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private ProductCategory productCategory;
 }

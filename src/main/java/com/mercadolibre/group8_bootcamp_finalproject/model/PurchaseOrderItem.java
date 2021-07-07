@@ -1,15 +1,17 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PurchaseOrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,11 +24,11 @@ public class PurchaseOrderItem {
     @Column(name = "total_price" , nullable = false, precision = 8, scale = 2)
     private Double totalPrice;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "batch_id")
     private Batch batch;
 
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private PurchaseOrder purchaseOrder;
 }
