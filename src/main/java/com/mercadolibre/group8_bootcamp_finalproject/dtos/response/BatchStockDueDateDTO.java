@@ -7,7 +7,8 @@ import java.time.LocalDate;
 
 @Data
 @Builder
-public class BatchStockDueDate {
+public class BatchStockDueDateDTO {
+    private Long sectionId;
     private Long batchNumber;
     private Long productId;
     private String productTypeId;

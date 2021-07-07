@@ -7,6 +7,6 @@ import java.util.List;
 
 @Data
 @Builder
-public class BatchStockDueDateList {
-    private List<BatchStockDueDate> batchStock;
+public class BatchStockDueDateListDTO {
+    private List<BatchStockDueDateDTO> batchStock;
 }
