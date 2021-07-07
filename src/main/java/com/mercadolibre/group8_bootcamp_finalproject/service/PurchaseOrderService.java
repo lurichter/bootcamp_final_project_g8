@@ -80,12 +80,14 @@ public class PurchaseOrderService {
             batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
             for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
                 if(productDueDateIsValid(map.getKey())){
+                    Batch actualBatch = getBatch(map.getKey());
                     PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
                     purchaseOrderItem.setQuantity(map.getValue());
                     purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
-                    purchaseOrderItem.setBatch(getBatch(map.getKey()));
+                    purchaseOrderItem.setBatch(actualBatch);
 
                     purchaseOrderItems.add(purchaseOrderItem);
+                    updateBatchesWithPurchaseOrder(actualBatch, map.getValue());
                 }
             }
         }
@@ -98,6 +100,11 @@ public class PurchaseOrderService {
 
     private Batch getBatch(Long bachId){
         return batchRepository.findById(bachId).get();
+    }
+
+    private void updateBatchesWithPurchaseOrder(Batch batch, Integer quantity){
+        batch.setQuantity(batch.getQuantity() - quantity);
+        batchRepository.save(batch);
     }
 
     private Map<Long, Integer> getBatchsAndQuantityToOrderItem(ProductQuantityRequestDTO productQuantityRequestDTO){
