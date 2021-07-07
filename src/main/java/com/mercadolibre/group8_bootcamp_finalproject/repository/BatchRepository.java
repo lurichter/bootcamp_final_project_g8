@@ -17,15 +17,30 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 
     @Query("SELECT " +
             " new com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateDTO(ws.warehouse.id, b.number, b.product.id, pc.name, b.dueDate, b.quantity) " +
-            "FROM WarehouseOperator wo " +
+            "FROM Batch b " +
             "JOIN WarehouseSection ws " +
-            "ON ws.warehouse.id = wo.warehouse.id " +
-            "JOIN Batch b " +
             "ON b.warehouseSection.id = ws.id " +
-            "JOIN Product p ON b.product.id = p.id " +
+            "JOIN WarehouseOperator wo " +
+            "ON ws.warehouse.id = wo.warehouse.id " +
+            "JOIN Product p " +
+            "ON b.product.id = p.id " +
             "JOIN ProductCategory pc " +
             "ON pc.id = p.productCategory.id " +
             "WHERE wo.operator.id = :operatorId " +
             "AND b.dueDate <= :dueDateFuture")
-    List<BatchStockDueDateDTO> findAllByWarehouseSectionWhereDueDateLessThanParam(@Param("operatorId") Long operatorId, @Param("dueDateFuture") LocalDate dueDateFuture);
+    List<BatchStockDueDateDTO> findAllByWarehouseSectionWhereDueDateLessThanParam(@Param("operatorId") Long operatorId, @Param("dueDateFuture") LocalDate dueDateFuture, Sort sort);
+//
+//    @Query("SELECT " +
+//            " new com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateDTO(ws.warehouse.id, b.number, b.product.id, pc.name, b.dueDate, b.quantity) " +
+//            "FROM WarehouseOperator wo " +
+//            "JOIN WarehouseSection ws " +
+//            "ON ws.warehouse.id = wo.warehouse.id " +
+//            "JOIN Batch b " +
+//            "ON b.warehouseSection.id = ws.id " +
+//            "JOIN Product p ON b.product.id = p.id " +
+//            "JOIN ProductCategory pc " +
+//            "ON pc.id = p.productCategory.id " +
+//            "WHERE wo.operator.id = :operatorId " +
+//            "AND b.dueDate <= :dueDateFuture")
+//    List<BatchStockDueDateDTO> findAllByWarehouseSectionWhereDueDateLessThanParam(@Param("operatorId") Long operatorId, @Param("dueDateFuture") LocalDate dueDateFuture, Sort sort);
 }

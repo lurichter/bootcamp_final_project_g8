@@ -1,11 +1,9 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 
 public interface IDueDateService {
-    BatchStockDueDateListDTO listBatchPerWarehouseSectionOrderedByDueDate
-            (Integer daysQuantity, String[] order);
-
-    BatchStockDueDateListDTO listBatchPerProductCategoryOrderedByDueDate
-            (Integer daysQuantity, String productCategory, String[] order);
+    BatchStockDueDateListDTO listBatchesOrderedByDueDate
+            (Integer daysQuantity, ProductCategoryEnum productCategory, String[] order);
 }
