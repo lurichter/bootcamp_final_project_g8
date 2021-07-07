@@ -1,16 +1,18 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class BatchDTO {
 
     private Integer batchId;
@@ -24,8 +26,8 @@ public class BatchDTO {
     @NotNull(message = "current temperature is required")
     private Double currentTemperature;
 
-    @NotNull(message = "minimum temperature is required")
-    private Double minimumTemperature;
+//    @NotNull(message = "minimum temperature is required")
+//    private Double minimumTemperature;
 
     @NotNull(message = "quantity is required")
     private Integer quantity;
@@ -34,7 +36,7 @@ public class BatchDTO {
     private LocalDate manufacturingDate;
 
     @PastOrPresent(message = "manufacturing date is in the future")
-    private LocalDateTime manufacturingTime;
+    private LocalTime manufacturingTime;
 
     @FutureOrPresent(message = "due date is in the past")
     private LocalDate dueDate;
