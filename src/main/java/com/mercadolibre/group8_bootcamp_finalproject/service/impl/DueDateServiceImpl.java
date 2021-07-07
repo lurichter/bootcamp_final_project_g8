@@ -2,9 +2,10 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateListDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotInBatchException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.BatchNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.UserRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IDueDateService;
 import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,9 @@ public class DueDateServiceImpl implements IDueDateService {
         List<BatchStockDueDateDTO> batchStockDueDate =
                 batchRepository.findAllByWarehouseSectionWhereDueDateLessThanParam(userId, dueDateFilter(daysQuantity), SortUtil.sortStringToSort(order));
 
-        if (batchStockDueDate.isEmpty()) throw new ProductNotInBatchException("The Product isn't in a Batch");
-
         if (category != null) return new BatchStockDueDateListDTO(filterByCategory(batchStockDueDate, category));
+
+        if (batchStockDueDate.isEmpty()) throw new BatchNotFoundException("There are no batches with the due date between the given range.");
 
         return new BatchStockDueDateListDTO(batchStockDueDate);
     }
@@ -42,7 +43,12 @@ public class DueDateServiceImpl implements IDueDateService {
     }
 
     private List<BatchStockDueDateDTO> filterByCategory(List<BatchStockDueDateDTO> batchStockDueDate, ProductCategoryEnum category){
-        return batchStockDueDate.stream().filter(batch -> batch.getProductCategory().equals(category.getLabel())).collect(Collectors.toList());
+        List<BatchStockDueDateDTO> batchStockDueDateResponse= batchStockDueDate
+                .stream()
+                .filter(batch -> batch.getProductCategory().equals(category.getLabel()))
+                .collect(Collectors.toList());
+        if (batchStockDueDateResponse.isEmpty()) throw new BatchNotFoundException("There are no batches with the due date between the given range."));
+        return batchStockDueDateResponse;
     }
 
 }
