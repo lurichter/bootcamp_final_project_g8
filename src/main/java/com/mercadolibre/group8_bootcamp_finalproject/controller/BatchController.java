@@ -28,7 +28,7 @@ public class BatchController {
        return ProductBatchDTO.builder()
                 .section(SectionDTO.builder().sectionCode(123L).warehouseCode(456L).build())
                 .productId(789L)
-                .batchStock(Collections.singletonList(BatchStockDTO.builder().batchNumber(123L).currentQuantity(2).dueDate(LocalDate.now()).build()))
+                .batchStock(Collections.singletonList(BatchStockDTO.builder().batchNumber("123L").currentQuantity(2).dueDate(LocalDate.now()).build()))
                 .build();
     }
 }

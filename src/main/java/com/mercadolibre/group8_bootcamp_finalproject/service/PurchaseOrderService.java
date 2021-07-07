@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PurchaseOrderService {
@@ -68,9 +69,28 @@ public class PurchaseOrderService {
         //devolver p/ lote produtos da ordem de compra que NAO aparecem no PUT
         for(ProductQuantityRequestDTO product: products){
             verifyIfProductExists(product.getProductId());
-            if(verifyIfPurchaseOrderItemExistsUsingProductId(product.getProductId(), purchaseOrderId)){
-                continue;
-                //verificar quantidade atual e quantidade anterior (Adicionou ou tirou do carrinho?)
+            if(verifyIfPurchaseOrderItemExistsWithProduct(product.getProductId(), purchaseOrderId)){
+                List<PurchaseOrderItem> purchaseOrderItemListWithProduct = getPurchaseOrderItemsWithProduct(product.getProductId(), purchaseOrderId);
+                Collections.sort(purchaseOrderItemListWithProduct);
+                Integer quantityInPurchaseOrder = purchaseOrderItemListWithProduct.stream().mapToInt(PurchaseOrderItem::getQuantity).sum();
+                if(quantityInPurchaseOrder > product.getQuantity()){
+                    Integer quantityToReturn = quantityInPurchaseOrder - product.getQuantity();
+                    for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListWithProduct){
+                        if(quantityToReturn >= purchaseOrderItem.getQuantity()){
+                            returnItemsFromPurchaseOrderItem(purchaseOrderItem, purchaseOrderItem.getQuantity());
+                            quantityToReturn -= purchaseOrderItem.getQuantity();
+                        }
+                        else{
+                            returnItemsFromPurchaseOrderItem(purchaseOrderItem, quantityToReturn);
+                            break;
+                        }
+                    }
+                }
+                else if (quantityInPurchaseOrder < product.getQuantity()) {
+                    product.setQuantity(product.getQuantity() - quantityInPurchaseOrder);
+                    addPurchaseOrderItemsToList(product, purchaseOrderItems);
+                    updateOrdemItems(purchaseOrderItems, purchaseOrderId);
+                }
             }
             else{
                 addPurchaseOrderItemsToList(product, purchaseOrderItems);
@@ -80,11 +100,20 @@ public class PurchaseOrderService {
         }
     }
 
+    private void returnItemsFromPurchaseOrderItem(PurchaseOrderItem purchaseOrderItem, Integer quantity){
+        updateBatchesWithPurchaseOrder(purchaseOrderItem.getBatch(), quantity);
+        if(purchaseOrderItem.getQuantity().equals(quantity)){
+            purchaseOrderItemRepository.delete(purchaseOrderItem);
+        }
+    }
+
     private void updateOrdemItems(List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
         for (PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
-            PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
-            purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-            purchaseOrderItemRepository.save(purchaseOrderItem);
+            if(purchaseOrderItem.getPurchaseOrder() == null){
+                PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
+                purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+                purchaseOrderItemRepository.save(purchaseOrderItem);
+            }
         }
     }
 
@@ -121,7 +150,7 @@ public class PurchaseOrderService {
                 purchaseOrderItem.setBatch(actualBatch);
 
                 purchaseOrderItems.add(purchaseOrderItem);
-                updateBatchesWithPurchaseOrder(actualBatch, map.getValue());
+                updateBatchesWithPurchaseOrder(actualBatch, actualBatch.getQuantity() - map.getValue());
             }
         }
     }
@@ -135,7 +164,7 @@ public class PurchaseOrderService {
     }
 
     private void updateBatchesWithPurchaseOrder(Batch batch, Integer quantity){
-        batch.setQuantity(batch.getQuantity() - quantity);
+        batch.setQuantity(quantity);
         batchRepository.save(batch);
     }
 
@@ -236,9 +265,13 @@ public class PurchaseOrderService {
         }
     }
 
-    private Boolean verifyIfPurchaseOrderItemExistsUsingProductId(Long productId, Long purchaseOrderId){
+    private Boolean verifyIfPurchaseOrderItemExistsWithProduct(Long productId, Long purchaseOrderId){
         Long count = purchaseOrderItemRepository.countByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
         return count > 0;
+    }
+
+    private List<PurchaseOrderItem> getPurchaseOrderItemsWithProduct(Long productId, Long purchaseOrderId){
+        return purchaseOrderItemRepository.findPurchaseOrderItemByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
     }
 
 }

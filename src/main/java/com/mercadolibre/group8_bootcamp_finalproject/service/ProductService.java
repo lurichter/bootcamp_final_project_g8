@@ -2,12 +2,15 @@ package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
-import com.mercadolibre.group8_bootcamp_finalproject.model.*;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
+import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
+import com.mercadolibre.group8_bootcamp_finalproject.model.ProductCategory;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.BuyerRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductCategoryRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,12 +23,6 @@ public class ProductService {
 
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
-
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
-
-    @Autowired
-    private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
     @Autowired
     private BatchRepository batchRepository;
@@ -70,33 +67,5 @@ public class ProductService {
             throw new NotFoundException("Products not found");
         }
     }
-
-    private void verifyIfProductExists(Long productId){
-        if(productRepository.existsById(productId)){
-            productRepository.findById(productId).get();
-        }
-        else{
-            throw new NotFoundException("Products not found");
-        }
-    }
-
-    private Buyer verifyIfBuyerExists(Long buyerId){
-        if(buyerRepository.existsById(buyerId)){
-            return buyerRepository.findById(buyerId).get();
-        }
-        else{
-            throw new NotFoundException("Buyer not found");
-        }
-    }
-
-    private Batch verifyIfBatchExists(Long batchId){
-        if(batchRepository.existsById(batchId)){
-            return batchRepository.findById(batchId).get();
-        }
-        else{
-            throw new NotFoundException("Batch not found");
-        }
-    }
-
 
 }

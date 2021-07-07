@@ -13,7 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class PurchaseOrderItem {
+public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
@@ -34,4 +34,9 @@ public class PurchaseOrderItem {
     @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id")
     private PurchaseOrder purchaseOrder;
+
+    @Override
+    public int compareTo(PurchaseOrderItem o) {
+        return this.getQuantity().compareTo(o.getQuantity());
+    }
 }
