@@ -36,7 +36,7 @@ public class PurchaseOrderService {
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrderRepository.save(purchaseOrder);
-        updateOrdemItems(purchaseOrder);
+        updateOrdemItems(purchaseOrder.getPurchaseOrderItems(), purchaseOrder.getId());
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
@@ -52,8 +52,37 @@ public class PurchaseOrderService {
         return convertProductListToProductDTOList(productsFromPurchaseOrder);
     }
 
-    private void updateOrdemItems(PurchaseOrder purchaseOrder){
-        for (PurchaseOrderItem purchaseOrderItem: purchaseOrder.getPurchaseOrderItems()){
+    public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId){
+        verifyIfPurchaseOrderExists(purchaseOrderId);
+        PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
+        List<ProductQuantityRequestDTO> products = purchaseOrderDTO.getProducts();
+
+        List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrder(purchaseOrderId);
+        compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(purchaseOrderId, purchaseOrderItems, products);
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
+        Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
+        return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
+    }
+
+    private void compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems, List<ProductQuantityRequestDTO> products){
+        //devolver p/ lote produtos da ordem de compra que NAO aparecem no PUT
+        for(ProductQuantityRequestDTO product: products){
+            verifyIfProductExists(product.getProductId());
+            if(verifyIfPurchaseOrderItemExistsUsingProductId(product.getProductId(), purchaseOrderId)){
+                continue;
+                //verificar quantidade atual e quantidade anterior (Adicionou ou tirou do carrinho?)
+            }
+            else{
+                addPurchaseOrderItemsToList(product, purchaseOrderItems);
+                updateOrdemItems(purchaseOrderItems, purchaseOrderId);
+            }
+
+        }
+    }
+
+    private void updateOrdemItems(List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
+        for (PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
+            PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
             purchaseOrderItem.setPurchaseOrder(purchaseOrder);
             purchaseOrderItemRepository.save(purchaseOrderItem);
         }
@@ -73,25 +102,28 @@ public class PurchaseOrderService {
 
     private List<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
-        Map<Long, Integer> batchesFromOrderItem;
 
         for(ProductQuantityRequestDTO product: purchaseOrderRequestDTO.getPurchaseOrder().getProducts()){
-            checkQuantityInBatches(product);
-            batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
-            for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
-                if(productDueDateIsValid(map.getKey())){
-                    Batch actualBatch = getBatch(map.getKey());
-                    PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-                    purchaseOrderItem.setQuantity(map.getValue());
-                    purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
-                    purchaseOrderItem.setBatch(actualBatch);
-
-                    purchaseOrderItems.add(purchaseOrderItem);
-                    updateBatchesWithPurchaseOrder(actualBatch, map.getValue());
-                }
-            }
+            addPurchaseOrderItemsToList(product, purchaseOrderItems);
         }
         return purchaseOrderItems;
+    }
+
+    private void addPurchaseOrderItemsToList(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItems ){
+        checkQuantityInBatches(product);
+        Map<Long, Integer> batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
+        for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
+            if(productDueDateIsValid(map.getKey())){
+                Batch actualBatch = getBatch(map.getKey());
+                PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+                purchaseOrderItem.setQuantity(map.getValue());
+                purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
+                purchaseOrderItem.setBatch(actualBatch);
+
+                purchaseOrderItems.add(purchaseOrderItem);
+                updateBatchesWithPurchaseOrder(actualBatch, map.getValue());
+            }
+        }
     }
 
     private Double getPriceFromProduct(Long batchId){
@@ -204,5 +236,9 @@ public class PurchaseOrderService {
         }
     }
 
+    private Boolean verifyIfPurchaseOrderItemExistsUsingProductId(Long productId, Long purchaseOrderId){
+        Long count = purchaseOrderItemRepository.countByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
+        return count > 0;
+    }
 
 }

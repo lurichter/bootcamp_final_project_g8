@@ -3,9 +3,9 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.service.ProductService;
 import com.mercadolibre.group8_bootcamp_finalproject.service.PurchaseOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +21,7 @@ public class PurchaseOrderController {
 
     @PostMapping
     public ResponseEntity<PurchaseOrderPriceResponseDTO> newPurchaseOrder(@RequestBody @Valid PurchaseOrderRequestDTO purchaseOrderRequestDTO) {
-        return ResponseEntity.ok(purchaseOrderService.savePurchaseOrder(purchaseOrderRequestDTO));
+        return new ResponseEntity<>(purchaseOrderService.savePurchaseOrder(purchaseOrderRequestDTO), HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/{idOrder}")
@@ -31,9 +31,8 @@ public class PurchaseOrderController {
     }
 
     @PutMapping(path = "/{idOrder}")
-    public ResponseEntity<Void> editOrder(@PathVariable Long idOrder) {
+    public ResponseEntity<PurchaseOrderPriceResponseDTO> editOrder(@RequestBody @Valid PurchaseOrderRequestDTO purchaseOrderRequestDTO, @PathVariable Long idOrder) {
 
-        System.out.println("==Retornar todos os produtos==");
-        return null;
+        return new ResponseEntity<>(purchaseOrderService.updatePurchaseOrder(purchaseOrderRequestDTO, idOrder), HttpStatus.CREATED);
     }
 }
