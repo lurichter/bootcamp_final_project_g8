@@ -2,7 +2,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderService;
+import com.mercadolibre.group8_bootcamp_finalproject.service.InboundOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
