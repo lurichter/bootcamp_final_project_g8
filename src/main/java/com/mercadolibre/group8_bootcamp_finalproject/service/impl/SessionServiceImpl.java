@@ -3,8 +3,8 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
-import com.mercadolibre.group8_bootcamp_finalproject.model.User;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.UserRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.model.Users;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.UsersRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.security.JWTAuthorizationFilter;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ISessionService;
 import io.jsonwebtoken.Claims;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl implements ISessionService {
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Autowired
     private PasswordEncoder encoder;
@@ -51,7 +51,7 @@ public class SessionServiceImpl implements ISessionService {
     public AccountResponseDTO login(String username, String password) throws ApiException {
         String passEncoded = encoder.encode(password);
 
-        User account = userRepository.findByName(username);
+        Users account = usersRepository.findByName(username);
 
         if ( account.getName().isBlank() ) throw new NotFoundException("User not found");
 

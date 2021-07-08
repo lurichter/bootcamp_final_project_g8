@@ -15,6 +15,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,7 +32,7 @@ public class BatchServiceImpl implements IBatchService {
 
         if (!productRepository.existsById(productId)) throw new ProductNotFoundException();
 
-        Set<Batch> batches = batchRepository.findBatchByProductId(productId, SortUtil.sortStringToSort(order));
+        Set<Batch> batches = batchRepository.findBatchByProductIdAndByDueDate(productId, minimunDueDate(), SortUtil.sortStringToSort(order));
 
         if (batches.isEmpty()) throw new ProductNotInBatchException("The Product isn't in a Batch");
 
@@ -60,6 +61,10 @@ public class BatchServiceImpl implements IBatchService {
             .dueDate(batch.getDueDate())
             .build()));
         return batchStockDTOList;
+    }
+
+    private LocalDate minimunDueDate(){
+        return LocalDate.now().plusDays(21);
     }
 
 }
