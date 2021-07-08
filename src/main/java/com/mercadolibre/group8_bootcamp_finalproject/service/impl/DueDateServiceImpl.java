@@ -47,7 +47,7 @@ public class DueDateServiceImpl implements IDueDateService {
                 .stream()
                 .filter(batch -> batch.getProductCategory().equals(category.getLabel()))
                 .collect(Collectors.toList());
-        if (batchStockDueDateResponse.isEmpty()) throw new BatchNotFoundException("There are no batches with the due date between the given range."));
+        if (batchStockDueDateResponse.isEmpty()) throw new BatchNotFoundException("There are no batches with the due date between the given range and the category selected.");
         return batchStockDueDateResponse;
     }
 
