@@ -21,6 +21,7 @@ public class BatchResponseListDTO {
                     .batchNumber(batch.getNumber())
                     .productId(batch.getProduct().getId().intValue())
                     .currentTemperature(batch.getCurrentTemperature())
+                    .minimumTemperature(batch.getProduct().getMinTemperature())
                     .quantity(batch.getQuantity())
                     .manufacturingDate(batch.getManufacturingDate())
                     .manufacturingTime(batch.getManufacturingTime())

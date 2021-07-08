@@ -5,7 +5,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDue
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.BatchNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.UserRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.repository.UsersRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IDueDateService;
 import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +20,13 @@ import java.util.stream.Collectors;
 public class DueDateServiceImpl implements IDueDateService {
 
     private final BatchRepository batchRepository;
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Override
     public BatchStockDueDateListDTO listBatchesOrderedByDueDate(Integer daysQuantity, ProductCategoryEnum category, String[] order){
 //        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader("Authorization");
 //        String user = SessionServiceImpl.getUsername(token);
-        Long userId = userRepository.findByName("operador1@mercadolivre.com").getId();
+        Long userId = usersRepository.findByName("operador1@mercadolivre.com").getId();
 
         List<BatchStockDueDateDTO> batchStockDueDate =
                 batchRepository.findAllByWarehouseSectionWhereDueDateLessThanParam(userId, dueDateFilter(daysQuantity), SortUtil.sortStringToSort(order));
