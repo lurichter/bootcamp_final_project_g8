@@ -66,7 +66,7 @@ public class PurchaseOrderService {
     }
 
     private void compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems, List<ProductQuantityRequestDTO> products){
-        //devolver p/ lote produtos da ordem de compra que NAO aparecem no PUT
+
         for(ProductQuantityRequestDTO product: products){
             verifyIfProductExists(product.getProductId());
             if(verifyIfPurchaseOrderItemExistsWithProduct(product.getProductId(), purchaseOrderId)){
@@ -74,37 +74,55 @@ public class PurchaseOrderService {
                 Collections.sort(purchaseOrderItemListWithProduct);
                 Integer quantityInPurchaseOrder = purchaseOrderItemListWithProduct.stream().mapToInt(PurchaseOrderItem::getQuantity).sum();
                 if(quantityInPurchaseOrder > product.getQuantity()){
+                    List<PurchaseOrderItem> purchaseOrderItemListToRemove = new ArrayList<>();
                     Integer quantityToReturn = quantityInPurchaseOrder - product.getQuantity();
                     for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListWithProduct){
                         if(quantityToReturn >= purchaseOrderItem.getQuantity()){
                             returnItemsFromPurchaseOrderItem(purchaseOrderItem, purchaseOrderItem.getQuantity());
                             quantityToReturn -= purchaseOrderItem.getQuantity();
+                            purchaseOrderItemListToRemove.add(purchaseOrderItem);
+
                         }
                         else{
                             returnItemsFromPurchaseOrderItem(purchaseOrderItem, quantityToReturn);
+                            purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() - quantityToReturn);
+                            purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
+                            purchaseOrderItemRepository.save(purchaseOrderItem);
                             break;
                         }
                     }
+                    removeItemsFromList(purchaseOrderItemListWithProduct, purchaseOrderItemListToRemove);
+                    removeItemsFromPurchaseOrderItemsDb(purchaseOrderItemListToRemove);
                 }
                 else if (quantityInPurchaseOrder < product.getQuantity()) {
                     product.setQuantity(product.getQuantity() - quantityInPurchaseOrder);
-                    addPurchaseOrderItemsToList(product, purchaseOrderItems);
-                    updateOrdemItems(purchaseOrderItems, purchaseOrderId);
+                    addPurchaseOrderItemsToList(product, purchaseOrderItems, purchaseOrderId);
+                    updateOrdemItems(purchaseOrderItemListWithProduct, purchaseOrderId);
                 }
             }
             else{
-                addPurchaseOrderItemsToList(product, purchaseOrderItems);
+                addPurchaseOrderItemsToList(product, purchaseOrderItems, purchaseOrderId);
                 updateOrdemItems(purchaseOrderItems, purchaseOrderId);
             }
+        }
+        //checar se algum produto ficou de fora na nova versão da ordem de compra
+    }
 
+    private void removeItemsFromList(List<PurchaseOrderItem> purchaseOrderItemListWithProduct, List<PurchaseOrderItem> purchaseOrderItemListToRemove){
+        for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListToRemove){
+            purchaseOrderItemListWithProduct.remove(purchaseOrderItem);
+        }
+
+    }
+
+    private void removeItemsFromPurchaseOrderItemsDb(List<PurchaseOrderItem> purchaseOrderItemListToRemove){
+        for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListToRemove){
+            purchaseOrderItemRepository.delete(purchaseOrderItem);
         }
     }
 
     private void returnItemsFromPurchaseOrderItem(PurchaseOrderItem purchaseOrderItem, Integer quantity){
-        updateBatchesWithPurchaseOrder(purchaseOrderItem.getBatch(), quantity);
-        if(purchaseOrderItem.getQuantity().equals(quantity)){
-            purchaseOrderItemRepository.delete(purchaseOrderItem);
-        }
+        updateBatchesWithPurchaseOrder(purchaseOrderItem.getBatch(), purchaseOrderItem.getBatch().getQuantity() + quantity);
     }
 
     private void updateOrdemItems(List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
@@ -112,8 +130,9 @@ public class PurchaseOrderService {
             if(purchaseOrderItem.getPurchaseOrder() == null){
                 PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
                 purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-                purchaseOrderItemRepository.save(purchaseOrderItem);
+
             }
+            purchaseOrderItemRepository.save(purchaseOrderItem);
         }
     }
 
@@ -133,26 +152,41 @@ public class PurchaseOrderService {
         List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
 
         for(ProductQuantityRequestDTO product: purchaseOrderRequestDTO.getPurchaseOrder().getProducts()){
-            addPurchaseOrderItemsToList(product, purchaseOrderItems);
+            addPurchaseOrderItemsToList(product, purchaseOrderItems, null);
         }
         return purchaseOrderItems;
     }
 
-    private void addPurchaseOrderItemsToList(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItems ){
+    private void addPurchaseOrderItemsToList(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
         checkQuantityInBatches(product);
         Map<Long, Integer> batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
         for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
             if(productDueDateIsValid(map.getKey())){
                 Batch actualBatch = getBatch(map.getKey());
-                PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-                purchaseOrderItem.setQuantity(map.getValue());
-                purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
-                purchaseOrderItem.setBatch(actualBatch);
-
-                purchaseOrderItems.add(purchaseOrderItem);
+                if(purchaseOrderId != null){
+                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemRepository.findPurchaseOrderItemByBatch_IdAndPurchaseOrderId(actualBatch.getId(), purchaseOrderId);
+                    if(purchaseOrderItem != null){
+                        purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() + map.getValue());
+                        purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
+                    }
+                    else{
+                        createPurchaseOrdemItemAndAddToList(map, actualBatch, purchaseOrderItems);
+                    }
+                }
+                else{
+                    createPurchaseOrdemItemAndAddToList(map, actualBatch, purchaseOrderItems);
+                }
                 updateBatchesWithPurchaseOrder(actualBatch, actualBatch.getQuantity() - map.getValue());
             }
         }
+    }
+
+    private void createPurchaseOrdemItemAndAddToList(Map.Entry<Long, Integer> map, Batch batch, List<PurchaseOrderItem> purchaseOrderItems){
+        PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+        purchaseOrderItem.setQuantity(map.getValue());
+        purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
+        purchaseOrderItem.setBatch(batch);
+        purchaseOrderItems.add(purchaseOrderItem);
     }
 
     private Double getPriceFromProduct(Long batchId){

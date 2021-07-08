@@ -24,12 +24,6 @@ public class ProductService {
     @Autowired
     private ProductCategoryRepository productCategoryRepository;
 
-    @Autowired
-    private BatchRepository batchRepository;
-
-    @Autowired
-    private BuyerRepository buyerRepository;
-
     public Set<ProductDTO> getAllProducts(){
 
         List<Product> products = productRepository.findAll();
