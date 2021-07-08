@@ -25,7 +25,7 @@ public class Operator {
     private Long id;
 
     @OneToOne
-    private User user;
+    private Users user;
 
     @OneToMany(mappedBy = "operator")
     private List<InboundOrder> inboundOrders;
