@@ -1,6 +1,9 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import lombok.AllArgsConstructor;
+
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,8 +15,10 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class WarehouseOperator {
+
     @EmbeddedId
     private WarehouseOperatorKey id;
 
