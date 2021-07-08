@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 @Embeddable
 @AllArgsConstructor
+@NoArgsConstructor
 public class WarehouseOperatorKey implements Serializable {
     @Column(name = "warehouse_id")
     private Long warehouse_id;
