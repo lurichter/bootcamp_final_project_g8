@@ -1,6 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/list/{productCategory}")
-    public ResponseEntity<Set<ProductDTO>> listProductsByCategory(@PathVariable String productCategory) {
+    public ResponseEntity<Set<ProductDTO>> listProductsByCategory(@PathVariable ProductCategoryEnum productCategory) {
         return new ResponseEntity<>(productService.getAllProductsByCategory(productCategory), HttpStatus.OK);
     }
     /*

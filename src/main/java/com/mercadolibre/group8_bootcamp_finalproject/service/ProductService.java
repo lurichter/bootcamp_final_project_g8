@@ -4,8 +4,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
 import com.mercadolibre.group8_bootcamp_finalproject.model.ProductCategory;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.BuyerRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductCategoryRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +30,9 @@ public class ProductService {
         return convertProductListToProductDTOList(products);
     }
 
-    public Set<ProductDTO> getAllProductsByCategory(String category){
+    public Set<ProductDTO> getAllProductsByCategory(ProductCategoryEnum category){
 
-        ProductCategory productCategory = productCategoryRepository.findByCategoryName(category);
+        ProductCategory productCategory = productCategoryRepository.findByName(category);
         List<Product> products = productRepository.findAllByProductCategory(productCategory.getId());
         verifyIfListIsEmpty(products);
         return convertProductListToProductDTOList(products);

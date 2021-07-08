@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class PurchaseOrderService {
@@ -66,8 +65,10 @@ public class PurchaseOrderService {
     }
 
     private void compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems, List<ProductQuantityRequestDTO> products){
+        Set<Long> productsIdInPurchaseOrderRequest = new HashSet<>();
 
         for(ProductQuantityRequestDTO product: products){
+            productsIdInPurchaseOrderRequest.add(product.getProductId());
             verifyIfProductExists(product.getProductId());
             if(verifyIfPurchaseOrderItemExistsWithProduct(product.getProductId(), purchaseOrderId)){
                 List<PurchaseOrderItem> purchaseOrderItemListWithProduct = getPurchaseOrderItemsWithProduct(product.getProductId(), purchaseOrderId);
@@ -105,7 +106,29 @@ public class PurchaseOrderService {
                 updateOrdemItems(purchaseOrderItems, purchaseOrderId);
             }
         }
-        //checar se algum produto ficou de fora na nova versão da ordem de compra
+        Set<Long> productsIdInPurchaseOrderDb = productRepository.finAllByPurchaseOrder(purchaseOrderId);
+        if(productsIdInPurchaseOrderDb.size() != productsIdInPurchaseOrderRequest.size()){
+
+            if(productsIdInPurchaseOrderDb.size() > productsIdInPurchaseOrderRequest.size()){
+                productsIdInPurchaseOrderDb.removeAll(productsIdInPurchaseOrderRequest);
+                returnProductsDiscartedInThePurchaseOrder(productsIdInPurchaseOrderDb, purchaseOrderId);
+            }
+            else{
+                productsIdInPurchaseOrderRequest.removeAll(productsIdInPurchaseOrderDb);
+                returnProductsDiscartedInThePurchaseOrder(productsIdInPurchaseOrderRequest, purchaseOrderId);
+            }
+        }
+
+    }
+
+    private void returnProductsDiscartedInThePurchaseOrder(Set<Long> productsId, Long purchaseOrderId){
+        for(Long productId: productsId){
+            List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findPurchaseOrderItemByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
+            for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
+                returnItemsFromPurchaseOrderItem(purchaseOrderItem, purchaseOrderItem.getQuantity());
+                purchaseOrderItemRepository.delete(purchaseOrderItem);
+            }
+        }
     }
 
     private void removeItemsFromList(List<PurchaseOrderItem> purchaseOrderItemListWithProduct, List<PurchaseOrderItem> purchaseOrderItemListToRemove){
