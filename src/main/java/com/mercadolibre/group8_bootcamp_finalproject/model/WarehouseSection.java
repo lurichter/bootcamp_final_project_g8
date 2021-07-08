@@ -1,12 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import lombok.AllArgsConstructor;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -14,8 +8,9 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @Builder
+@EqualsAndHashCode
+@NoArgsConstructor
 @AllArgsConstructor
 public class WarehouseSection {
 

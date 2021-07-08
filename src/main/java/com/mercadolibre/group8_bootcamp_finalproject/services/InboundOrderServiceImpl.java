@@ -32,9 +32,13 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 	private List<Product> getProductList (List<Integer> productIds) {
         List<Product> productList = new ArrayList<>();
 
-        productIds.stream().map( product_id ->
-                productList.add(productRepository.findById(product_id.longValue()).orElseThrow(() -> new NotFoundException("Product not found")))
-        );
+        for(int i = 0; i < productIds.size(); i++) {
+            productList.add(productRepository.findById(productIds.get(i).longValue()).orElseThrow(() -> new NotFoundException("Product not found")));
+        }
+
+//        productIds.stream().map( product_id ->
+//                productList.add(productRepository.findById(product_id.longValue()).orElseThrow(() -> new NotFoundException("Product not found")))
+//        );
 
         return productList;
     }
@@ -62,7 +66,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
     @Override
     @Transactional
-    public BatchResponseListDTO createInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
+    public BatchResponseListDTO createInboundOrder(InboundOrderRequestDTO inboundOrderRequest) throws NotFoundException {
 
         // verify if seller exists
         List<Integer> productIds = inboundOrderRequest.getInboundOrder()

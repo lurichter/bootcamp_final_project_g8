@@ -10,20 +10,22 @@ import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
 import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.util.MockitoExtension;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static org.mockito.AdditionalMatchers.*;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class InboundOrderUnitTest {
 
     InboundOrderRequestDTO inboundOrderRequestDTO = new InboundOrderRequestDTO();
@@ -43,7 +45,7 @@ public class InboundOrderUnitTest {
     private WarehouseOperatorRepository warehouseOperatorRepository;
 
     @InjectMocks
-    InboundOrderServiceImpl inboundOrderService;
+    private InboundOrderServiceImpl inboundOrderService;
 
     @BeforeEach
     void setUp() {
@@ -190,14 +192,13 @@ public class InboundOrderUnitTest {
 
         warehouse.setWarehouseSections(new ArrayList<>(Arrays.asList(warehouseSection)));
 
-        BDDMockito.when(productRepository.findById(freshProduct1.getId())).thenReturn(Optional.of(freshProduct1));
-        BDDMockito.when(productRepository.findById(freshProduct2.getId())).thenReturn(Optional.of(freshProduct2));
-        BDDMockito.when(productRepository.findById(AdditionalMatchers
-                        .and(AdditionalMatchers.not(ArgumentMatchers.eq(freshProduct1.getId())),
-                                AdditionalMatchers.not(ArgumentMatchers.eq(freshProduct2.getId()))))).thenThrow(new NotFoundException("Product not found"));
+        BDDMockito.doReturn(Optional.of(freshProduct1)).when(productRepository).findById(freshProduct1.getId());
+        BDDMockito.doReturn(Optional.of(freshProduct2)).when(productRepository).findById(freshProduct2.getId());
+        BDDMockito.doThrow(new NotFoundException("Product not found")).when(productRepository).findById(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
 
         BDDMockito.when(productRepository.getOne(freshProduct1.getId())).thenReturn(freshProduct1);
         BDDMockito.when(productRepository.getOne(freshProduct2.getId())).thenReturn(freshProduct2);
+        BDDMockito.doThrow(new NotFoundException("Product not found")).when(productRepository).getOne(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
 
         BDDMockito.when(warehouseSectionRepository.findById(warehouseSection.getId())).thenReturn(Optional.of(warehouseSection));
         BDDMockito.when(warehouseOperatorRepository.findByWarehouseCode(warehouseOperator.getWarehouse().getId())).thenReturn(Arrays.asList(warehouseOperator));
@@ -257,8 +258,9 @@ public class InboundOrderUnitTest {
     public void returnExceptionWhenInvalidProduct() {
         this.inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3);
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);})
-                .isInstanceOf(NotFoundException.class);
-//                .hasMessage("bairro não encontrado.");
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Not Found Exception. Product not found");
+
     }
 
 }
