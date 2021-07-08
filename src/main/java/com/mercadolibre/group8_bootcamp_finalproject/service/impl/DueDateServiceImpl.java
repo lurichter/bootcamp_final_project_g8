@@ -24,7 +24,7 @@ public class DueDateServiceImpl implements IDueDateService {
 
     @Override
     public BatchStockDueDateListDTO listBatchesOrderedByDueDate(Integer daysQuantity, ProductCategoryEnum category, String[] order){
-        //        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader("Authorization");
+//        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader("Authorization");
 //        String user = SessionServiceImpl.getUsername(token);
         Long userId = userRepository.findByName("operador1@mercadolivre.com").getId();
 
