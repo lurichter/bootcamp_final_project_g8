@@ -4,4 +4,5 @@ import com.mercadolibre.group8_bootcamp_finalproject.model.Operator;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OperatorRepository extends JpaRepository<Operator, Long> {
+    Operator findOperatorByUserId(Long userId);
 }
