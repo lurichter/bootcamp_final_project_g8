@@ -32,8 +32,8 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 	private List<Product> getProductList (List<Integer> productIds) {
         List<Product> productList = new ArrayList<>();
 
-        for(int i = 0; i < productIds.size(); i++) {
-            productList.add(productRepository.findById(productIds.get(i).longValue()).orElseThrow(() -> new NotFoundException("Product not found")));
+        for(Integer id : productIds) {
+            productList.add(productRepository.findById(id.longValue()).orElseThrow(() -> new NotFoundException("Product not found")));
         }
 
 //        productIds.stream().map( product_id ->
@@ -51,6 +51,18 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     // verify section accepts product category
 
     private void verifySectionAcceptsProductCategory (List<Product> productList, Long wareHouseCode) {
+
+	    WarehouseSection warehouseSection = this.getWarehouseSectionByCode(wareHouseCode);
+
+	    for (Product product : productList) {
+	        if (product.getProductCategory() != warehouseSection.getProductCategory()) {
+	            throw new NotFoundException("Product category is invalid to Warehouse Section Category. productId: "
+                        + product.getId()  +
+                        ", WarehouseSection: " + this.getWarehouseSectionByCode(wareHouseCode).getWarehouse().getId());
+            }
+
+        }
+
         productList.stream().map(product ->
                 (product.getProductCategory() == this.getWarehouseSectionByCode(wareHouseCode).getProductCategory()) ?
                         null :

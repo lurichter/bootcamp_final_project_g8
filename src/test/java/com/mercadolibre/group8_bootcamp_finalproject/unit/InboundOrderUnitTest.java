@@ -1,16 +1,13 @@
 package com.mercadolibre.group8_bootcamp_finalproject.unit;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
-import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
 import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderServiceImpl;
 import com.mercadolibre.group8_bootcamp_finalproject.util.MockitoExtension;
+import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,20 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import static org.mockito.AdditionalMatchers.*;
-
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class InboundOrderUnitTest {
 
-    InboundOrderRequestDTO inboundOrderRequestDTO = new InboundOrderRequestDTO();
-    InboundOrderDTO inboundOrderDTO = new InboundOrderDTO();
-    WarehouseSectionDTO warehouseSectionDTO = new WarehouseSectionDTO();
-    List<BatchDTO> batchesDTO = new ArrayList<BatchDTO>();
+    private TestObjectsUtil testObjects;
 
     @Mock
     private BatchRepository batchRepository;
@@ -50,180 +39,57 @@ public class InboundOrderUnitTest {
     @BeforeEach
     void setUp() {
 
-        this.warehouseSectionDTO.setSectionCode(1);
-        this.warehouseSectionDTO.setWarehouseCode(1);
+        this.testObjects = new TestObjectsUtil();
 
-        BatchDTO batchDTO1 = BatchDTO.builder()
-                .batchNumber("MELI0001")
-                .productId(1)
-                .currentTemperature(10.0)
-                .quantity(20000)
-                .manufacturingDate(LocalDate.now().minusDays(7))
-                .manufacturingTime(LocalTime.now())
-                .dueDate(LocalDate.now().plusDays(14))
-                .build();
-
-        this.batchesDTO.add(batchDTO1);
-
-        BatchDTO batchDTO2 = BatchDTO.builder()
-                .batchNumber("MELI0002")
-                .productId(2)
-                .currentTemperature(2.0)
-                .quantity(20000)
-                .manufacturingDate(LocalDate.now().minusDays(7))
-                .manufacturingTime(LocalTime.now())
-                .dueDate(LocalDate.now().plusDays(14))
-                .build();
-
-        this.batchesDTO.add(batchDTO2);
-
-        this.inboundOrderDTO.setSection(this.warehouseSectionDTO);
-        this.inboundOrderDTO.setBatchStock(this.batchesDTO);
-
-        this.inboundOrderRequestDTO.setInboundOrder(this.inboundOrderDTO);
-
-        User user1 = User.builder()
-                .id(1L)
-                .name("operador1@mercadolivre.com")
-                .password("123456")
-                .build();
-
-        User user2 = User.builder()
-                .id(2L)
-                .name("vendedor1@mercadolivre.com")
-                .password("123456")
-                .build();
-
-        Seller seller = Seller.builder()
-                .id(1L)
-                .user(user2)
-                .build();
-
-        Operator operator = Operator.builder()
-                .id(1L)
-                .user(user1)
-                .build();
-
-        Warehouse warehouse = Warehouse.builder()
-                .id(1L)
-                .name("CAJAMAR01")
-                .address("Avenida Doutor Antonio Joao Abdalla, 3333")
-                .acceptFresh(true)
-                .build();
-
-        WarehouseOperator warehouseOperator = WarehouseOperator.builder()
-                .id(new WarehouseOperatorKey(warehouse.getId(), operator.getId()))
-                .warehouse(warehouse)
-                .operator(operator)
-                .build();
-
-        ProductCategory category = ProductCategory.builder()
-                .id(1L)
-                .name(ProductCategoryEnum.FS)
-                .build();
-
-        WarehouseSection warehouseSection = WarehouseSection.builder()
-                .id(1L)
-                .name("CAJAMAR01FRESH")
-                .capacity(100000)
-                .currentAvailability(100000)
-                .temperature(10.0)
-                .warehouse(warehouse)
-                .productCategory(category)
-                .build();
-
-        Product freshProduct1 = Product.builder()
-                .id(1L)
-                .name("Tomate Caqui unidade")
-                .description("Uma unidade de tomate Caqui")
-                .minTemperature(8.0)
-                .maxTemperature(13.0)
-                .price(2.39)
-                .seller(seller)
-                .productCategory(category)
-                .build();
-
-        Product freshProduct2 = Product.builder()
-                .id(2L)
-                .name("Banana nanica 6/un")
-                .description("Um cacho com 6 bananas nanicas")
-                .minTemperature(8.0)
-                .maxTemperature(13.0)
-                .price(3.10)
-                .seller(seller)
-                .productCategory(category)
-                .build();
-
-        Batch batch1 = Batch.builder()
-                .number(batchesDTO.get(0).getBatchNumber())
-                .quantity(batchesDTO.get(0).getQuantity())
-                .currentTemperature(batchesDTO.get(0).getCurrentTemperature())
-                .manufacturingDate(batchesDTO.get(0).getManufacturingDate())
-                .manufacturingTime(batchesDTO.get(0).getManufacturingTime())
-                .dueDate(batchesDTO.get(0).getDueDate())
-                .product(freshProduct1)
-                .warehouseSection(warehouseSection)
-                .build();
-
-        Batch batch2 = Batch.builder()
-                .number(batchesDTO.get(1).getBatchNumber())
-                .quantity(batchesDTO.get(1).getQuantity())
-                .currentTemperature(batchesDTO.get(1).getCurrentTemperature())
-                .manufacturingDate(batchesDTO.get(1).getManufacturingDate())
-                .manufacturingTime(batchesDTO.get(1).getManufacturingTime())
-                .dueDate(batchesDTO.get(1).getDueDate())
-                .product(freshProduct2)
-                .warehouseSection(warehouseSection)
-                .build();
-
-        InboundOrder inboundOrder = InboundOrder.builder()
-                .dateTime(LocalDateTime.now())
-                .operator(operator)
-                .batch(new HashSet<Batch>(Arrays.asList(batch1, batch2)))
-                .build();
-
-        seller.setProducts(new HashSet<Product>(Arrays.asList(freshProduct1, freshProduct2)));
-
-        List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
-        warehouseOperators.add(warehouseOperator);
-
-        operator.setWarehouseOperators(warehouseOperators);
-        warehouse.setWarehouseOperators(warehouseOperators);
-
-        warehouse.setWarehouseSections(new ArrayList<>(Arrays.asList(warehouseSection)));
+        Product freshProduct1 = this.testObjects.getFreshProducts().get(0);
+        Product freshProduct2 = this.testObjects.getFreshProducts().get(0);
+        WarehouseSection freshWarehouseSection = this.testObjects.getFreshWarehouseSections().get(0);
+        WarehouseSection frozenWarehouseSection = this.testObjects.getFrozenWarehouseSections().get(0);
+        WarehouseOperator warehouseOperator = this.testObjects.getWarehouseOperators().get(0);
+        InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
+        List<Batch> batches = this.testObjects.getFreshBatches();
 
         BDDMockito.doReturn(Optional.of(freshProduct1)).when(productRepository).findById(freshProduct1.getId());
         BDDMockito.doReturn(Optional.of(freshProduct2)).when(productRepository).findById(freshProduct2.getId());
-        BDDMockito.doThrow(new NotFoundException("Product not found")).when(productRepository).findById(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
+        BDDMockito.doThrow(new NotFoundException("Product not found"))
+                .when(productRepository)
+                .findById(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
 
-        BDDMockito.when(productRepository.getOne(freshProduct1.getId())).thenReturn(freshProduct1);
-        BDDMockito.when(productRepository.getOne(freshProduct2.getId())).thenReturn(freshProduct2);
-        BDDMockito.doThrow(new NotFoundException("Product not found")).when(productRepository).getOne(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
+        BDDMockito.doReturn(freshProduct1).when(productRepository).getOne(freshProduct1.getId());
+        BDDMockito.doReturn(freshProduct2).when(productRepository).getOne(freshProduct2.getId());
+        BDDMockito.doThrow(new NotFoundException("Product not found"))
+                .when(productRepository)
+                .getOne(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
 
-        BDDMockito.when(warehouseSectionRepository.findById(warehouseSection.getId())).thenReturn(Optional.of(warehouseSection));
-        BDDMockito.when(warehouseOperatorRepository.findByWarehouseCode(warehouseOperator.getWarehouse().getId())).thenReturn(Arrays.asList(warehouseOperator));
+        BDDMockito.doReturn(Optional.of(freshWarehouseSection)).when(warehouseSectionRepository).findById(freshWarehouseSection.getId());
+        BDDMockito.doReturn(Optional.of(frozenWarehouseSection)).when(warehouseSectionRepository).findById(frozenWarehouseSection.getId());
+        BDDMockito.doThrow(new NotFoundException("Warehouse Section not found"))
+                .when(productRepository)
+                .getOne(not(or(ArgumentMatchers.eq(freshWarehouseSection.getId()),ArgumentMatchers.eq(frozenWarehouseSection.getId()))));
+
+        BDDMockito.doReturn(Arrays.asList(warehouseOperator)).when(warehouseOperatorRepository).findByWarehouseCode(freshWarehouseSection.getWarehouse().getId());
 
         BDDMockito.when(inboundOrderRepository.save(inboundOrder))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     ((InboundOrder)args[0]).setId(1L);
                     return args[0];
-        });
+                });
 
-        BDDMockito.when(batchRepository.saveAll(new ArrayList<Batch>(Arrays.asList(batch1, batch2))))
+        BDDMockito.when(batchRepository.saveAll(batches))
                 .thenAnswer(invocation -> {
                     Object[] args = invocation.getArguments();
                     ((List<Batch>)args[0]).get(0).setId(1L);
                     ((List<Batch>)args[0]).get(1).setId(2L);
                     return args[0];
-        });
-
+                });
     }
 
     @Test
     public void returnBatchResponseListWhenValidInboundOrder() {
 
-        BatchResponseListDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        BatchResponseListDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);
 
         Assertions.assertThat(batchResponseListDTO.getBatchStock())
                 .extracting(
@@ -236,31 +102,74 @@ public class InboundOrderUnitTest {
                         record -> record.getDueDate())
                 .contains(
                         Tuple.tuple(
-                                "MELI0001",
-                                1,
-                                10.0,
-                                20000,
-                                this.batchesDTO.get(0).getManufacturingDate(),
-                                this.batchesDTO.get(0).getManufacturingTime(),
-                                this.batchesDTO.get(0).getDueDate()),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getBatchNumber(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getProductId(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getCurrentTemperature(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getQuantity(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getManufacturingDate(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getManufacturingTime(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getDueDate()),
                         Tuple.tuple(
-                                "MELI0002",
-                                2,
-                                2.0,
-                                20000,
-                                this.batchesDTO.get(1).getManufacturingDate(),
-                                this.batchesDTO.get(1).getManufacturingTime(),
-                                this.batchesDTO.get(1).getDueDate()));
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getBatchNumber(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getProductId(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getCurrentTemperature(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getQuantity(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getManufacturingDate(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getManufacturingTime(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getDueDate()));
 
     }
 
     @Test
     public void returnExceptionWhenInvalidProduct() {
-        this.inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3);
-        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);})
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("Not Found Exception. Product not found");
 
     }
+
+    @Test
+    public void returnExceptionWhenInvalidWarehouseSection() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(3);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Not Found Exception. Warehouse Section not found");
+
+    }
+
+    @Test
+    public void returnExceptionWhenOperatorNotRegisteredInWarehouse() {
+
+    }
+
+    @Test
+    public void returnExceptionWhenProductCategoryNotAllowedInWarehouseSection() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(2);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Product category is invalid to Warehouse Section Category.");
+    }
+
+    @Test
+    public void returnExceptionWhenOrderQuantityBiggerThanWarehouseSectionAvailability() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setQuantity(100000);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Not Found Exception. WarehouseSection current capability is less than all quantity products from batch stock");
+    }
+
 
 }
