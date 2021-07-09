@@ -35,7 +35,7 @@ public class BatchDTO {
     @PastOrPresent(message = "manufacturing date is in the future")
     private LocalDate manufacturingDate;
 
-    @PastOrPresent(message = "manufacturing date is in the future")
+//    @PastOrPresent(message = "manufacturing date is in the future")
     private LocalTime manufacturingTime;
 
     @FutureOrPresent(message = "due date is in the past")
