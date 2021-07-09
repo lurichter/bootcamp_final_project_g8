@@ -1,4 +1,4 @@
-package com.mercadolibre.group8_bootcamp_finalproject.service;
+package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
@@ -7,6 +7,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.model.ProductCategory;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductCategoryRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-public class ProductService {
+public class ProductServiceImpl implements IProductService {
 
     @Autowired
     private ProductRepository productRepository;

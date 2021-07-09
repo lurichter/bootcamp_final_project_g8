@@ -1,4 +1,4 @@
-package com.mercadolibre.group8_bootcamp_finalproject.service;
+package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
-public class PurchaseOrderService {
+public class PurchaseOrderServiceImpl {
 
     @Autowired
     private ProductRepository productRepository;
