@@ -2,33 +2,32 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
 import com.mercadolibre.group8_bootcamp_finalproject.model.ProductCategory;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductCategoryRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private ProductCategoryRepository productCategoryRepository;
+    private final ProductCategoryRepository productCategoryRepository;
 
     public Set<ProductDTO> getAllProducts(){
 
         List<Product> products = productRepository.findAll();
         verifyIfListIsEmpty(products);
-        return convertProductListToProductDTOList(products);
+        return ProductMapper.convertProductListToProductDTOList(products);
     }
 
     public Set<ProductDTO> getAllProductsByCategory(ProductCategoryEnum category){
@@ -36,24 +35,7 @@ public class ProductServiceImpl implements IProductService {
         ProductCategory productCategory = productCategoryRepository.findByName(category);
         List<Product> products = productRepository.findAllByProductCategory(productCategory.getId());
         verifyIfListIsEmpty(products);
-        return convertProductListToProductDTOList(products);
-    }
-
-    private Set<ProductDTO> convertProductListToProductDTOList(List<Product> products){
-        Set<ProductDTO> productDTOS = new LinkedHashSet<>();
-        for(Product product: products){
-            ProductDTO productDTO = ProductDTO.builder()
-                    .id(product.getId())
-                    .name(product.getName())
-                    .description(product.getDescription())
-                    .minTemperature(product.getMinTemperature())
-                    .maxTemperature(product.getMaxTemperature())
-                    .price(product.getPrice())
-                    .build();
-            productDTOS.add(productDTO);
-        }
-
-        return productDTOS;
+        return ProductMapper.convertProductListToProductDTOList(products);
     }
 
     private void verifyIfListIsEmpty(List<Product> products){
