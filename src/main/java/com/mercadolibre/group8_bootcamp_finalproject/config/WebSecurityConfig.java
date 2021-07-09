@@ -13,12 +13,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
         http.csrf().disable()
                 .addFilterAfter(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/v1/sign-in").permitAll()
                 .antMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-//                .antMatchers("**").permitAll() // PARA TESTE, REMOVER DPS
+                .antMatchers( "/h2-console/**").permitAll()
+                //                .antMatchers("**").permitAll() // PARA TESTE, REMOVER DPS
                 .anyRequest().authenticated();
     }
 }

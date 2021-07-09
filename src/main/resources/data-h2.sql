@@ -9,16 +9,16 @@ INSERT INTO users (name, password) VALUES ('comprador1@gmail.com', '123456');
 INSERT INTO users (name, password) VALUES ('comprador2@gmail.com', '123456');
 
 -- Insert operators
-INSERT INTO operator (users_user_id) VALUES (1);
-INSERT INTO operator (users_user_id) VALUES (2);
+INSERT INTO operator (user_user_id) VALUES (1);
+INSERT INTO operator (user_user_id) VALUES (2);
 
 -- Insert sellers
-INSERT INTO seller (users_user_id) VALUES (3);
-INSERT INTO seller (users_user_id) VALUES (4);
+INSERT INTO seller (user_user_id) VALUES (3);
+INSERT INTO seller (user_user_id) VALUES (4);
 
 -- Insert buyers
-INSERT INTO buyer (users_user_id) VALUES (5);
-INSERT INTO buyer (users_user_id) VALUES (6);
+INSERT INTO buyer (user_user_id) VALUES (5);
+INSERT INTO buyer (user_user_id) VALUES (6);
 
 -- Insert Warehouses
 INSERT INTO warehouse (accept_fresh, address, warehouse_name) VALUES (1, 'Avenida Doutor Antonio Joao Abdalla, 3333', 'CAJAMAR01');
@@ -225,107 +225,107 @@ VALUES ('Bandeja com 1kg de filé de peito de frango',
         3,
         2);
 
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-09-09 14:13:19, 1);
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-08-09 14:13:19, 1);
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-07-09 14:13:19, 1);
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-07-15 16:13:19, 2);
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-07-09 14:13:19, 2);
--- INSERT INTO inbound_order (order_datetime, operator_id) VALUES (2021-07-27 12:13:19, 2);
---
--- INSERT INTO batch (quantity,
---                    current_temperature,
---                    manufacturing_date,
---                    manufacturing_time,
---                    due_date,
---                    product_id,
---                    section_id,
---                    inbound_order_id,
---                    batch_number)
--- VALUES (12,
---         10,
---         2021-06-27,
---         12:13:19,
---         2021-12-27,
---         1,
---         1,
---         1,
---            'TESTE');
---
--- INSERT INTO batch (quantity,
---                    current_temperature,
---                    manufacturing_date,
---                    manufacturing_time,
---                    due_date,
---                    product_id,
---                    section_id,
---                    inbound_order_id,
---                    batch_number)
--- VALUES (17,
---         2,
---         2021-06-27,
---         12:13:19,
---         2021-10-02,
---         1,
---         1,
---         2,
---            'TESTE2');
---
--- INSERT INTO batch (quantity,
---                    current_temperature,
---                    manufacturing_date,
---                    manufacturing_time,
---                    due_date,
---                    product_id,
---                    section_id,
---                    inbound_order_id,
---                    batch_number)
--- VALUES (13,
---         2,
---         2021-06-27,
---         12:13:19,
---         2021-08-02,
---         1,
---         2,
---         2,
---            'TESTE3');
---
--- INSERT INTO batch (quantity,
---                    current_temperature,
---                    manufacturing_date,
---                    manufacturing_time,
---                    due_date,
---                    product_id,
---                    section_id,
---                    inbound_order_id,
---                    batch_number)
--- VALUES (23,
---         -1,
---         2021-06-27,
---         12:13:19,
---         2021-07-12,
---         2,
---         2,
---         2,
---            'TESTE4');
---
--- INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES (2021-07-08 12:13:19, 'OPEN', 1);
--- INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES (2021-07-07 12:13:19, 'OPEN', 1);
--- INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES (2021-07-06 12:13:19, 'OPEN', 2);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 4,78, 1, 1);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 7.96, 2, 1);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 4,78, 1, 2);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 7.96, 2, 2);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 4,78, 1, 3);
---
--- INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
--- VALUES (2, 6.2, 3, 3);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-09-09 14:13:19', 1);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-08-09 14:13:19', 1);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-07-09 14:13:19', 1);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-07-15 16:13:19', 2);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-07-09 14:13:19', 2);
+INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-07-27 12:13:19', 2);
+
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (12,
+        10,
+        '2021-06-27',
+        '12:13:19',
+        '2021-12-27',
+        1,
+        1,
+        1,
+           'TESTE');
+
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (17,
+        2,
+        '2021-06-27',
+        '12:13:19',
+        '2021-10-02',
+        1,
+        1,
+        2,
+           'TESTE2');
+
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (13,
+        2,
+        '2021-06-27',
+        '12:13:19',
+        '2021-08-02',
+        1,
+        2,
+        2,
+           'TESTE3');
+
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (23,
+        -1,
+        '2021-06-27',
+        '12:13:19',
+        '2021-07-12',
+        2,
+        2,
+        2,
+           'TESTE4');
+
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-08 12:13:19', 'OPEN', 1);
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-07 12:13:19', 'OPEN', 1);
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-06 12:13:19', 'OPEN', 2);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 4.78, 1, 1);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 7.96, 2, 1);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 4.78, 1, 2);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 7.96, 2, 2);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 4.78, 1, 3);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 6.2, 3, 3);
