@@ -2,7 +2,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiException;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.UnauthorizedException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Users;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.UsersRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.security.JWTAuthorizationFilter;
@@ -33,46 +33,36 @@ public class SessionServiceImpl implements ISessionService {
     @Autowired
     private PasswordEncoder encoder;
 
-//    /**
-//     * Perform the validation of the user and password entered.
-//     * If correct, return the account with the necessary token to carry out the other queries.
-//     *
-//     * @param username
-//     * @param password
-//     * @return
-//                            //     * @throws NotFoundException
-//     */
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Perform the validation of the user and password entered.
+     * If correct, return the account with the necessary token to carry out the other queries.
+     *
+     * @param username
+     * @param password
+     * @return
+     * @throws ApiException
+     */
     @Override
     public AccountResponseDTO login(String username, String password) throws ApiException {
-        String passEncoded = encoder.encode(password);
-
         Users account = usersRepository.findByName(username);
 
-        if ( account.getName().isBlank() ) throw new NotFoundException("User not found");
+        if (account == null || !(encoder.matches(password, account.getPassword()))) throw new UnauthorizedException();
 
-        boolean isPassword = encoder.matches(account.getPassword(), passEncoded);
-
-        if ( !isPassword ) throw new NotFoundException("Incorrect password");
-
-        if (account != null) {
-            String token = getJWTToken(username);
-            AccountResponseDTO user = new AccountResponseDTO();
-            user.setUsername(username);
-            user.setToken(token);
-            return user;
-        } else {
-            throw new ApiException("404", "Incorrect username and/or password", 404);
-        }
-
+        String token = getJWTToken(username);
+        AccountResponseDTO user = new AccountResponseDTO();
+        user.setUsername(username);
+        user.setToken(token);
+        return user;
     }
 
     /**
-     * Generate a token for a specific user, valid for 10'
+     * Generate a token for a specific user, valid for 60 minutes
+     *
      * @param username
      * @return
      */
@@ -89,7 +79,7 @@ public class SessionServiceImpl implements ISessionService {
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 600000))
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(SignatureAlgorithm.HS512,
                         secretKey.getBytes()).compact();
 
@@ -98,6 +88,7 @@ public class SessionServiceImpl implements ISessionService {
 
     /**
      * Decode a token in order to obtain the components it contains
+     *
      * @param token
      * @return
      */
@@ -109,6 +100,7 @@ public class SessionServiceImpl implements ISessionService {
 
     /**
      * It allows to obtain the username according to the indicated token
+     *
      * @param token
      * @return
      */

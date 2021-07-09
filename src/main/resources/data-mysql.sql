@@ -20,6 +20,7 @@ TRUNCATE warehouse_section;
 SET FOREIGN_KEY_CHECKS=1;
 --
 
+
 ---------- Initial data-------------
 
 

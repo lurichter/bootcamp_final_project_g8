@@ -9,11 +9,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class ProductQuantityRequestDTO {
 
-    @NotNull(message = "O ID do produto não pode ser null.")
+    @NotNull(message = "Product ID cannot be null.")
     private Long productId;
 
     @NotNull
-    @Min(value = 1, message = "A quantidade do produto deve ser maior do que 0.")
+    @Min(value = 1, message = "The product quantity must be greater than 0.")
     private Integer quantity;
 
 }

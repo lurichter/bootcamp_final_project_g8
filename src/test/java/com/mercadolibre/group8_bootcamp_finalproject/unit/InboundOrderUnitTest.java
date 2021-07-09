@@ -4,7 +4,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
@@ -48,12 +48,12 @@ public class InboundOrderUnitTest {
     @BeforeEach
     void setUp() {
 
-        this.warehouseSectionDTO.setSectionCode(1);
-        this.warehouseSectionDTO.setWarehouseCode(1);
+        this.warehouseSectionDTO.setSectionCode(1L);
+        this.warehouseSectionDTO.setWarehouseCode(1L);
 
         BatchDTO batchDTO1 = BatchDTO.builder()
                 .batchNumber("MELI0001")
-                .productId(1)
+                .productId(1L)
                 .currentTemperature(10.0)
                 .quantity(20000)
                 .manufacturingDate(LocalDate.now().minusDays(7))
@@ -65,7 +65,7 @@ public class InboundOrderUnitTest {
 
         BatchDTO batchDTO2 = BatchDTO.builder()
                 .batchNumber("MELI0002")
-                .productId(2)
+                .productId(2L)
                 .currentTemperature(2.0)
                 .quantity(20000)
                 .manufacturingDate(LocalDate.now().minusDays(7))
@@ -177,10 +177,10 @@ public class InboundOrderUnitTest {
         InboundOrder inboundOrder = InboundOrder.builder()
                 .dateTime(LocalDateTime.now())
                 .operator(operator)
-                .batch(new HashSet<Batch>(Arrays.asList(batch1, batch2)))
+                .batches(Arrays.asList(batch1, batch2))
                 .build();
 
-        seller.setProducts(new HashSet<Product>(Arrays.asList(freshProduct1, freshProduct2)));
+        seller.setProducts(Arrays.asList(freshProduct1, freshProduct2));
 
         List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
         warehouseOperators.add(warehouseOperator);
@@ -222,7 +222,7 @@ public class InboundOrderUnitTest {
     @Test
     public void returnBatchResponseListWhenValidInboundOrder() {
 
-        BatchResponseListDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
+        InboundOrderResponseDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
 
         Assertions.assertThat(batchResponseListDTO.getBatchStock())
                 .extracting(
@@ -255,7 +255,7 @@ public class InboundOrderUnitTest {
 
     @Test
     public void returnExceptionWhenInvalidProduct() {
-        this.inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3);
+        this.inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3L);
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);})
                 .isInstanceOf(NotFoundException.class);
 //                .hasMessage("bairro não encontrado.");
