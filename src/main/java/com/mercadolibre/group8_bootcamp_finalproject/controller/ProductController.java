@@ -3,7 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.ProductServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +15,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/")
+@RequiredArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductServiceImpl productServiceImpl;
+    private final ProductServiceImpl productServiceImpl;
 
     @GetMapping
     public ResponseEntity<Set<ProductDTO>> listAllProducts() {

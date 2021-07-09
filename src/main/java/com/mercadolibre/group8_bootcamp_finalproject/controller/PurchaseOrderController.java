@@ -4,7 +4,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.PurchaseOrderServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +14,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/orders")
+@RequiredArgsConstructor
 public class PurchaseOrderController {
 
-    @Autowired
-    private PurchaseOrderServiceImpl purchaseOrderServiceImpl;
+    private final PurchaseOrderServiceImpl purchaseOrderServiceImpl;
 
     @PostMapping
     public ResponseEntity<PurchaseOrderPriceResponseDTO> newPurchaseOrder(@RequestBody @Valid PurchaseOrderRequestDTO purchaseOrderRequestDTO) {
@@ -25,7 +25,7 @@ public class PurchaseOrderController {
     }
 
     @GetMapping(path = "/{idOrder}")
-    public ResponseEntity<Set<ProductDTO>> getOrders(@PathVariable Long idOrder) { //Alterar p/ ProductDTO
+    public ResponseEntity<Set<ProductDTO>> getOrders(@PathVariable Long idOrder) {
 
         return ResponseEntity.ok(purchaseOrderServiceImpl.getAllProductsFromPurchaseOrder(idOrder));
     }

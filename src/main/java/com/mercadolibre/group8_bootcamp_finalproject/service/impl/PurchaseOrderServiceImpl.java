@@ -6,9 +6,10 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantit
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,28 +17,24 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class PurchaseOrderServiceImpl {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
 
-    @Autowired
-    private PurchaseOrderItemRepository purchaseOrderItemRepository;
+    private final PurchaseOrderItemRepository purchaseOrderItemRepository;
 
-    @Autowired
-    private BatchRepository batchRepository;
+    private final BatchRepository batchRepository;
 
-    @Autowired
-    private BuyerRepository buyerRepository;
+    private final BuyerRepository buyerRepository;
 
-    @Transactional
+    //@Transactional
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrderRepository.save(purchaseOrder);
-        updateOrdemItems(purchaseOrder.getPurchaseOrderItems(), purchaseOrder.getId());
+        updateOrderItems(purchaseOrder.getPurchaseOrderItems(), purchaseOrder.getId());
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
@@ -48,82 +45,186 @@ public class PurchaseOrderServiceImpl {
         List<Product> productsFromPurchaseOrder = new ArrayList<>();
         for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
             Batch batch = verifyIfBatchExists(purchaseOrderItem.getBatch().getId());
-            productsFromPurchaseOrder.add(productRepository.findById(batch.getProduct().getId()).get());
+            productsFromPurchaseOrder.add(verifyIfProductExists(batch.getProduct().getId()));
         }
-        return convertProductListToProductDTOList(productsFromPurchaseOrder);
+        return ProductMapper.convertProductListToProductDTOList(productsFromPurchaseOrder);
     }
 
-    @Transactional
+    //@Transactional
     public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId){
         verifyIfPurchaseOrderExists(purchaseOrderId);
         PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
         List<ProductQuantityRequestDTO> products = purchaseOrderDTO.getProducts();
 
         List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrder(purchaseOrderId);
-        compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(purchaseOrderId, purchaseOrderItems, products);
-        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
+        compareProductsFromPurchaseOrderRequestWithProductsFromPurchaseOrderItemDb(purchaseOrderId, purchaseOrderItems, products);
+        PurchaseOrder purchaseOrder = getPurchaseOrder(purchaseOrderId);
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
 
-    private void compareProductsFromPurchaseOrderWithProductsFromPurchaseOrderItem(Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems, List<ProductQuantityRequestDTO> products){
+    private PurchaseOrder createPurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
+        PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
+        Buyer buyer = verifyIfBuyerExists(purchaseOrderDTO.getBuyerId());
+
+        PurchaseOrder purchaseOrder = new PurchaseOrder();
+        purchaseOrder.setOrderStatusEnum(purchaseOrderDTO.getOrderStatus().getStatusCode());
+        purchaseOrder.setBuyer(buyer);
+        purchaseOrder.setPurchaseOrderItems(createPurchaseOrderItems(purchaseOrderRequestDTO));
+
+        return purchaseOrder;
+    }
+
+    private List<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
+        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
+
+        for(ProductQuantityRequestDTO product: purchaseOrderRequestDTO.getPurchaseOrder().getProducts()){
+            addPurchaseOrderItemsToList(product, purchaseOrderItems, null);
+        }
+        return purchaseOrderItems;
+    }
+
+    private void addPurchaseOrderItemsToList(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
+        checkQuantityInBatches(product);
+        Map<Long, Integer> batchesFromOrderItem = getBatchesAndQuantityToOrderItem(product);
+        for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
+            if(productDueDateIsValid(map.getKey())){
+                Batch actualBatch = getBatch(map.getKey());
+                if(purchaseOrderId != null){
+                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemRepository.findPurchaseOrderItemByBatch_IdAndPurchaseOrderId(actualBatch.getId(), purchaseOrderId);
+                    if(purchaseOrderItem != null){
+                        purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() + map.getValue());
+                        purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
+                    }
+                    else{
+                        createPurchaseOrderItemAndAddToList(map, actualBatch, purchaseOrderItems);
+                    }
+                }
+                else{
+                    createPurchaseOrderItemAndAddToList(map, actualBatch, purchaseOrderItems);
+                }
+                updateBatchesWithPurchaseOrder(actualBatch, actualBatch.getQuantity() - map.getValue());
+            }
+        }
+    }
+
+    private void createPurchaseOrderItemAndAddToList(Map.Entry<Long, Integer> map, Batch batch, List<PurchaseOrderItem> purchaseOrderItems){
+        PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+        purchaseOrderItem.setQuantity(map.getValue());
+        purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
+        purchaseOrderItem.setBatch(batch);
+        purchaseOrderItems.add(purchaseOrderItem);
+    }
+
+    private Double getPriceFromProduct(Long batchId){
+        return getBatch(batchId).getProduct().getPrice();
+    }
+
+    private void updateBatchesWithPurchaseOrder(Batch batch, Integer quantity){
+        batch.setQuantity(quantity);
+        batchRepository.save(batch);
+    }
+
+    private Map<Long, Integer> getBatchesAndQuantityToOrderItem(ProductQuantityRequestDTO productQuantityRequestDTO){
+        List<Batch> batches = batchRepository.findAllByProduct(productQuantityRequestDTO.getProductId());
+        Map<Long, Integer> batchesAndQuantityFromOrderItem = new HashMap<>();
+        Collections.sort(batches);
+
+        int neededQuantity = productQuantityRequestDTO.getQuantity();
+
+        for(Batch batch: batches){
+            if(batch.getQuantity() >= neededQuantity){
+                batchesAndQuantityFromOrderItem.put(batch.getId(), neededQuantity);
+                break;
+            }
+            else{
+                if(batch.getQuantity() != 0){
+                    batchesAndQuantityFromOrderItem.put(batch.getId(), batch.getQuantity());
+                    neededQuantity = neededQuantity - batch.getQuantity();
+                }
+            }
+        }
+
+        return batchesAndQuantityFromOrderItem;
+    }
+
+    private void checkQuantityInBatches(ProductQuantityRequestDTO product){
+        Integer sum = productQuantityInBatches(product.getProductId());
+        if(product.getQuantity() > sum){
+            throw new NotFoundException("Insufficient Quantity");
+        }
+    }
+
+    private void compareProductsFromPurchaseOrderRequestWithProductsFromPurchaseOrderItemDb(Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems, List<ProductQuantityRequestDTO> products){
         Set<Long> productsIdInPurchaseOrderRequest = new HashSet<>();
 
         for(ProductQuantityRequestDTO product: products){
             productsIdInPurchaseOrderRequest.add(product.getProductId());
             verifyIfProductExists(product.getProductId());
             if(verifyIfPurchaseOrderItemExistsWithProduct(product.getProductId(), purchaseOrderId)){
-                List<PurchaseOrderItem> purchaseOrderItemListWithProduct = getPurchaseOrderItemsWithProduct(product.getProductId(), purchaseOrderId);
-                Collections.sort(purchaseOrderItemListWithProduct);
-                Integer quantityInPurchaseOrder = purchaseOrderItemListWithProduct.stream().mapToInt(PurchaseOrderItem::getQuantity).sum();
-                if(quantityInPurchaseOrder > product.getQuantity()){
-                    List<PurchaseOrderItem> purchaseOrderItemListToRemove = new ArrayList<>();
-                    Integer quantityToReturn = quantityInPurchaseOrder - product.getQuantity();
-                    for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListWithProduct){
-                        if(quantityToReturn >= purchaseOrderItem.getQuantity()){
-                            returnItemsFromPurchaseOrderItem(purchaseOrderItem, purchaseOrderItem.getQuantity());
-                            quantityToReturn -= purchaseOrderItem.getQuantity();
-                            purchaseOrderItemListToRemove.add(purchaseOrderItem);
-
-                        }
-                        else{
-                            returnItemsFromPurchaseOrderItem(purchaseOrderItem, quantityToReturn);
-                            purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() - quantityToReturn);
-                            purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
-                            purchaseOrderItemRepository.save(purchaseOrderItem);
-                            break;
-                        }
-                    }
-                    removeItemsFromList(purchaseOrderItemListWithProduct, purchaseOrderItemListToRemove);
-                    removeItemsFromPurchaseOrderItemsDb(purchaseOrderItemListToRemove);
-                }
-                else if (quantityInPurchaseOrder < product.getQuantity()) {
-                    product.setQuantity(product.getQuantity() - quantityInPurchaseOrder);
-                    addPurchaseOrderItemsToList(product, purchaseOrderItems, purchaseOrderId);
-                    updateOrdemItems(purchaseOrderItemListWithProduct, purchaseOrderId);
-                }
+                updatePurchaseItemsWithProduct(product, purchaseOrderId, purchaseOrderItems);
             }
             else{
                 addPurchaseOrderItemsToList(product, purchaseOrderItems, purchaseOrderId);
-                updateOrdemItems(purchaseOrderItems, purchaseOrderId);
+                updateOrderItems(purchaseOrderItems, purchaseOrderId);
             }
         }
         Set<Long> productsIdInPurchaseOrderDb = productRepository.finAllByPurchaseOrder(purchaseOrderId);
+
+        checkProductsOutOfPurchaseOrderUpdated(productsIdInPurchaseOrderDb, productsIdInPurchaseOrderRequest, purchaseOrderId);
+
+    }
+
+    private void updatePurchaseItemsWithProduct(ProductQuantityRequestDTO product, Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems){
+        List<PurchaseOrderItem> purchaseOrderItemListWithProduct = getPurchaseOrderItemsWithProduct(product.getProductId(), purchaseOrderId);
+        Collections.sort(purchaseOrderItemListWithProduct);
+        Integer quantityInPurchaseOrder = purchaseOrderItemListWithProduct.stream().mapToInt(PurchaseOrderItem::getQuantity).sum();
+        if(quantityInPurchaseOrder > product.getQuantity()){
+            updatePurchaseOrderWithMoreQuantitiesInUpdate(product, purchaseOrderItemListWithProduct, quantityInPurchaseOrder);
+        }
+        else if (quantityInPurchaseOrder < product.getQuantity()) {
+            product.setQuantity(product.getQuantity() - quantityInPurchaseOrder);
+            addPurchaseOrderItemsToList(product, purchaseOrderItemListWithProduct, purchaseOrderId);
+            updateOrderItems(purchaseOrderItemListWithProduct, purchaseOrderId);
+        }
+    }
+
+    private void updatePurchaseOrderWithMoreQuantitiesInUpdate(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItemListWithProduct, Integer quantityInPurchaseOrder ){
+        List<PurchaseOrderItem> purchaseOrderItemListToRemove = new ArrayList<>();
+        Integer quantityToReturn = quantityInPurchaseOrder - product.getQuantity();
+        for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItemListWithProduct){
+            if(quantityToReturn >= purchaseOrderItem.getQuantity()){
+                returnItemsFromPurchaseOrderItem(purchaseOrderItem, purchaseOrderItem.getQuantity());
+                quantityToReturn -= purchaseOrderItem.getQuantity();
+                purchaseOrderItemListToRemove.add(purchaseOrderItem);
+            }
+            else{
+                returnItemsFromPurchaseOrderItem(purchaseOrderItem, quantityToReturn);
+                purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() - quantityToReturn);
+                purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
+                purchaseOrderItemRepository.save(purchaseOrderItem);
+                break;
+            }
+        }
+        removeItemsFromList(purchaseOrderItemListWithProduct, purchaseOrderItemListToRemove);
+        removeItemsFromPurchaseOrderItemsDb(purchaseOrderItemListToRemove);
+    }
+
+    private void checkProductsOutOfPurchaseOrderUpdated(Set<Long> productsIdInPurchaseOrderDb, Set<Long> productsIdInPurchaseOrderRequest, Long purchaseOrderId ){
         if(productsIdInPurchaseOrderDb.size() != productsIdInPurchaseOrderRequest.size()){
 
             if(productsIdInPurchaseOrderDb.size() > productsIdInPurchaseOrderRequest.size()){
                 productsIdInPurchaseOrderDb.removeAll(productsIdInPurchaseOrderRequest);
-                returnProductsDiscartedInThePurchaseOrder(productsIdInPurchaseOrderDb, purchaseOrderId);
+                returnProductsDiscardedInThePurchaseOrder(productsIdInPurchaseOrderDb, purchaseOrderId);
             }
             else{
                 productsIdInPurchaseOrderRequest.removeAll(productsIdInPurchaseOrderDb);
-                returnProductsDiscartedInThePurchaseOrder(productsIdInPurchaseOrderRequest, purchaseOrderId);
+                returnProductsDiscardedInThePurchaseOrder(productsIdInPurchaseOrderRequest, purchaseOrderId);
             }
         }
-
     }
 
-    private void returnProductsDiscartedInThePurchaseOrder(Set<Long> productsId, Long purchaseOrderId){
+    private void returnProductsDiscardedInThePurchaseOrder(Set<Long> productsId, Long purchaseOrderId){
         for(Long productId: productsId){
             List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findPurchaseOrderItemByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
             for(PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
@@ -150,113 +251,24 @@ public class PurchaseOrderServiceImpl {
         updateBatchesWithPurchaseOrder(purchaseOrderItem.getBatch(), purchaseOrderItem.getBatch().getQuantity() + quantity);
     }
 
-    private void updateOrdemItems(List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
+    private void updateOrderItems(List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
         for (PurchaseOrderItem purchaseOrderItem: purchaseOrderItems){
             if(purchaseOrderItem.getPurchaseOrder() == null){
-                PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).get();
-                purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-
+                Optional<PurchaseOrder> purchaseOrderO = purchaseOrderRepository.findById(purchaseOrderId);
+                if(purchaseOrderO.isPresent()){
+                    PurchaseOrder purchaseOrder = purchaseOrderO.get();
+                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+                }
+                else{
+                    throw new NotFoundException("Purchase Order Not Found");
+                }
             }
             purchaseOrderItemRepository.save(purchaseOrderItem);
         }
     }
 
-    private PurchaseOrder createPurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
-        PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
-        Buyer buyer = verifyIfBuyerExists(purchaseOrderDTO.getBuyerId());
-
-        PurchaseOrder purchaseOrder = new PurchaseOrder();
-        purchaseOrder.setOrderStatusEnum(purchaseOrderDTO.getOrderStatus().getStatusCode());
-        purchaseOrder.setBuyer(buyer);
-        purchaseOrder.setPurchaseOrderItems(createPurchaseOrderItems(purchaseOrderRequestDTO));
-
-        return purchaseOrder;
-    }
-
-    private List<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
-        List<PurchaseOrderItem> purchaseOrderItems = new ArrayList<>();
-
-        for(ProductQuantityRequestDTO product: purchaseOrderRequestDTO.getPurchaseOrder().getProducts()){
-            addPurchaseOrderItemsToList(product, purchaseOrderItems, null);
-        }
-        return purchaseOrderItems;
-    }
-
-    private void addPurchaseOrderItemsToList(ProductQuantityRequestDTO product, List<PurchaseOrderItem> purchaseOrderItems, Long purchaseOrderId){
-        checkQuantityInBatches(product);
-        Map<Long, Integer> batchesFromOrderItem = getBatchsAndQuantityToOrderItem(product);
-        for(Map.Entry<Long, Integer> map: batchesFromOrderItem.entrySet()){
-            if(productDueDateIsValid(map.getKey())){
-                Batch actualBatch = getBatch(map.getKey());
-                if(purchaseOrderId != null){
-                    PurchaseOrderItem purchaseOrderItem = purchaseOrderItemRepository.findPurchaseOrderItemByBatch_IdAndPurchaseOrderId(actualBatch.getId(), purchaseOrderId);
-                    if(purchaseOrderItem != null){
-                        purchaseOrderItem.setQuantity(purchaseOrderItem.getQuantity() + map.getValue());
-                        purchaseOrderItem.setTotalPrice(purchaseOrderItem.getBatch().getProduct().getPrice()*purchaseOrderItem.getQuantity());
-                    }
-                    else{
-                        createPurchaseOrdemItemAndAddToList(map, actualBatch, purchaseOrderItems);
-                    }
-                }
-                else{
-                    createPurchaseOrdemItemAndAddToList(map, actualBatch, purchaseOrderItems);
-                }
-                updateBatchesWithPurchaseOrder(actualBatch, actualBatch.getQuantity() - map.getValue());
-            }
-        }
-    }
-
-    private void createPurchaseOrdemItemAndAddToList(Map.Entry<Long, Integer> map, Batch batch, List<PurchaseOrderItem> purchaseOrderItems){
-        PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-        purchaseOrderItem.setQuantity(map.getValue());
-        purchaseOrderItem.setTotalPrice(getPrice(map.getValue(), getPriceFromProduct(map.getKey())));
-        purchaseOrderItem.setBatch(batch);
-        purchaseOrderItems.add(purchaseOrderItem);
-    }
-
-    private Double getPriceFromProduct(Long batchId){
-        return batchRepository.findById(batchId).get().getProduct().getPrice();
-    }
-
-    private Batch getBatch(Long bachId){
-        return batchRepository.findById(bachId).get();
-    }
-
-    private void updateBatchesWithPurchaseOrder(Batch batch, Integer quantity){
-        batch.setQuantity(quantity);
-        batchRepository.save(batch);
-    }
-
-    private Map<Long, Integer> getBatchsAndQuantityToOrderItem(ProductQuantityRequestDTO productQuantityRequestDTO){
-        List<Batch> batches = batchRepository.findAllByProduct(productQuantityRequestDTO.getProductId());
-        Map<Long, Integer> batchesAndQuantityFromOrderItem = new HashMap<>();
-        Collections.sort(batches);
-
-        int neededQuantity = productQuantityRequestDTO.getQuantity();
-
-        for(Batch batch: batches){
-            if(batch.getQuantity() >= neededQuantity){
-                batchesAndQuantityFromOrderItem.put(batch.getId(), neededQuantity);
-                break;
-            }
-            else{
-                batchesAndQuantityFromOrderItem.put(batch.getId(), batch.getQuantity());
-                neededQuantity = neededQuantity - batch.getQuantity();
-            }
-        }
-
-        return batchesAndQuantityFromOrderItem;
-    }
-
-    private void checkQuantityInBatches(ProductQuantityRequestDTO product){
-        Integer sum = productQuantityInBatches(product.getProductId());
-        if(product.getQuantity() > sum){
-            throw new NotFoundException("Quantidade insuficiente");
-        }
-    }
-
     private Boolean productDueDateIsValid(Long batchId){
-        Batch batch = batchRepository.findById(batchId).get();
+        Batch batch = getBatch(batchId);
         return batch.getDueDate().plusWeeks(-3).compareTo(LocalDate.now()) >= 0;
     }
 
@@ -266,7 +278,7 @@ public class PurchaseOrderServiceImpl {
         if(batches.size()>0){
             return batches.stream().mapToInt(Batch::getQuantity).sum();
         }else{
-            throw new NotFoundException("Estoque em falta");
+            throw new NotFoundException("Product out of stock");
         }
     }
 
@@ -280,35 +292,36 @@ public class PurchaseOrderServiceImpl {
         }
     }
 
-    private Set<ProductDTO> convertProductListToProductDTOList(List<Product> products){
-        Set<ProductDTO> productDTOS = new LinkedHashSet<>();
-        for(Product product: products){
-            ProductDTO productDTO = ProductDTO.builder()
-                    .id(product.getId())
-                    .name(product.getName())
-                    .description(product.getDescription())
-                    .minTemperature(product.getMinTemperature())
-                    .maxTemperature(product.getMaxTemperature())
-                    .price(product.getPrice())
-                    .build();
-            productDTOS.add(productDTO);
+    private Batch getBatch(Long batchId){
+        Optional<Batch> batch = batchRepository.findById(batchId);
+        if(batch.isPresent()){
+            return batch.get();
         }
-
-        return productDTOS;
+        throw new NotFoundException("Batch not found");
     }
 
-    private void verifyIfProductExists(Long productId){
-        if(productRepository.existsById(productId)){
-            productRepository.findById(productId).get();
+    private PurchaseOrder getPurchaseOrder(Long purchaseOrderId){
+        Optional<PurchaseOrder> purchaseOrderO = purchaseOrderRepository.findById(purchaseOrderId);
+        if(purchaseOrderO.isPresent()){
+            return purchaseOrderO.get();
+        }
+        throw new NotFoundException("Purchase Order not found");
+    }
+
+    private Product verifyIfProductExists(Long productId){
+        Optional<Product> productOptional = productRepository.findById(productId);
+        if(productOptional.isPresent()){
+            return productOptional.get();
         }
         else{
-            throw new NotFoundException("Products not found");
+            throw new NotFoundException("Product not found");
         }
     }
 
     private Buyer verifyIfBuyerExists(Long buyerId){
-        if(buyerRepository.existsById(buyerId)){
-            return buyerRepository.findById(buyerId).get();
+        Optional<Buyer> buyerOptional = buyerRepository.findById(buyerId);
+        if(buyerOptional.isPresent()){
+            return buyerOptional.get();
         }
         else{
             throw new NotFoundException("Buyer not found");
@@ -317,7 +330,7 @@ public class PurchaseOrderServiceImpl {
 
     private Batch verifyIfBatchExists(Long batchId){
         if(batchRepository.existsById(batchId)){
-            return batchRepository.findById(batchId).get();
+            return getBatch(batchId);
         }
         else{
             throw new NotFoundException("Batch not found");
