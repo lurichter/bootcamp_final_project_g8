@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,5 +33,5 @@ public class PurchaseOrder {
     private Buyer buyer;
 
     @OneToMany(mappedBy = "purchaseOrder")
-    private Set<PurchaseOrderItem> purchaseOrderItems;
+    private List<PurchaseOrderItem> purchaseOrderItems;
 }

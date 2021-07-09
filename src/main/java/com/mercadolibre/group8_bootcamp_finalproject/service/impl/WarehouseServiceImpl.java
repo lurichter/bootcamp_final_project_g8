@@ -5,7 +5,9 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseTota
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.WarehouseProductNotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.WarehouseSectionCapabilityException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
+import com.mercadolibre.group8_bootcamp_finalproject.model.WarehouseSection;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.SellerRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.WarehouseSectionRepository;
@@ -42,6 +44,20 @@ public class WarehouseServiceImpl implements IWarehouseService {
                 .build();
     }
 
+    @Override
+    public void verifySectionCapability(WarehouseSection warehouseSection, int quantity) {
+        if ( warehouseSection.getCurrentAvailability() < quantity ) {
+            throw new WarehouseSectionCapabilityException();
+        }
+    }
+
+    @Override
+    public void decreaseWarehouseSectionCapacity(WarehouseSection warehouseSection, int quantity) {
+        verifySectionCapability(warehouseSection, quantity);
+        int newQuantity = warehouseSection.getCurrentAvailability() - quantity;
+        warehouseSection.setCurrentAvailability(newQuantity);
+        warehouseSectionRepository.save(warehouseSection);
+    }
 
     private void isValidSeller (Integer id) {
         Long seller_id = this.getProductById(id).getSeller().getId();

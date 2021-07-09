@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.repository;
 
+import com.mercadolibre.group8_bootcamp_finalproject.model.Batch;
 import com.mercadolibre.group8_bootcamp_finalproject.model.PurchaseOrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,4 +12,6 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
 
     @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.batch.id = :batchId")
     List<PurchaseOrderItem> findByBatchId (@Param("batchId") Long batchId);
+
+    List<PurchaseOrderItem> findPurchaseOrderItemByBatchIn(List<Batch> batches);
 }

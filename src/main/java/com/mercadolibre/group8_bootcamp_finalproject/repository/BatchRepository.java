@@ -14,7 +14,7 @@ import java.util.Set;
 public interface BatchRepository extends JpaRepository<Batch, Long> {
 
     @Query("SELECT b FROM Batch b WHERE b.product.id = :productId AND b.dueDate > :minimunDueDate")
-    Set<Batch> findBatchByProductIdAndByDueDate(Long productId, LocalDate minimunDueDate, Sort sort);
+    List<Batch> findBatchByProductIdAndByDueDate(Long productId, LocalDate minimunDueDate, Sort sort);
 
     @Query("SELECT " +
             " new com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateDTO(ws.warehouse.id, b.number, b.product.id, pc.name, b.dueDate, b.quantity) " +

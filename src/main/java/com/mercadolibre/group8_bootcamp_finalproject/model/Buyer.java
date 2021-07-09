@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,5 +24,5 @@ public class Buyer {
     private Users user;
 
     @OneToMany(mappedBy = "buyer")
-    private Set<PurchaseOrder> purchaseOrders;
+    private List<PurchaseOrder> purchaseOrders;
 }

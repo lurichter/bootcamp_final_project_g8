@@ -1,16 +1,10 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
-import lombok.AllArgsConstructor;
-
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,8 +23,8 @@ public class ProductCategory {
     private ProductCategoryEnum name;
 
     @OneToMany(mappedBy = "productCategory")
-    private Set<Product> products;
+    private List<Product> products;
 
     @OneToMany(mappedBy = "productCategory")
-    private Set<WarehouseSection> warehouseSections;
+    private List<WarehouseSection> warehouseSections;
 }
