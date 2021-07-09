@@ -2,6 +2,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
 import com.mercadolibre.group8_bootcamp_finalproject.model.ProductCategory;
@@ -40,7 +41,7 @@ public class ProductServiceImpl implements IProductService {
 
     private void verifyIfListIsEmpty(List<Product> products){
         if(products.size() == 0){
-            throw new NotFoundException("Products not found");
+            throw new ProductNotFoundException("Product List not found");
         }
     }
 

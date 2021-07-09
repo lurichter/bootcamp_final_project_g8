@@ -5,7 +5,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantityRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
@@ -148,10 +148,11 @@ public class PurchaseOrderServiceImpl {
         return batchesAndQuantityFromOrderItem;
     }
 
-    private void checkQuantityInBatches(ProductQuantityRequestDTO product){
-        Integer sum = productQuantityInBatches(product.getProductId());
-        if(product.getQuantity() > sum){
-            throw new NotFoundException("Insufficient Quantity");
+    private void checkQuantityInBatches(ProductQuantityRequestDTO productDTO){
+        Product product = verifyIfProductExists(productDTO.getProductId());
+        Integer sum = productQuantityInBatches(productDTO.getProductId());
+        if(productDTO.getQuantity() > sum){
+            throw new ProductQuantityOutStockNotFoundException("Insufficient Quantity (" +productDTO.getQuantity()+ ") to " + product.getName());
         }
     }
 
@@ -260,7 +261,7 @@ public class PurchaseOrderServiceImpl {
                     purchaseOrderItem.setPurchaseOrder(purchaseOrder);
                 }
                 else{
-                    throw new NotFoundException("Purchase Order Not Found");
+                    throw new NotFoundException("Purchase Order" + purchaseOrderId.toString() + "Not Found");
                 }
             }
             purchaseOrderItemRepository.save(purchaseOrderItem);
@@ -273,12 +274,12 @@ public class PurchaseOrderServiceImpl {
     }
 
     private Integer productQuantityInBatches(Long productId){
-        verifyIfProductExists(productId);
+        Product product = verifyIfProductExists(productId);
         List<Batch> batches = batchRepository.findAllByProduct(productId);
         if(batches.size()>0){
             return batches.stream().mapToInt(Batch::getQuantity).sum();
         }else{
-            throw new NotFoundException("Product out of stock");
+            throw new BatchNotFoundException("Batch with product " + product.getName() + "not found");
         }
     }
 
@@ -297,7 +298,7 @@ public class PurchaseOrderServiceImpl {
         if(batch.isPresent()){
             return batch.get();
         }
-        throw new NotFoundException("Batch not found");
+        throw new BatchNotFoundException("Batch with id " + batchId + " not found");
     }
 
     private PurchaseOrder getPurchaseOrder(Long purchaseOrderId){
@@ -314,7 +315,7 @@ public class PurchaseOrderServiceImpl {
             return productOptional.get();
         }
         else{
-            throw new NotFoundException("Product not found");
+            throw new ProductNotFoundException("Product with id "+ productId + " not found");
         }
     }
 
@@ -324,7 +325,7 @@ public class PurchaseOrderServiceImpl {
             return buyerOptional.get();
         }
         else{
-            throw new NotFoundException("Buyer not found");
+            throw new BuyerNotFoundException("Buyer with id " + " not found");
         }
     }
 
@@ -333,7 +334,7 @@ public class PurchaseOrderServiceImpl {
             return getBatch(batchId);
         }
         else{
-            throw new NotFoundException("Batch not found");
+            throw new BatchNotFoundException("Batch with id " + batchId + " not found");
         }
     }
 
