@@ -9,7 +9,7 @@ public class WarehouseSectionDTO {
 
     @NotNull(message = "section code is required")
     private Integer sectionCode;
-
+// TODO não serve pra nada mas está no teste
     @NotNull(message = "warehouse code is required")
     private Integer warehouseCode;
 }

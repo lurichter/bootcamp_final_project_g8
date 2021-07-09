@@ -9,6 +9,7 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
+@NoArgsConstructor
 @AllArgsConstructor
 public class WarehouseOperatorKey implements Serializable {
     @Column(name = "warehouse_id")

@@ -1,4 +1,4 @@
-package com.mercadolibre.group8_bootcamp_finalproject.services;
+package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseDTO;

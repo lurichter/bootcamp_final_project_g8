@@ -25,7 +25,7 @@ public class Seller {
     private Long id;
 
     @OneToOne
-    private User user;
+    private Users user;
 
     @OneToMany(mappedBy = "seller")
     private Set<Product> products;
