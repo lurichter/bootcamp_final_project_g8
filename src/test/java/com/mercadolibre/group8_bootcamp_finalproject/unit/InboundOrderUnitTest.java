@@ -4,17 +4,19 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
-import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.InboundOrderServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.BDDMockito;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -47,12 +49,12 @@ public class InboundOrderUnitTest {
     @BeforeEach
     void setUp() {
 
-        this.warehouseSectionDTO.setSectionCode(1);
-        this.warehouseSectionDTO.setWarehouseCode(1);
+        this.warehouseSectionDTO.setSectionCode(1L);
+        this.warehouseSectionDTO.setWarehouseCode(1L);
 
         BatchDTO batchDTO1 = BatchDTO.builder()
                 .batchNumber("MELI0001")
-                .productId(1)
+                .productId(1L)
                 .currentTemperature(10.0)
                 .quantity(20000)
                 .manufacturingDate(LocalDate.now().minusDays(7))
@@ -64,7 +66,7 @@ public class InboundOrderUnitTest {
 
         BatchDTO batchDTO2 = BatchDTO.builder()
                 .batchNumber("MELI0002")
-                .productId(2)
+                .productId(2L)
                 .currentTemperature(2.0)
                 .quantity(20000)
                 .manufacturingDate(LocalDate.now().minusDays(7))
@@ -79,13 +81,13 @@ public class InboundOrderUnitTest {
 
         this.inboundOrderRequestDTO.setInboundOrder(this.inboundOrderDTO);
 
-        User user1 = User.builder()
+        Users user1 = Users.builder()
                 .id(1L)
                 .name("operador1@mercadolivre.com")
                 .password("123456")
                 .build();
 
-        User user2 = User.builder()
+        Users user2 = Users.builder()
                 .id(2L)
                 .name("vendedor1@mercadolivre.com")
                 .password("123456")
@@ -176,10 +178,10 @@ public class InboundOrderUnitTest {
         InboundOrder inboundOrder = InboundOrder.builder()
                 .dateTime(LocalDateTime.now())
                 .operator(operator)
-                .batch(new HashSet<Batch>(Arrays.asList(batch1, batch2)))
+                .batches(Arrays.asList(batch1, batch2))
                 .build();
 
-        seller.setProducts(new HashSet<Product>(Arrays.asList(freshProduct1, freshProduct2)));
+        seller.setProducts(Arrays.asList(freshProduct1, freshProduct2));
 
         List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
         warehouseOperators.add(warehouseOperator);
@@ -218,7 +220,7 @@ public class InboundOrderUnitTest {
     @Test
     public void returnBatchResponseListIfValidInboundOrder() {
 
-        BatchResponseListDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
+        InboundOrderResponseDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
 
         Assertions.assertThat(batchResponseListDTO.getBatchStock())
                 .extracting(
