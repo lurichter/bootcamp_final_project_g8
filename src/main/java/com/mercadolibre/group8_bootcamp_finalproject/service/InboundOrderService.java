@@ -1,12 +1,11 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
 
 public interface InboundOrderService {
 
-    BatchResponseListDTO createInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
+    InboundOrderResponseDTO createInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
 
-    BatchResponseListDTO updateInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
+    InboundOrderResponseDTO updateInboundOrder (InboundOrderRequestDTO inboundOrderRequest);
 }

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
@@ -15,13 +16,13 @@ import java.time.LocalTime;
 @Builder
 public class BatchDTO {
 
-    private Integer batchId;
+    private Long batchId;
 
     @NotNull(message = "batch number is required")
     private String batchNumber;
 
     @NotNull(message = "product id is required")
-    private Integer productId;
+    private Long productId;
 
     @NotNull(message = "current temperature is required")
     private Double currentTemperature;
@@ -30,6 +31,7 @@ public class BatchDTO {
 //    private Double minimumTemperature;
 
     @NotNull(message = "quantity is required")
+    @Min(value = 1, message = "The inbound batch stock quantity must be greater than 0.")
     private Integer quantity;
 
     @PastOrPresent(message = "manufacturing date is in the future")

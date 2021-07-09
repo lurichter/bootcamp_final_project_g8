@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BatchResponseDTO {
+    private Long batchId;
     private String batchNumber;
     private Integer productId;
     private Double currentTemperature;
