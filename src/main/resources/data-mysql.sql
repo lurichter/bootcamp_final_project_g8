@@ -1,39 +1,54 @@
 USE fresh;
 
-# Insert users
-INSERT INTO user (name, password) VALUES ("operador1@mercadolivre.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
-INSERT INTO user (name, password) VALUES ("operador2@mercadolivre.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
-INSERT INTO user (name, password) VALUES ("vendedor1@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
-INSERT INTO user (name, password) VALUES ("vendedor2@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
-INSERT INTO user (name, password) VALUES ("comprador1@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
-INSERT INTO user (name, password) VALUES ("comprador2@gmail.com", "$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS");
+-- Insert user
+INSERT INTO user (name, password) VALUES ("operador1@mercadolivre.com", "123456");
+INSERT INTO user (name, password) VALUES ("operador2@mercadolivre.com", "123456");
+INSERT INTO user (name, password) VALUES ("vendedor1@gmail.com", "123456");
+INSERT INTO user (name, password) VALUES ("vendedor2@gmail.com", "123456");
+INSERT INTO user (name, password) VALUES ("comprador1@gmail.com", "123456");
+INSERT INTO user (name, password) VALUES ("comprador2@gmail.com", "123456");
 
-
-# Insert operators
+-- Insert operators
 INSERT INTO operator (user_user_id) VALUES (1);
 INSERT INTO operator (user_user_id) VALUES (2);
 
-# Insert sellers
+-- Insert sellers
 INSERT INTO seller (user_user_id) VALUES (3);
 INSERT INTO seller (user_user_id) VALUES (4);
 
-# Insert buyers
+-- Insert buyers
 INSERT INTO buyer (user_user_id) VALUES (5);
 INSERT INTO buyer (user_user_id) VALUES (6);
 
-# Insert product categories
-INSERT INTO product_category (category_code, category_name) VALUES ("FS", "Fresh");
-INSERT INTO product_category (category_code, category_name) VALUES ("FR", "Chilled");
-INSERT INTO product_category (category_code, category_name) VALUES ("FF", "Frozen");
+-- Insert Warehouses
+INSERT INTO warehouse (accept_fresh, address, warehouse_name) VALUES (1, "Avenida Doutor Antonio Joao Abdalla, 3333", "CAJAMAR01");
+INSERT INTO warehouse (accept_fresh, address, warehouse_name) VALUES (1, "Avenida Doutor Antonio Joao Abdalla, 3333", "CAJAMAR02");
 
+-- Insert Warehouse Operators
+INSERT INTO warehouse_operator (operator_id, warehouse_id) VALUES (1, 1);
+INSERT INTO warehouse_operator (operator_id, warehouse_id) VALUES (1, 2);
 
-# Insert products seller 1
+-- Insert product categories
+INSERT INTO product_category (category_name) VALUES ("FS");
+INSERT INTO product_category (category_name) VALUES ("RF");
+INSERT INTO product_category (category_name) VALUES ("FF");
+
+-- Insert Warehouse Sections
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (100000, 100000, "CAJAMAR01FRESH", 10.0, 1, 1);
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (80000, 80000, "CAJAMAR01CHILL", 2.0, 1, 2);
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (50000, 50000, "CAJAMAR01FROZEN", -1.0, 1, 3);
+
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (100000, 100000, "CAJAMAR02FRESH", 10.0, 2, 1);
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (80000, 80000, "CAJAMAR02CHILL", 2.0, 2, 2);
+INSERT INTO warehouse_section (capacity, current_availability, section_name, temperature, warehouse_id, category_id) VALUES (50000, 50000, "CAJAMAR02FROZEN", -1.0, 2, 3);
+
+-- Insert products seller 1
 INSERT INTO product (product_description, 
 					maximum_temperature, 
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Uma unidade de tomate Caqui",
 		13.0,
@@ -48,7 +63,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Um cacho com 6 bananas nanicas",
 		13.0,
@@ -63,7 +78,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Um maço de alface crespa higienizado",
 		3.0,
@@ -78,7 +93,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Uma peça de queijo minas frescal sem drenagem",
 		7.0,
@@ -93,7 +108,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Torta congelada com recheio de grango com Catupiry(original) cremoso",
 		4.0,
@@ -108,7 +123,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Pacote com 6 unidades de pão de alho congelados",
 		4.0,
@@ -119,13 +134,13 @@ VALUES ("Pacote com 6 unidades de pão de alho congelados",
         1);
 
 
-# Insert products seller 2
+-- Insert products seller 2
 INSERT INTO product (product_description, 
 					maximum_temperature, 
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Uma unidade de cenoura tipo Extra",
 		15.0,
@@ -140,7 +155,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Pacote com 500g de abobrinha brasileira",
 		13.0,
@@ -155,7 +170,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Pacote com 160g de folhas de rúcula higienizadas",
 		4.0,
@@ -170,7 +185,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Uma peça de queijo parmesão de primeira qualidade",
 		8.0,
@@ -185,7 +200,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Açaí Frooty tradicional",
 		0.0,
@@ -200,7 +215,7 @@ INSERT INTO product (product_description,
                     minimum_temperature, 
                     product_name, 
                     price, 
-                    product_category,
+                    category_id,
                     seller_id)
 VALUES ("Bandeja com 1kg de filé de peito de frango",
 		-1.0,
@@ -209,4 +224,3 @@ VALUES ("Bandeja com 1kg de filé de peito de frango",
         20.99,
         3,
         2);
-        
