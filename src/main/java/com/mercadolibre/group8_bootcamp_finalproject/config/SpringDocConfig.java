@@ -17,6 +17,9 @@ import static java.lang.String.format;
 @Configuration
 public class SpringDocConfig {
 
+	@Value("${server.port}")
+	private int serverPort;
+
 	@Bean
 	public OpenAPI customOpenAPI(@Value("${app.title}") String appName, @Value("${app.description}") String description, @Value("${app.version}") String version) {
 		final String securitySchemeName = "bearerAuth";
@@ -39,7 +42,7 @@ public class SpringDocConfig {
 								)
 				);
 
-		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:8082" : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
+		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:"+serverPort : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
 				.description(format("Scope %s", SCOPE_VALUE)));
 		return api;
 	}

@@ -44,6 +44,38 @@ public class ControllerExceptionHandler {
 		);
 	}
 
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ApiError notFoundRequest(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value()
+		);
+	}
+
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ResponseBody
+	public ApiError unauthorizedRequest(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.UNAUTHORIZED.value()
+		);
+	}
+
+	@ExceptionHandler(UserIsNotAOperatorException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ResponseBody
+	public ApiError userNotAllowed(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.FORBIDDEN.value()
+		);
+	}
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
@@ -61,17 +93,6 @@ public class ControllerExceptionHandler {
 					objectError.getDefaultMessage());
 		}
 		return new ValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
-	}
-
-	@ExceptionHandler({NotFoundException.class})
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public ApiError notFoundRequest(Exception ex) {
-		return new ApiError(
-				ex.getClass().getName(),
-				ex.getMessage(),
-				HttpStatus.NOT_FOUND.value()
-		);
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)
