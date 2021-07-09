@@ -9,8 +9,8 @@ import javax.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class WarehouseOperatorKey implements Serializable {
     @Column(name = "warehouse_id")
     private Long warehouse_id;

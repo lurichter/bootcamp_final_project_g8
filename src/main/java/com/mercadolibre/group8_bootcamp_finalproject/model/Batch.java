@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Batch {
+public class Batch implements Comparable<Batch>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,4 +56,10 @@ public class Batch {
 
     @OneToMany(mappedBy = "batch")
     private List<PurchaseOrderItem> purchaseOrderItems;
+
+    @Override
+    public int compareTo(Batch o) {
+        return this.getDueDate().compareTo(o.getDueDate());
+    }
+
 }

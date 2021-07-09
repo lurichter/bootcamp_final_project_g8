@@ -13,6 +13,9 @@ import java.util.Set;
 
 public interface BatchRepository extends JpaRepository<Batch, Long> {
 
+    @Query(value = "SELECT b FROM Batch b WHERE b.product.id = :productId")
+    List<Batch> findAllByProduct(@Param("productId") Long productId);
+
     @Query("SELECT b FROM Batch b WHERE b.product.id = :productId AND b.dueDate > :minimunDueDate")
     List<Batch> findBatchByProductIdAndByDueDate(Long productId, LocalDate minimunDueDate, Sort sort);
 

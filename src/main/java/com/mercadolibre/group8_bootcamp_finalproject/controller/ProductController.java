@@ -1,30 +1,35 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.ProductServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/")
+@RequiredArgsConstructor
 public class ProductController {
 
+    private final ProductServiceImpl productServiceImpl;
+
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> listAllProducts() {
-        return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
+    public ResponseEntity<Set<ProductDTO>> listAllProducts() {
+        return new ResponseEntity<>(productServiceImpl.getAllProducts(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/list/{productCategory}")
-    public ResponseEntity<List<ProductDTO>> listProductsByCategory(@PathVariable String productCategory) {
-        return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
+    public ResponseEntity<Set<ProductDTO>> listProductsByCategory(@PathVariable ProductCategoryEnum productCategory) {
+        return new ResponseEntity<>(productServiceImpl.getAllProductsByCategory(productCategory), HttpStatus.OK);
     }
-
+    /*
     public List<ProductDTO> createProductsForTest(){
         ProductDTO product = ProductDTO.builder()
                 .id(1L)
@@ -48,4 +53,5 @@ public class ProductController {
 
         return Arrays.asList(product, product2);
     }
+     */
 }

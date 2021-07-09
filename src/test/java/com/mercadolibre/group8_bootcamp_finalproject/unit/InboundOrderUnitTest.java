@@ -5,6 +5,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
@@ -193,6 +194,9 @@ public class InboundOrderUnitTest {
 
         BDDMockito.when(productRepository.findById(freshProduct1.getId())).thenReturn(Optional.of(freshProduct1));
         BDDMockito.when(productRepository.findById(freshProduct2.getId())).thenReturn(Optional.of(freshProduct2));
+        BDDMockito.when(productRepository.findById(AdditionalMatchers
+                        .and(AdditionalMatchers.not(ArgumentMatchers.eq(freshProduct1.getId())),
+                                AdditionalMatchers.not(ArgumentMatchers.eq(freshProduct2.getId()))))).thenThrow(new NotFoundException("Product not found"));
 
         BDDMockito.when(productRepository.getOne(freshProduct1.getId())).thenReturn(freshProduct1);
         BDDMockito.when(productRepository.getOne(freshProduct2.getId())).thenReturn(freshProduct2);
@@ -218,7 +222,7 @@ public class InboundOrderUnitTest {
     }
 
     @Test
-    public void returnBatchResponseListIfValidInboundOrder() {
+    public void returnBatchResponseListWhenValidInboundOrder() {
 
         InboundOrderResponseDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);
 
@@ -249,6 +253,14 @@ public class InboundOrderUnitTest {
                                 this.batchesDTO.get(1).getManufacturingTime(),
                                 this.batchesDTO.get(1).getDueDate()));
 
+    }
+
+    @Test
+    public void returnExceptionWhenInvalidProduct() {
+        this.inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3L);
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(this.inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class);
+//                .hasMessage("bairro não encontrado.");
     }
 
 }

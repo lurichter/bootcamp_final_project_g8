@@ -56,7 +56,7 @@ public class BatchServiceImpl implements IBatchService {
     private List<BatchStockDTO> toBatchStockDTOList(List<Batch> batches){
         List<BatchStockDTO> batchStockDTOList = new ArrayList<>();
         batches.forEach(batch -> batchStockDTOList.add(BatchStockDTO.builder()
-            .batchNumber(batch.getId())
+            .batchNumber(batch.getId().toString())
             .currentQuantity(batch.getQuantity())
             .dueDate(batch.getDueDate())
             .build()));

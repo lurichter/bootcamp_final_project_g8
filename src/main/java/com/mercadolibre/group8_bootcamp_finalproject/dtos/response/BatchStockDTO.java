@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class BatchStockDTO {
-    private Long batchNumber;
+    private String batchNumber;
     private int currentQuantity;
     private LocalDate dueDate;
 }

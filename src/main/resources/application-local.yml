@@ -8,6 +8,7 @@ spring:
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASS}
     initialization-mode: always
+    platform: mysql
 
   jpa:
     show-sql: true
