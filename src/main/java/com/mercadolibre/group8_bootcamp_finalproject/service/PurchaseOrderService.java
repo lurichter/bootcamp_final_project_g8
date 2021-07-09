@@ -11,6 +11,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -32,7 +33,7 @@ public class PurchaseOrderService {
     @Autowired
     private BuyerRepository buyerRepository;
 
-    //@Transactional Implementar baixa no estoque após salvar uma ordem de compra
+    @Transactional
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrderRepository.save(purchaseOrder);
@@ -52,6 +53,7 @@ public class PurchaseOrderService {
         return convertProductListToProductDTOList(productsFromPurchaseOrder);
     }
 
+    @Transactional
     public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId){
         verifyIfPurchaseOrderExists(purchaseOrderId);
         PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
