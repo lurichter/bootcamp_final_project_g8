@@ -1,24 +1,24 @@
 CREATE SCHEMA testdb AUTHORIZATION sa;
 
 -- Insert user
-INSERT INTO user (name, password) VALUES ('operador1@mercadolivre.com', '123456');
-INSERT INTO user (name, password) VALUES ('operador2@mercadolivre.com', '123456');
-INSERT INTO user (name, password) VALUES ('vendedor1@gmail.com', '123456');
-INSERT INTO user (name, password) VALUES ('vendedor2@gmail.com', '123456');
-INSERT INTO user (name, password) VALUES ('comprador1@gmail.com', '123456');
-INSERT INTO user (name, password) VALUES ('comprador2@gmail.com', '123456');
+INSERT INTO users (name, password) VALUES ('operador1@mercadolivre.com', '123456');
+INSERT INTO users (name, password) VALUES ('operador2@mercadolivre.com', '123456');
+INSERT INTO users (name, password) VALUES ('vendedor1@gmail.com', '123456');
+INSERT INTO users (name, password) VALUES ('vendedor2@gmail.com', '123456');
+INSERT INTO users (name, password) VALUES ('comprador1@gmail.com', '123456');
+INSERT INTO users (name, password) VALUES ('comprador2@gmail.com', '123456');
 
 -- Insert operators
-INSERT INTO operator (user_user_id) VALUES (1);
-INSERT INTO operator (user_user_id) VALUES (2);
+INSERT INTO operator (users_user_id) VALUES (1);
+INSERT INTO operator (users_user_id) VALUES (2);
 
 -- Insert sellers
-INSERT INTO seller (user_user_id) VALUES (3);
-INSERT INTO seller (user_user_id) VALUES (4);
+INSERT INTO seller (users_user_id) VALUES (3);
+INSERT INTO seller (users_user_id) VALUES (4);
 
 -- Insert buyers
-INSERT INTO buyer (user_user_id) VALUES (5);
-INSERT INTO buyer (user_user_id) VALUES (6);
+INSERT INTO buyer (users_user_id) VALUES (5);
+INSERT INTO buyer (users_user_id) VALUES (6);
 
 -- Insert Warehouses
 INSERT INTO warehouse (accept_fresh, address, warehouse_name) VALUES (1, 'Avenida Doutor Antonio Joao Abdalla, 3333', 'CAJAMAR01');

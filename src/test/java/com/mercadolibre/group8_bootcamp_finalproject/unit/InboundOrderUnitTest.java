@@ -9,7 +9,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundExceptio
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
-import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.InboundOrderServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,13 +80,13 @@ public class InboundOrderUnitTest {
 
         this.inboundOrderRequestDTO.setInboundOrder(this.inboundOrderDTO);
 
-        User user1 = User.builder()
+        Users user1 = Users.builder()
                 .id(1L)
                 .name("operador1@mercadolivre.com")
                 .password("123456")
                 .build();
 
-        User user2 = User.builder()
+        Users user2 = Users.builder()
                 .id(2L)
                 .name("vendedor1@mercadolivre.com")
                 .password("123456")
