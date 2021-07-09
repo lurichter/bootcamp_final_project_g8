@@ -43,4 +43,6 @@ public interface BatchRepository extends JpaRepository<Batch, Long> {
 //            "WHERE wo.operator.id = :operatorId " +
 //            "AND b.dueDate <= :dueDateFuture")
 //    List<BatchStockDueDateDTO> findAllByWarehouseSectionWhereDueDateLessThanParam(@Param("operatorId") Long operatorId, @Param("dueDateFuture") LocalDate dueDateFuture, Sort sort);
+    @Query(value = "SELECT b FROM Batch b WHERE b.product.id = :productId")
+    List<Batch> findAllByProduct(@Param("productId") Long productId);
 }

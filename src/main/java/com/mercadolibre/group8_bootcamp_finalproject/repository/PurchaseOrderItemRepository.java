@@ -11,4 +11,15 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
 
     @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.batch.id = :batchId")
     List<PurchaseOrderItem> findByBatchId (@Param("batchId") Long batchId);
+
+    @Query(value = "SELECT p FROM PurchaseOrderItem p WHERE p.purchaseOrder.id = :purchaseOrderId")
+    List<PurchaseOrderItem> findAllByPurchaseOrder(@Param("purchaseOrderId") Long purchaseOrderId);
+
+    //@Query("SELECT COUNT(PurchaseOrderItem) FROM PurchaseOrderItem f JOIN Batch b ON b.id = f.id WHERE b.product.id = :productId AND f.purchaseOrder.id = :purchaseOrderId")
+    Long countByBatch_ProductIdAndPurchaseOrderId(Long productId, Long purchaseOrderId);
+
+    //@Query("SELECT f.id, f.quantity, f.totalPrice, f.batch, f.purchaseOrder FROM PurchaseOrderItem f JOIN Batch b ON b.id = f.id WHERE b.product.id = :productId AND f.purchaseOrder.id = :purchaseOrderId")
+    List<PurchaseOrderItem> findPurchaseOrderItemByBatch_ProductIdAndPurchaseOrderId(Long productId, Long purchaseOrderId);
+
+    PurchaseOrderItem findPurchaseOrderItemByBatch_IdAndPurchaseOrderId(Long batchId, Long purchaseOrderId);
 }

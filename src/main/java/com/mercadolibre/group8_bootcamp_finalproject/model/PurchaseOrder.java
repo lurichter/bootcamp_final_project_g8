@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +32,6 @@ public class PurchaseOrder {
     @JoinColumn(name = "buyer_id")
     private Buyer buyer;
 
-    @OneToMany(mappedBy = "purchaseOrder")
-    private Set<PurchaseOrderItem> purchaseOrderItems;
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.PERSIST)
+    private List<PurchaseOrderItem> purchaseOrderItems;
 }
