@@ -1,11 +1,12 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,10 +14,11 @@ import java.time.LocalTime;
 import java.util.Set;
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
+@AllArgsConstructor
 public class Batch implements Comparable<Batch>{
 
     @Id
@@ -44,18 +46,18 @@ public class Batch implements Comparable<Batch>{
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-    @JsonIgnore
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @JsonIgnore
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "inbound_order_id")
     private InboundOrder inboundOrder;
 
-    @JsonIgnore
-    @ManyToOne(fetch=FetchType.LAZY)
+
+    @ManyToOne
     @JoinColumn(name = "section_id")
     private WarehouseSection warehouseSection;
 

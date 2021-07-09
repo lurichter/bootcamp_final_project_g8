@@ -4,6 +4,7 @@ import com.newrelic.api.agent.NewRelic;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -26,6 +27,7 @@ public class ControllerExceptionHandler {
 
 	@ExceptionHandler({
 			BadRequestException.class,
+			PropertyReferenceException.class,
 			org.springframework.dao.DuplicateKeyException.class,
 			org.springframework.web.bind.support.WebExchangeBindException.class,
 			org.springframework.http.converter.HttpMessageNotReadableException.class,
@@ -37,7 +39,8 @@ public class ControllerExceptionHandler {
 		LOGGER.info("executing exception handler (REST)");
 		return new ApiError(
 				ex.getClass().getName(),
-				ex.getMessage()
+				ex.getMessage(),
+				HttpStatus.BAD_REQUEST.value()
 		);
 	}
 
@@ -66,7 +69,8 @@ public class ControllerExceptionHandler {
 	public ApiError notFoundRequest(Exception ex) {
 		return new ApiError(
 				ex.getClass().getName(),
-				ex.getMessage()
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value()
 		);
 	}
 

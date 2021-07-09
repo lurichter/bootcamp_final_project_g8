@@ -113,7 +113,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
             batch.setQuantity(batchRequest.getQuantity());
             batch.setCurrentTemperature(batchRequest.getCurrentTemperature());
             batch.setManufacturingDate(batchRequest.getManufacturingDate());
-            batch.setManufacturingTime(batchRequest.getManufacturingTime().toLocalTime());
+            batch.setManufacturingTime(batchRequest.getManufacturingTime());
             batch.setDueDate(batchRequest.getDueDate());
             batch.setInboundOrder(inboundOrderResponse);
             batch.setWarehouseSection(warehouseSection);
@@ -187,7 +187,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
                 batch.setQuantity(batchRequest.getQuantity());
                 batch.setCurrentTemperature(batchRequest.getCurrentTemperature());
                 batch.setManufacturingDate(batchRequest.getManufacturingDate());
-                batch.setManufacturingTime(batchRequest.getManufacturingTime().toLocalTime());
+                batch.setManufacturingTime(batchRequest.getManufacturingTime());
                 batch.setDueDate(batchRequest.getDueDate());
                 batch.setInboundOrder(inboundOrderFromBatch);
                 batch.setWarehouseSection(warehouseSection);

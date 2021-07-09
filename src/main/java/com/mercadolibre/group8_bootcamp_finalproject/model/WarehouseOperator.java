@@ -1,30 +1,32 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 
 @Entity
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Builder
+@AllArgsConstructor
 public class WarehouseOperator {
+
     @EmbeddedId
     private WarehouseOperatorKey id;
 
-    @JsonIgnore
     @ManyToOne(fetch=FetchType.LAZY)
     @MapsId("warehouse_id")
     @JoinColumn(name = "warehouse_id")
     private Warehouse warehouse;
 
-    @JsonIgnore
     @ManyToOne(fetch=FetchType.LAZY)
     @MapsId("operator_id")
     @JoinColumn(name = "operator_id")

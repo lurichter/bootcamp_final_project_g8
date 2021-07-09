@@ -162,7 +162,7 @@ public class PurchaseOrderServiceImpl {
             productsIdInPurchaseOrderRequest.add(product.getProductId());
             verifyIfProductExists(product.getProductId());
             if(verifyIfPurchaseOrderItemExistsWithProduct(product.getProductId(), purchaseOrderId)){
-                updatePurchaseItemsWithProduct(product, purchaseOrderId, purchaseOrderItems);
+                updatePurchaseItemsWithProduct(product, purchaseOrderId);
             }
             else{
                 addPurchaseOrderItemsToList(product, purchaseOrderItems, purchaseOrderId);
@@ -175,7 +175,7 @@ public class PurchaseOrderServiceImpl {
 
     }
 
-    private void updatePurchaseItemsWithProduct(ProductQuantityRequestDTO product, Long purchaseOrderId, List<PurchaseOrderItem> purchaseOrderItems){
+    private void updatePurchaseItemsWithProduct(ProductQuantityRequestDTO product, Long purchaseOrderId){
         List<PurchaseOrderItem> purchaseOrderItemListWithProduct = getPurchaseOrderItemsWithProduct(product.getProductId(), purchaseOrderId);
         Collections.sort(purchaseOrderItemListWithProduct);
         Integer quantityInPurchaseOrder = purchaseOrderItemListWithProduct.stream().mapToInt(PurchaseOrderItem::getQuantity).sum();
