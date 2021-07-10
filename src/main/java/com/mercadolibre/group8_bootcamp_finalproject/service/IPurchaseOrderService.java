@@ -6,11 +6,11 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrder
 
 import java.util.Set;
 
-public interface IPurchaseOrder {
+public interface IPurchaseOrderService {
 
     PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO);
 
-    public Set<ProductDTO> getAllProductsFromPurchaseOrder(Long orderId);
+    Set<ProductDTO> getAllProductsFromPurchaseOrder(Long orderId);
 
-    public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId);
+    PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId);
 }

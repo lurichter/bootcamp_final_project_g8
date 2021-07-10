@@ -9,16 +9,16 @@ import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IPurchaseOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class PurchaseOrderServiceImpl {
+public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
 
     private final ProductRepository productRepository;
 
@@ -33,7 +33,7 @@ public class PurchaseOrderServiceImpl {
     //@Transactional
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
-        purchaseOrderRepository.save(purchaseOrder);
+        purchaseOrder = purchaseOrderRepository.save(purchaseOrder);
         updateOrderItems(purchaseOrder.getPurchaseOrderItems(), purchaseOrder.getId());
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
@@ -261,7 +261,7 @@ public class PurchaseOrderServiceImpl {
                     purchaseOrderItem.setPurchaseOrder(purchaseOrder);
                 }
                 else{
-                    throw new NotFoundException("Purchase Order" + purchaseOrderId.toString() + "Not Found");
+                    throw new NotFoundException("Purchase Order " + purchaseOrderId.toString() + " not Found");
                 }
             }
             purchaseOrderItemRepository.save(purchaseOrderItem);
@@ -279,7 +279,7 @@ public class PurchaseOrderServiceImpl {
         if(batches.size()>0){
             return batches.stream().mapToInt(Batch::getQuantity).sum();
         }else{
-            throw new BatchNotFoundException("Batch with product " + product.getName() + "not found");
+            throw new BatchNotFoundException("Batch with product " + product.getName() + " not found");
         }
     }
 
@@ -325,7 +325,7 @@ public class PurchaseOrderServiceImpl {
             return buyerOptional.get();
         }
         else{
-            throw new BuyerNotFoundException("Buyer with id " + " not found");
+            throw new BuyerNotFoundException("Buyer with id " + buyerId + " not found");
         }
     }
 

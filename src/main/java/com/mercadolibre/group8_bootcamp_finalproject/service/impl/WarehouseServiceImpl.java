@@ -26,20 +26,20 @@ public class WarehouseServiceImpl implements IWarehouseService {
     private final WarehouseSectionRepository warehouseSectionRepository;
 
     @Override
-    public WarehouseProductListDTO findAllProductsFromWarehouseById(Integer id) {
+    public WarehouseProductListDTO findAllProductsFromWarehouseById(Long productId) {
 
         // valid product
-        this.getProductById(id);
+        this.getProductById(productId);
 
         // valid seller
-        this.isValidSeller(id);
+        this.isValidSeller(productId);
 
-        List<WarehouseTotalProductDTO> allProductsFromWarehouse = warehouseSectionRepository.findAllProductsFromWarehouse(id.longValue());
+        List<WarehouseTotalProductDTO> allProductsFromWarehouse = warehouseSectionRepository.findAllProductsFromWarehouse(productId.longValue());
 
         if ( allProductsFromWarehouse.isEmpty() ) throw new WarehouseProductNotFoundException();
 
         return WarehouseProductListDTO.builder()
-                .productId(id.longValue())
+                .productId(productId)
                 .warehouses(allProductsFromWarehouse)
                 .build();
     }
@@ -59,12 +59,12 @@ public class WarehouseServiceImpl implements IWarehouseService {
         warehouseSectionRepository.save(warehouseSection);
     }
 
-    private void isValidSeller (Integer id) {
+    private void isValidSeller (Long id) {
         Long seller_id = this.getProductById(id).getSeller().getId();
         sellerRepository.findById(seller_id).orElseThrow(() -> new NotFoundException("Seller not found"));
     }
 
-    private Product getProductById (Integer id) {
-        return productRepository.findById(id.longValue()).orElseThrow(ProductNotFoundException::new);
+    private Product getProductById (Long id) {
+        return productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
     }
 }
