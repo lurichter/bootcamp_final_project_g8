@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.PrintWriter;
@@ -28,10 +29,11 @@ public class ControllerExceptionHandler {
 	@ExceptionHandler({
 			BadRequestException.class,
 			PropertyReferenceException.class,
+			MethodArgumentTypeMismatchException.class,
 			org.springframework.dao.DuplicateKeyException.class,
+			org.springframework.web.server.ServerWebInputException.class,
 			org.springframework.web.bind.support.WebExchangeBindException.class,
-			org.springframework.http.converter.HttpMessageNotReadableException.class,
-			org.springframework.web.server.ServerWebInputException.class
+			org.springframework.http.converter.HttpMessageNotReadableException.class
 	})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
