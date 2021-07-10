@@ -37,6 +37,6 @@ public class OperatorService implements IOperatorService {
 
     @Override
     public void validateOperatorInWarehouse(Long operatorId, Long wareHouseId) {
-        if (!this.isOperatorInWarehouse(operatorId, wareHouseId)) throw new OperatorNotInWarehouseException();
+        if (!isOperatorInWarehouse(operatorId, wareHouseId)) throw new OperatorNotInWarehouseException();
     }
 }

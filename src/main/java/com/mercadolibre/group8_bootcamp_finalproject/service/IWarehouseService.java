@@ -5,7 +5,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.model.WarehouseSection;
 
 public interface IWarehouseService {
 
-    WarehouseProductListDTO findAllProductsFromWarehouseById (Integer id);
+    WarehouseProductListDTO findAllProductsFromWarehouseById (Long id);
 
     void verifySectionCapability(WarehouseSection warehouseSection, int quantity);
 

@@ -12,3 +12,4 @@ public class OperatorNotInWarehouseException extends BadRequestException {
     }
 
 }
+

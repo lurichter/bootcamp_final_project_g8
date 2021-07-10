@@ -1,6 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseProductListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IWarehouseService;
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.WarehouseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class WarehouseController {
 
-    private final WarehouseServiceImpl warehouseService;
+    private final IWarehouseService warehouseService;
 
-    @GetMapping
-    public WarehouseProductListDTO findAllProductsFromWarehouseById (@RequestParam Integer querytype) {
-        return warehouseService.findAllProductsFromWarehouseById(querytype);
+    @GetMapping(path = "/{productId}")
+    public WarehouseProductListDTO findAllProductsFromWarehouseById (@PathVariable Long productId) {
+        return warehouseService.findAllProductsFromWarehouseById(productId);
     }
 }

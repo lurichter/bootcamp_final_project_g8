@@ -2,7 +2,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
-import com.mercadolibre.group8_bootcamp_finalproject.service.impl.ProductServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,40 +18,16 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ProductController {
 
-    private final ProductServiceImpl productServiceImpl;
+    private final IProductService productService;
 
     @GetMapping
     public ResponseEntity<Set<ProductDTO>> listAllProducts() {
-        return new ResponseEntity<>(productServiceImpl.getAllProducts(), HttpStatus.OK);
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping(path = "/list/{productCategory}")
     public ResponseEntity<Set<ProductDTO>> listProductsByCategory(@PathVariable ProductCategoryEnum productCategory) {
-        return new ResponseEntity<>(productServiceImpl.getAllProductsByCategory(productCategory), HttpStatus.OK);
+        return ResponseEntity.ok(productService.getAllProductsByCategory(productCategory));
     }
-    /*
-    public List<ProductDTO> createProductsForTest(){
-        ProductDTO product = ProductDTO.builder()
-                .id(1L)
-                .batchNumber(24L)
-                .description("AAAAA")
-                .dueDate(LocalDateTime.now())
-                .maxTemperature(2.)
-                .minTemperature(1.)
-                .price(50.25)
-                .build();
 
-        ProductDTO product2 = ProductDTO.builder()
-                .id(2L)
-                .batchNumber(24L)
-                .description("AAAAA")
-                .dueDate(LocalDateTime.now())
-                .maxTemperature(2.)
-                .minTemperature(1.)
-                .price(50.25)
-                .build();
-
-        return Arrays.asList(product, product2);
-    }
-     */
 }

@@ -25,14 +25,12 @@ public class ProductServiceImpl implements IProductService {
     private final ProductCategoryRepository productCategoryRepository;
 
     public Set<ProductDTO> getAllProducts(){
-
         List<Product> products = productRepository.findAll();
         verifyIfListIsEmpty(products);
         return ProductMapper.convertProductListToProductDTOList(products);
     }
 
     public Set<ProductDTO> getAllProductsByCategory(ProductCategoryEnum category){
-
         ProductCategory productCategory = productCategoryRepository.findByName(category);
         List<Product> products = productRepository.findAllByProductCategory(productCategory.getId());
         verifyIfListIsEmpty(products);

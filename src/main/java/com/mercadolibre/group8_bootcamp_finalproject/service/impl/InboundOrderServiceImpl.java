@@ -33,8 +33,8 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     private final ProductRepository productRepository;
     private final WarehouseSectionRepository warehouseSectionRepository;
 
-    private final OperatorService operatorService;
-    private final WarehouseServiceImpl warehouseService;
+    private final IOperatorService operatorService;
+    private final IWarehouseService warehouseService;
 
     @Override
     @Transactional
@@ -52,48 +52,37 @@ public class InboundOrderServiceImpl implements InboundOrderService {
 
     private InboundOrderResponseDTO saveInboundOrder(InboundOrderRequestDTO inboundOrderRequest, InboundOrder inboundOrder) {
 
-        // Get the operator who is doing the request
         Operator operator = operatorService.getLoggedUOperator();
 
-        // Get all the batchStockDTO in request
-        List<BatchDTO> batchStockToCreateList = inboundOrderRequest.getInboundOrder().getBatchStock();
+        List<BatchDTO> batchStockToSaveList = inboundOrderRequest.getInboundOrder().getBatchStock();
 
-        // Get the products Ids from the batches of the request
-        List<Long> productIds = getInboundOrderRequestProductIds(batchStockToCreateList);
+        List<Long> productIds = getInboundOrderRequestProductIds(batchStockToSaveList);
 
-        // Get the products Entities from the Ids
         List<Product> productList = getProductList(productIds);
 
-        // Get section code from request
         WarehouseSection warehouseSection = getWarehouseSectionByCode(inboundOrderRequest.getInboundOrder()
                 .getSection().getSectionCode());
 
-        // Validations
-        validateSaveInboundOrder(operator.getId(), warehouseSection, productList,batchStockToCreateList);
+        validateSaveInboundOrder(operator.getId(), warehouseSection, productList);
 
-        // Prepare the entity to insert in database
+        int quantity = batchStockToSaveList.stream().mapToInt(BatchDTO::getQuantity).sum();
+
+        warehouseService.decreaseWarehouseSectionCapacity(warehouseSection, quantity);
+
         inboundOrder.setOperator(operator);
         inboundOrder.setBatches(BatchMapper.batchStockDTOListToBatchList(inboundOrder, warehouseSection,
-                batchStockToCreateList, productList));
+                batchStockToSaveList, productList));
 
         inboundOrder = inboundOrderRepository.save(inboundOrder);
 
         return new InboundOrderResponseDTO(inboundOrder);
     }
 
-    private void validateSaveInboundOrder(Long operatorId, WarehouseSection warehouseSection,
-                                          List<Product> productList, List<BatchDTO> batchStockToSaveList) {
+    private void validateSaveInboundOrder(Long operatorId, WarehouseSection warehouseSection, List<Product> productList) {
 
-        // Verify if the logged operator is in the informed warehouse
         operatorService.validateOperatorInWarehouse(operatorId, warehouseSection.getWarehouse().getId());
 
-        // Verify if the informed Warehouse Section accepts the products categories
         verifySectionAcceptsProductCategory(productList, warehouseSection.getId());
-
-        // Decreases the batch capacity of the Warehouse Section if capable
-        int quantity = batchStockToSaveList.stream().mapToInt(BatchDTO::getQuantity).sum();
-
-        warehouseService.decreaseWarehouseSectionCapacity(warehouseSection, quantity);
     }
 
     private void validateCreateInboundOrder(InboundOrderRequestDTO inboundOrderRequest) {
@@ -107,52 +96,67 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     }
 
     private InboundOrder validateUpdateInboundOrder(InboundOrderRequestDTO inboundOrderRequest){
-        // Get the Inbound Order to be updated
         InboundOrder inboundOrder = inboundOrderRepository.findById(inboundOrderRequest.getInboundOrder()
                 .getInboundOrderId()).orElseThrow(() -> new NotFoundException("Inbound Order not found."));
 
-        // Validate if the Warehouse Section is the same of the inboundOrderRequest
-        Long inboundWareHouseSectionId = inboundOrder.getBatches().get(0).getWarehouseSection().getId();
-        if(!inboundWareHouseSectionId.equals(inboundOrderRequest.getInboundOrder().getSection().getSectionCode()))
-            throw new BadRequestException("Cannot update a batch warehouse section by this method.");
+        verifySameWarehouseSection(inboundOrderRequest, inboundOrder);
 
-        // Get all the batchStockDTO in request
         List<BatchDTO> batchStockToUpdateList = inboundOrderRequest.getInboundOrder().getBatchStock();
 
-        // Get all the batchStockDTO IDS in request
         List<Long> batchesIdsToUpdate = batchStockToUpdateList.stream().map(BatchDTO::getBatchId)
                 .collect(Collectors.toList());
 
-        // Verify if one of the informed batches don't have an ID
-        if(batchesIdsToUpdate.stream().anyMatch(Objects::isNull)) throw new BadRequestException("Some Batches to " +
-                "update have null identifier.");
+        verifyIfBatchesHaveID(batchesIdsToUpdate);
 
-        // Get all existing batches from the request ids
         List<Long> existingBatchIds = batchRepository.findAllById(batchesIdsToUpdate).stream()
                 .map(Batch::getId).collect(Collectors.toList());
 
-        // Verify if all the informed batches to update exists
-        List<Long> unExistingBatchIds = batchesIdsToUpdate.stream().filter(
-                batchIdToUpdate -> !existingBatchIds.contains(batchIdToUpdate)).collect(Collectors.toList());
-        if (!unExistingBatchIds.isEmpty()) throw new BadRequestException("The batch ids " +
-                unExistingBatchIds+" do not exist.");
+        verifyBatchesExistence(batchesIdsToUpdate, existingBatchIds);
 
-        // Verify if some of the batches in the request is not of the informed Inbound Order
+        verifyInboundOrderBatches(inboundOrder, existingBatchIds);
+
+        verifyBatchesPurchaseOrder(inboundOrder, batchesIdsToUpdate);
+
+        return inboundOrder;
+    }
+
+    // Verify if one of these batches already had a purchase order
+    private void verifyBatchesPurchaseOrder(InboundOrder inboundOrder, List<Long> batchesIdsToUpdate) {
+        List<Long> batchesIdWithPurchaseOrder = inboundOrder.getBatches().stream().filter(batch ->
+                !batch.getPurchaseOrderItems().isEmpty()).map(Batch::getId).collect(Collectors.toList());
+
+        if (CollectionUtils.containsAny(batchesIdsToUpdate, batchesIdWithPurchaseOrder)) throw new
+                BadRequestException("The batch(es) "+batchesIdWithPurchaseOrder +" already had a purchase order.");
+    }
+
+    // Verify if some of the batches in the request is not of the informed Inbound Order
+    private void verifyInboundOrderBatches(InboundOrder inboundOrder, List<Long> existingBatchIds) {
         List<Long> inboundOrderBatchIds = inboundOrder.getBatches().stream()
                 .map(Batch::getId).collect(Collectors.toList());
         List<Long> batchesNotInInboundOrder = existingBatchIds.stream().filter(
                 existingBatchId -> !inboundOrderBatchIds.contains(existingBatchId)).collect(Collectors.toList());
         if(!batchesNotInInboundOrder.isEmpty()) throw new BadRequestException("The batch(es) " +
                 batchesNotInInboundOrder+" update do not belongs to the informed Inbound Order.");
+    }
 
-        // Verify if one of these batches already had a purchase order
-        List<Long> batchesIdWithPurchaseOrder = inboundOrder.getBatches().stream().filter(batch ->
-                !batch.getPurchaseOrderItems().isEmpty()).map(Batch::getId).collect(Collectors.toList());
+    // Verify if all the informed batches to update exists
+    private void verifyBatchesExistence(List<Long> batchesIdsToUpdate, List<Long> existingBatchIds) {
+        List<Long> unExistingBatchIds = batchesIdsToUpdate.stream().filter(
+                batchIdToUpdate -> !existingBatchIds.contains(batchIdToUpdate)).collect(Collectors.toList());
+        if (!unExistingBatchIds.isEmpty()) throw new BadRequestException("The batch ids " +
+                unExistingBatchIds+" do not exist.");
+    }
 
-        if (CollectionUtils.containsAny(batchesIdsToUpdate, batchesIdWithPurchaseOrder)) throw new
-                BadRequestException("The batch(es) "+batchesIdWithPurchaseOrder +" already had a purchase order.");
+    // Verify if one of the informed batches don't have an ID
+    private void verifyIfBatchesHaveID(List<Long> batchesIdsToUpdate) {
+        if(batchesIdsToUpdate.stream().anyMatch(Objects::isNull)) throw new BadRequestException("Some Batches to " +
+                "update have null identifier.");
+    }
 
-        return inboundOrder;
+    private void verifySameWarehouseSection(InboundOrderRequestDTO inboundOrderRequest, InboundOrder inboundOrder) {
+        Long inboundWareHouseSectionId = inboundOrder.getBatches().get(0).getWarehouseSection().getId();
+        if(!inboundWareHouseSectionId.equals(inboundOrderRequest.getInboundOrder().getSection().getSectionCode()))
+            throw new BadRequestException("Cannot update a batch warehouse section by this method.");
     }
 
     private List<Long> getInboundOrderRequestProductIds(List<BatchDTO> batchStock) {
