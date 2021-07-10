@@ -1,12 +1,12 @@
-CREATE SCHEMA testdb AUTHORIZATION sa;
+-- CREATE SCHEMA testdb AUTHORIZATION sa;
 
 -- Insert user
-INSERT INTO users (name, password) VALUES ('operador1@mercadolivre.com', '123456');
-INSERT INTO users (name, password) VALUES ('operador2@mercadolivre.com', '123456');
-INSERT INTO users (name, password) VALUES ('vendedor1@gmail.com', '123456');
-INSERT INTO users (name, password) VALUES ('vendedor2@gmail.com', '123456');
-INSERT INTO users (name, password) VALUES ('comprador1@gmail.com', '123456');
-INSERT INTO users (name, password) VALUES ('comprador2@gmail.com', '123456');
+INSERT INTO users (name, password) VALUES ('operador1@mercadolivre.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
+INSERT INTO users (name, password) VALUES ('operador2@mercadolivre.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
+INSERT INTO users (name, password) VALUES ('vendedor1@gmail.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
+INSERT INTO users (name, password) VALUES ('vendedor2@gmail.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
+INSERT INTO users (name, password) VALUES ('comprador1@gmail.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
+INSERT INTO users (name, password) VALUES ('comprador2@gmail.com', '$2a$10$F7Vs.88XzihZaUrUoeIEGOnyZn.hKgkmllVeIHvSneDcAC/KRQsDS');
 
 -- Insert operators
 INSERT INTO operator (user_user_id) VALUES (1);
@@ -304,7 +304,7 @@ VALUES (23,
         '12:13:19',
         '2021-07-12',
         2,
-        2,
+        1,
         2,
            'TESTE4');
 
