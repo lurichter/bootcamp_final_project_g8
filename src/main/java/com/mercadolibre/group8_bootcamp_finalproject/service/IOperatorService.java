@@ -8,4 +8,5 @@ public interface IOperatorService {
     Long getLoggedUserOperatorId();
     boolean isLoggedOperatorInWarehouse(Long wareHouseId);
     boolean isOperatorInWarehouse(Long operatorId, Long wareHouseId);
+    void validateOperatorInWarehouse(Long operatorId, Long wareHouseId);
 }

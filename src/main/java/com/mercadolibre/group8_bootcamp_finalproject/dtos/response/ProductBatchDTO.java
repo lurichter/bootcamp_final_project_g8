@@ -8,7 +8,6 @@ import java.util.List;
 @Data
 @Builder
 public class ProductBatchDTO {
-    private SectionDTO section;
     private Long productId;
     private List<BatchStockDTO> batchStock;
 }

@@ -40,26 +40,23 @@ public class BatchServiceImpl implements IBatchService {
     }
 
     private ProductBatchDTO toProductBatchDTO(Long productId, List<Batch> batches){
-        WarehouseSection warehouseSection = batches.stream().findFirst().orElseThrow(() -> new NotFoundException("Section not found")).getWarehouseSection();
-
         return ProductBatchDTO.builder()
                 .productId(productId)
-                .section(toSectionDTO(warehouseSection))
                 .batchStock(toBatchStockDTOList(batches))
                 .build();
     }
 
-    private SectionDTO toSectionDTO(WarehouseSection warehouseSection){
-        return SectionDTO.builder().sectionCode(warehouseSection.getId()).warehouseCode(warehouseSection.getWarehouse().getId()).build();
-    }
-
     private List<BatchStockDTO> toBatchStockDTOList(List<Batch> batches){
         List<BatchStockDTO> batchStockDTOList = new ArrayList<>();
-        batches.forEach(batch -> batchStockDTOList.add(BatchStockDTO.builder()
-            .batchNumber(batch.getId().toString())
-            .currentQuantity(batch.getQuantity())
-            .dueDate(batch.getDueDate())
-            .build()));
+        batches.forEach(batch -> batchStockDTOList.add(
+                BatchStockDTO.builder()
+                        .wareHouseId(batch.getWarehouseSection().getWarehouse().getId())
+                        .sectionId(batch.getWarehouseSection().getId())
+                        .batchId(batch.getId())
+                        .batchNumber(batch.getNumber())
+                        .currentQuantity(batch.getQuantity())
+                        .dueDate(batch.getDueDate())
+                        .build()));
         return batchStockDTOList;
     }
 

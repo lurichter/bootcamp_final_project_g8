@@ -26,13 +26,11 @@ public class PurchaseOrderController {
 
     @GetMapping(path = "/{idOrder}")
     public ResponseEntity<Set<ProductDTO>> getOrders(@PathVariable Long idOrder) {
-
         return ResponseEntity.ok(purchaseOrderServiceImpl.getAllProductsFromPurchaseOrder(idOrder));
     }
 
     @PutMapping(path = "/{idOrder}")
     public ResponseEntity<PurchaseOrderPriceResponseDTO> editOrder(@RequestBody @Valid PurchaseOrderRequestDTO purchaseOrderRequestDTO, @PathVariable Long idOrder) {
-
         return new ResponseEntity<>(purchaseOrderServiceImpl.updatePurchaseOrder(purchaseOrderRequestDTO, idOrder), HttpStatus.CREATED);
     }
 }
