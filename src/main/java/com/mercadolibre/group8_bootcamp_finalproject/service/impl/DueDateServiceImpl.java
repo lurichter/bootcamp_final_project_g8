@@ -5,8 +5,8 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDue
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.BatchNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
-import com.mercadolibre.group8_bootcamp_finalproject.repository.UsersRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IDueDateService;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IOperatorService;
 import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,16 +20,15 @@ import java.util.stream.Collectors;
 public class DueDateServiceImpl implements IDueDateService {
 
     private final BatchRepository batchRepository;
-    private final UsersRepository usersRepository;
+
+    private final IOperatorService operatorService;
 
     @Override
     public BatchStockDueDateListDTO listBatchesOrderedByDueDate(Integer daysQuantity, ProductCategoryEnum category, String[] order){
-//        String token = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest().getHeader("Authorization");
-//        String user = SessionServiceImpl.getUsername(token);
-        Long userId = usersRepository.findByName("operador1@mercadolivre.com").getId();
+        Long operatorId = operatorService.getLoggedUserOperatorId();
 
         List<BatchStockDueDateDTO> batchStockDueDate =
-                batchRepository.findAllByWarehouseSectionWhereDueDateLessThanParam(userId, dueDateFilter(daysQuantity), SortUtil.sortStringToSort(order));
+                batchRepository.findAllByWarehouseSectionWhereDueDateLessThanParam(operatorId, dueDateFilter(daysQuantity), SortUtil.sortStringToSort(order));
 
         if (category != null) return new BatchStockDueDateListDTO(filterByCategory(batchStockDueDate, category));
 
