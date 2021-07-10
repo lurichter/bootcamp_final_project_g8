@@ -8,13 +8,14 @@ spring:
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASS}
     initialization-mode: always
+    platform: mysql
 
   jpa:
     show-sql: true
     hibernate:
       sql: debug
-      ddl-auto: create-drop # create-drop para crear las entidades, una vez creadas y finalizado el mododel cambiar a none
+      ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
 server:
-  port: 8082 # no cambiar en prod
+  port: 8082 # do not change in prod

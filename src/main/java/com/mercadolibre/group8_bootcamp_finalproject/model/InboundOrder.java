@@ -5,7 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,6 +28,6 @@ public class InboundOrder {
     @JoinColumn(name = "operator_id")
     private Operator operator;
 
-    @OneToMany(mappedBy = "inboundOrder")
-    private Set<Batch> batch;
+    @OneToMany(mappedBy = "inboundOrder", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Batch> batches;
 }

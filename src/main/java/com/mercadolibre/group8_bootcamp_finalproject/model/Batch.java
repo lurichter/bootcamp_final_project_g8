@@ -6,7 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Batch {
+public class Batch implements Comparable<Batch>{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,21 +42,24 @@ public class Batch {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
-
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 
-
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "inbound_order_id")
     private InboundOrder inboundOrder;
-
 
     @ManyToOne
     @JoinColumn(name = "section_id")
     private WarehouseSection warehouseSection;
 
     @OneToMany(mappedBy = "batch")
-    private Set<PurchaseOrderItem> purchaseOrderItems;
+    private List<PurchaseOrderItem> purchaseOrderItems;
+
+    @Override
+    public int compareTo(Batch o) {
+        return this.getDueDate().compareTo(o.getDueDate());
+    }
+
 }

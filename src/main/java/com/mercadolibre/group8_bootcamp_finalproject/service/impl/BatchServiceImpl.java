@@ -15,6 +15,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.util.SortUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,14 +32,14 @@ public class BatchServiceImpl implements IBatchService {
 
         if (!productRepository.existsById(productId)) throw new ProductNotFoundException();
 
-        Set<Batch> batches = batchRepository.findBatchByProductId(productId, SortUtil.sortStringToSort(order));
+        List<Batch> batches = batchRepository.findBatchByProductIdAndByDueDate(productId, minimunDueDate(), SortUtil.sortStringToSort(order));
 
         if (batches.isEmpty()) throw new ProductNotInBatchException("The Product isn't in a Batch");
 
         return toProductBatchDTO(productId, batches);
     }
 
-    private ProductBatchDTO toProductBatchDTO(Long productId, Set<Batch> batches){
+    private ProductBatchDTO toProductBatchDTO(Long productId, List<Batch> batches){
         WarehouseSection warehouseSection = batches.stream().findFirst().orElseThrow(() -> new NotFoundException("Section not found")).getWarehouseSection();
 
         return ProductBatchDTO.builder()
@@ -52,14 +53,18 @@ public class BatchServiceImpl implements IBatchService {
         return SectionDTO.builder().sectionCode(warehouseSection.getId()).warehouseCode(warehouseSection.getWarehouse().getId()).build();
     }
 
-    private List<BatchStockDTO> toBatchStockDTOList(Set<Batch> batches){
+    private List<BatchStockDTO> toBatchStockDTOList(List<Batch> batches){
         List<BatchStockDTO> batchStockDTOList = new ArrayList<>();
         batches.forEach(batch -> batchStockDTOList.add(BatchStockDTO.builder()
-            .batchNumber(batch.getId())
+            .batchNumber(batch.getId().toString())
             .currentQuantity(batch.getQuantity())
             .dueDate(batch.getDueDate())
             .build()));
         return batchStockDTOList;
+    }
+
+    private LocalDate minimunDueDate(){
+        return LocalDate.now().plusDays(21);
     }
 
 }

@@ -3,7 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
@@ -36,7 +36,7 @@ public class WarehouseSection {
     private Warehouse warehouse;
 
     @OneToMany(mappedBy = "warehouseSection", fetch=FetchType.LAZY)
-    private Set<Batch> batch;
+    private List<Batch> batch;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "category_id")

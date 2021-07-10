@@ -9,6 +9,6 @@ import javax.validation.Valid;
 public class PurchaseOrderRequestDTO {
 
     @Valid
-    private PurchaseOrderDTO purchaseOrderDTO;
+    private PurchaseOrderDTO purchaseOrder;
 
 }
