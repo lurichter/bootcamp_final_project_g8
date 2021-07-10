@@ -1,12 +1,12 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.LoginRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.AccountResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.service.ISessionService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RequestMapping(path = "/api/v1")
 @RestController
@@ -21,14 +21,18 @@ public class SessionController {
      * Perform the validation of the user and password entered.
      * If correct, return the account with the necessary token to carry out the other queries.
      *
-     * @param username
-     * @param password
-     * @return
+     * @param loginRequestDTO
+     * @return AccountResponseDTO
      * @throws NotFoundException
      */
+//    @PostMapping("/sign-in")
+//    public AccountResponseDTO login(@RequestParam("username") String username, @RequestParam("password") String password) throws NotFoundException {
+//        return service.login(username, password);
+//    }
+
     @PostMapping("/sign-in")
-    public AccountResponseDTO login(@RequestParam("username") String username, @RequestParam("password") String password) throws NotFoundException {
-        return service.login(username, password);
+    public AccountResponseDTO login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) throws NotFoundException {
+        return service.login(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
     }
 
 }
