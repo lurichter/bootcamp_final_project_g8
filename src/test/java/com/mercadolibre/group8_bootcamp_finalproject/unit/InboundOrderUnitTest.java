@@ -1,11 +1,13 @@
 package com.mercadolibre.group8_bootcamp_finalproject.unit;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchResponseListDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
-import com.mercadolibre.group8_bootcamp_finalproject.services.InboundOrderServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.InboundOrderServiceImpl;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.OperatorService;
+import com.mercadolibre.group8_bootcamp_finalproject.service.impl.WarehouseServiceImpl;
 import com.mercadolibre.group8_bootcamp_finalproject.util.MockitoExtension;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
 import org.assertj.core.api.Assertions;
@@ -14,6 +16,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.internal.matchers.GreaterThan;
+
+import static org.hamcrest.Matchers.is;
 import static org.mockito.AdditionalMatchers.*;
 import java.util.*;
 
@@ -29,9 +34,15 @@ public class InboundOrderUnitTest {
     @Mock
     private ProductRepository productRepository;
     @Mock
+    private OperatorRepository operatorRepository;
+    @Mock
     private WarehouseSectionRepository warehouseSectionRepository;
     @Mock
     private WarehouseOperatorRepository warehouseOperatorRepository;
+    @Mock
+    private OperatorService operatorService;
+    @Mock
+    private WarehouseServiceImpl warehouseService;
 
     @InjectMocks
     private InboundOrderServiceImpl inboundOrderService;
@@ -42,32 +53,35 @@ public class InboundOrderUnitTest {
         this.testObjects = new TestObjectsUtil();
 
         Product freshProduct1 = this.testObjects.getFreshProducts().get(0);
-        Product freshProduct2 = this.testObjects.getFreshProducts().get(0);
+        Product freshProduct2 = this.testObjects.getFreshProducts().get(1);
+        List<Long> freshProductsIds = new ArrayList<Long>(Arrays.asList(freshProduct1.getId(), freshProduct2.getId()));
         WarehouseSection freshWarehouseSection = this.testObjects.getFreshWarehouseSections().get(0);
         WarehouseSection frozenWarehouseSection = this.testObjects.getFrozenWarehouseSections().get(0);
         WarehouseOperator warehouseOperator = this.testObjects.getWarehouseOperators().get(0);
         InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
         List<Batch> batches = this.testObjects.getFreshBatches();
+        Operator operator = this.testObjects.getOperators().get(0);
 
-        BDDMockito.doReturn(Optional.of(freshProduct1)).when(productRepository).findById(freshProduct1.getId());
-        BDDMockito.doReturn(Optional.of(freshProduct2)).when(productRepository).findById(freshProduct2.getId());
-        BDDMockito.doThrow(new NotFoundException("Product not found"))
-                .when(productRepository)
-                .findById(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
+        BDDMockito.doReturn(operator).when(operatorService).getLoggedUOperator();
 
-        BDDMockito.doReturn(freshProduct1).when(productRepository).getOne(freshProduct1.getId());
-        BDDMockito.doReturn(freshProduct2).when(productRepository).getOne(freshProduct2.getId());
-        BDDMockito.doThrow(new NotFoundException("Product not found"))
-                .when(productRepository)
-                .getOne(not(or(ArgumentMatchers.eq(freshProduct1.getId()),ArgumentMatchers.eq(freshProduct2.getId()))));
+        BDDMockito.doReturn(this.testObjects.getFreshProducts()).when(productRepository).findAllById(freshProductsIds);
+        BDDMockito.doNothing().when(operatorService).validateOperatorInWarehouse(warehouseOperator.getOperator().getId(), warehouseOperator.getWarehouse().getId());
 
         BDDMockito.doReturn(Optional.of(freshWarehouseSection)).when(warehouseSectionRepository).findById(freshWarehouseSection.getId());
         BDDMockito.doReturn(Optional.of(frozenWarehouseSection)).when(warehouseSectionRepository).findById(frozenWarehouseSection.getId());
         BDDMockito.doThrow(new NotFoundException("Warehouse Section not found"))
                 .when(productRepository)
                 .getOne(not(or(ArgumentMatchers.eq(freshWarehouseSection.getId()),ArgumentMatchers.eq(frozenWarehouseSection.getId()))));
-
         BDDMockito.doReturn(Arrays.asList(warehouseOperator)).when(warehouseOperatorRepository).findByWarehouseCode(freshWarehouseSection.getWarehouse().getId());
+
+        BDDMockito.doThrow(new OperatorNotInWarehouseException())
+                .when(operatorService)
+                .validateOperatorInWarehouse(not(ArgumentMatchers.eq(warehouseOperator.getOperator().getId())),
+                        ArgumentMatchers.eq(warehouseOperator.getWarehouse().getId()));
+
+        BDDMockito.doThrow(new WarehouseSectionCapabilityException())
+                .when(warehouseService)
+                .decreaseWarehouseSectionCapacity(ArgumentMatchers.eq(freshWarehouseSection), gt(freshWarehouseSection.getCurrentAvailability().intValue()));
 
         BDDMockito.when(inboundOrderRepository.save(inboundOrder))
                 .thenAnswer(invocation -> {
@@ -86,12 +100,12 @@ public class InboundOrderUnitTest {
     }
 
     @Test
-    public void returnBatchResponseListWhenValidInboundOrder() {
+    public void returnInboundOrderResponseDTOWhenCreateInboundOrderWithValidInboundOrder() {
 
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
-        BatchResponseListDTO batchResponseListDTO = this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);
+        InboundOrderResponseDTO inboundOrderResponseDTO = this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);
 
-        Assertions.assertThat(batchResponseListDTO.getBatchStock())
+        Assertions.assertThat(inboundOrderResponseDTO.getBatchStock())
                 .extracting(
                         record -> record.getBatchNumber(),
                         record -> record.getProductId(),
@@ -121,22 +135,37 @@ public class InboundOrderUnitTest {
     }
 
     @Test
-    public void returnExceptionWhenInvalidProduct() {
+    public void returnExceptionWhenCreateInboundOrderWithInvalidProduct() {
 
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
-        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3L);
 
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Not Found Exception. Product not found");
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessageStartingWith("Not Found Exception. The products")
+                .hasMessageEndingWith("was not found.");
 
     }
 
     @Test
-    public void returnExceptionWhenInvalidWarehouseSection() {
+    public void returnExceptionWhenCreateInboundOrderWithInvalidWarehouseOperator() {
+
+        Operator operator = this.testObjects.getOperators().get(1);
+        BDDMockito.doReturn(operator).when(operatorService).getLoggedUOperator();
 
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
-        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(3);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(OperatorNotInWarehouseException.class)
+                .hasMessage("Bad Request Exception. The operator is not in the Warehouse.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenCreateInboundOrderWithInvalidWarehouseSection() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(3L);
 
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
                 .isInstanceOf(NotFoundException.class)
@@ -145,30 +174,25 @@ public class InboundOrderUnitTest {
     }
 
     @Test
-    public void returnExceptionWhenOperatorNotRegisteredInWarehouse() {
-
-    }
-
-    @Test
-    public void returnExceptionWhenProductCategoryNotAllowedInWarehouseSection() {
+    public void returnExceptionWhenCreateInboundOrderWithProductCategoryNotAllowedInWarehouseSection() {
 
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
-        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(2);
+        inboundOrderRequestDTO.getInboundOrder().getSection().setSectionCode(2L);
 
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Product category is invalid to Warehouse Section Category.");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Bad Request Exception. Product category is invalid to Warehouse Section Category.");
     }
 
     @Test
-    public void returnExceptionWhenOrderQuantityBiggerThanWarehouseSectionAvailability() {
+    public void returnExceptionWhenCreateInboundOrderWithQuantityBiggerThanWarehouseSectionAvailability() {
 
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
         inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setQuantity(100000);
 
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Not Found Exception. WarehouseSection current capability is less than all quantity products from batch stock");
+                .isInstanceOf(WarehouseSectionCapabilityException.class)
+                .hasMessage("Bad Request Exception. WarehouseSection current capability is less than all quantity products from batch stock");
     }
 
 

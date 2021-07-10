@@ -33,8 +33,8 @@ public class InboundOrderServiceImpl implements InboundOrderService {
     private final ProductRepository productRepository;
     private final WarehouseSectionRepository warehouseSectionRepository;
 
-    private final IOperatorService operatorService;
-    private final IWarehouseService warehouseService;
+    private final OperatorService operatorService;
+    private final WarehouseServiceImpl warehouseService;
 
     @Override
     @Transactional
@@ -85,7 +85,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
                                           List<Product> productList, List<BatchDTO> batchStockToSaveList) {
 
         // Verify if the logged operator is in the informed warehouse
-        operatorService.isOperatorInWarehouse(operatorId, warehouseSection.getWarehouse().getId());
+        operatorService.validateOperatorInWarehouse(operatorId, warehouseSection.getWarehouse().getId());
 
         // Verify if the informed Warehouse Section accepts the products categories
         verifySectionAcceptsProductCategory(productList, warehouseSection.getId());
@@ -179,7 +179,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         ProductCategory productCategory = warehouseSection.getProductCategory();
 
         for (Product product : productList) {
-            if (!product.getProductCategory().equals(productCategory)) {
+            if (!product.getProductCategory().getName().equals(productCategory.getName())) {
                 throw new BadRequestException("Product category is invalid to Warehouse Section Category. productId: "
                         + product.getId() +
                         ", WarehouseSection: " + warehouseSection.getId());

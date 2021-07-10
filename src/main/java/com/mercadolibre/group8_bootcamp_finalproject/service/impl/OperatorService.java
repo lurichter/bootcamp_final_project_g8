@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.OperatorNotInWarehouseException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.UserIsNotAOperatorException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Operator;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.OperatorRepository;
@@ -32,5 +33,10 @@ public class OperatorService implements IOperatorService {
     @Override
     public boolean isOperatorInWarehouse(Long operatorId, Long wareHouseId) {
         return operatorRepository.existsByIdAndWarehouseOperatorsWarehouseId(operatorId, wareHouseId);
+    }
+
+    @Override
+    public void validateOperatorInWarehouse(Long operatorId, Long wareHouseId) {
+        if (!this.isOperatorInWarehouse(operatorId, wareHouseId)) throw new OperatorNotInWarehouseException();
     }
 }

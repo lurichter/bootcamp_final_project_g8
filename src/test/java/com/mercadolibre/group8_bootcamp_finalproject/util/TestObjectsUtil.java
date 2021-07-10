@@ -19,7 +19,7 @@ import java.util.List;
 @Getter
 public class TestObjectsUtil {
 
-    private List<User> users = new ArrayList<User>();
+    private List<Users> users = new ArrayList<Users>();
     private List<Operator> operators = new ArrayList<Operator>();
     private List<Seller> sellers = new ArrayList<Seller>();
     private List<Warehouse> warehouses = new ArrayList<Warehouse>();;
@@ -38,26 +38,37 @@ public class TestObjectsUtil {
 
     public TestObjectsUtil() {
 
-        User user1 = User.builder()
+        Users userOperator1 = Users.builder()
                 .id(1L)
                 .name("operador1@mercadolivre.com")
                 .password("123456")
                 .build();
 
-        User user2 = User.builder()
+        Users userOperator2 = Users.builder()
                 .id(2L)
+                .name("operador1@mercadolivre.com")
+                .password("123456")
+                .build();
+
+        Users userSeller = Users.builder()
+                .id(3L)
                 .name("vendedor1@mercadolivre.com")
                 .password("123456")
                 .build();
 
-        Operator operator = Operator.builder()
+        Operator operator1 = Operator.builder()
                 .id(1L)
-                .user(user1)
+                .user(userOperator1)
+                .build();
+
+        Operator operator2 = Operator.builder()
+                .id(2L)
+                .user(userOperator2)
                 .build();
 
         Seller seller = Seller.builder()
                 .id(1L)
-                .user(user2)
+                .user(userSeller)
                 .build();
 
         Warehouse warehouse = Warehouse.builder()
@@ -68,14 +79,14 @@ public class TestObjectsUtil {
                 .build();
 
         WarehouseOperator warehouseOperator = WarehouseOperator.builder()
-                .id(new WarehouseOperatorKey(warehouse.getId(), operator.getId()))
+                .id(new WarehouseOperatorKey(warehouse.getId(), operator1.getId()))
                 .warehouse(warehouse)
-                .operator(operator)
+                .operator(operator1)
                 .build();
 
         List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
         warehouseOperators.add(warehouseOperator);
-        operator.setWarehouseOperators(warehouseOperators);
+        operator1.setWarehouseOperators(warehouseOperators);
         warehouse.setWarehouseOperators(warehouseOperators);
 
         ProductCategory freshCategory = ProductCategory.builder()
@@ -132,7 +143,7 @@ public class TestObjectsUtil {
                 .productCategory(freshCategory)
                 .build();
 
-        seller.setProducts(new HashSet<Product>(Arrays.asList(freshProduct1, freshProduct2)));
+        seller.setProducts(new ArrayList<>(Arrays.asList(freshProduct1, freshProduct2)));
 
         Batch freshBatch1 = Batch.builder()
                 .number("MELI0001")
@@ -158,23 +169,23 @@ public class TestObjectsUtil {
 
         InboundOrder freshInboundOrder = InboundOrder.builder()
                 .dateTime(LocalDateTime.now())
-                .operator(operator)
-                .batch(new HashSet<Batch>(Arrays.asList(freshBatch1, freshBatch2)))
+                .operator(operator1)
+                .batches(new ArrayList<>(Arrays.asList(freshBatch1, freshBatch2)))
                 .build();
 
         WarehouseSectionDTO freshWarehouseSectionDTO = WarehouseSectionDTO.builder()
-                .sectionCode(freshWarehouseSection.getId().intValue())
-                .warehouseCode(warehouse.getId().intValue())
+                .sectionCode(freshWarehouseSection.getId())
+                .warehouseCode(warehouse.getId())
                 .build();
 
         WarehouseSectionDTO frozenWarehouseSectionDTO = WarehouseSectionDTO.builder()
-                .sectionCode(freshWarehouseSection.getId().intValue())
-                .warehouseCode(warehouse.getId().intValue())
+                .sectionCode(freshWarehouseSection.getId())
+                .warehouseCode(warehouse.getId())
                 .build();
 
         BatchDTO freshBatchDTO1 = BatchDTO.builder()
                 .batchNumber(freshBatch1.getNumber())
-                .productId(freshBatch1.getProduct().getId().intValue())
+                .productId(freshBatch1.getProduct().getId())
                 .currentTemperature(freshBatch1.getCurrentTemperature())
                 .quantity(freshBatch1.getQuantity())
                 .manufacturingDate(freshBatch1.getManufacturingDate())
@@ -183,13 +194,13 @@ public class TestObjectsUtil {
                 .build();
 
         BatchDTO freshBatchDTO2 = BatchDTO.builder()
-                .batchNumber(freshBatch1.getNumber())
-                .productId(freshBatch1.getProduct().getId().intValue())
-                .currentTemperature(freshBatch1.getCurrentTemperature())
-                .quantity(freshBatch1.getQuantity())
-                .manufacturingDate(freshBatch1.getManufacturingDate())
-                .manufacturingTime(freshBatch1.getManufacturingTime())
-                .dueDate(freshBatch1.getDueDate())
+                .batchNumber(freshBatch2.getNumber())
+                .productId(freshBatch2.getProduct().getId())
+                .currentTemperature(freshBatch2.getCurrentTemperature())
+                .quantity(freshBatch2.getQuantity())
+                .manufacturingDate(freshBatch2.getManufacturingDate())
+                .manufacturingTime(freshBatch2.getManufacturingTime())
+                .dueDate(freshBatch2.getDueDate())
                 .build();
 
         InboundOrderDTO freshInboundOrderDTO = InboundOrderDTO.builder()
@@ -201,9 +212,11 @@ public class TestObjectsUtil {
                 .inboundOrder(freshInboundOrderDTO)
                 .build();
 
-        this.users.add(user1);
-        this.users.add(user2);
-        this.operators.add(operator);
+        this.users.add(userOperator1);
+        this.users.add(userOperator2);
+        this.users.add(userSeller);
+        this.operators.add(operator1);
+        this.operators.add(operator2);
         this.sellers.add(seller);
         this.warehouses.add(warehouse);
         this.warehouseOperators.add(warehouseOperator);

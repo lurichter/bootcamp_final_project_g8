@@ -13,7 +13,7 @@ import java.time.LocalTime;
 public class BatchResponseDTO {
     private Long batchId;
     private String batchNumber;
-    private Integer productId;
+    private Long productId;
     private Double currentTemperature;
     private Double minimumTemperature;
     private Integer quantity;
