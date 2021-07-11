@@ -1,28 +1,40 @@
 package com.mercadolibre.group8_bootcamp_finalproject.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseTotalProductDTO;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 public class WarehouseControllerIntegrationTest extends ControllerTest {
 
-//    @Mock
-//    private WarehouseController warehouseController;
-//    @Mock
-//    private WarehouseProductListDTO warehouseProductListDTO;
-//    @Mock
-//    private WarehouseTotalProductDTO warehouseTotalProductDTO;
+    private MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
+
+    private String token;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @InjectMocks
     WarehouseProductListDTO warehouseProductListDTO;
@@ -30,61 +42,101 @@ public class WarehouseControllerIntegrationTest extends ControllerTest {
     @InjectMocks
     WarehouseTotalProductDTO warehouseTotalProductDTO;
 
+    private String loginRequest = "{\n" +
+            "    \"username\" : \"operador1@mercadolivre.com\",\n" +
+            "    \"password\" : \"123456\"\n" +
+            "}";
+
     @BeforeEach
-    public void setup () {
+    void setup() throws Exception {
+        this.mockMvc = webAppContextSetup(webApplicationContext)
+                .apply(springSecurity()).build();
+
+        MvcResult mvcResult = mockMvc.perform(
+                post("/api/v1/sign-in")
+                        .characterEncoding("UTF-8")
+                        .content(this.loginRequest)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept("application/json;charset=UTF-8"))
+                .andReturn();
+
+        JacksonJsonParser jsonParser = new JacksonJsonParser();
+
+        token = jsonParser.parseMap(mvcResult.getResponse().getContentAsString()).get("token").toString();
+
+         // mocking test
+
         this.warehouseProductListDTO.setProductId(1L);
 
         this.warehouseTotalProductDTO.setWarehouseCode(1L);
-        this.warehouseTotalProductDTO.setTotalQuantity(8L);
+        this.warehouseTotalProductDTO.setTotalQuantity(42L);
 
         this.warehouseProductListDTO.setWarehouses(Arrays.asList(this.warehouseTotalProductDTO));
 
-        System.out.println(this.warehouseTotalProductDTO.getTotalQuantity());
     }
 
-
     @Test
-    void shouldReturnStatusCodeOkFromAllProductsFromWarehouseById () {
+    void shouldReturnStatusCodeOkFromAllProductsFromWarehouseById () throws Exception {
 
-
-        ResponseEntity<String> responseEntity = this.testRestTemplate.exchange(
-                                                    "/api/v1/fresh-products/warehouse?querytype=1",
-                                                    HttpMethod.GET,
-                                                    this.getDefaultRequestEntity(),
-                                                    String.class);
-
-        Assertions.assertThat(HttpStatus.OK).isEqualTo(responseEntity.getStatusCode());
+        this.mockMvc
+                .perform(get("/api/v1/fresh-products/warehouse/1")
+                        .header("Authorization", this.token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
+    @Test
+    void shouldReturnStatusCodeNotFoundFromAllProductsFromWarehouseById () throws Exception {
+        this.mockMvc
+                .perform(get("/api/v1/fresh-products/warehouse/9")
+                        .header("Authorization", this.token)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 
     @Test
-    void shouldReturnCorrectProductQuantityFromWarehouseById () {
+    void shouldReturnCorrectProductQuantityFromWarehouseById () throws Exception {
 
-        ResponseEntity<WarehouseProductListDTO> responseEntity = this.testRestTemplate.exchange(
-                                                    "/api/v1/fresh-products/warehouse?querytype=1",
-                                                    HttpMethod.GET,
-                                                    this.getDefaultRequestEntity(),
-                                                    WarehouseProductListDTO.class);
-
-        Long allProductQuantitySum = responseEntity.getBody()
+        Long allProductQuantitySum = this.warehouseProductListDTO
                 .getWarehouses()
                 .stream().mapToLong(WarehouseTotalProductDTO::getTotalQuantity).sum();
 
-        Assertions.assertThat(allProductQuantitySum).isEqualTo(8);
+
+        this.mockMvc.perform(get("/api/v1/fresh-products/warehouse/1")
+                .header("Authorization", this.token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.warehouses[0].totalQuantity").value(allProductQuantitySum.intValue()));
     }
 
-    // nao funcionando, falta corrigir algo
-//    @Test
-//    void shouldAllProductFromWarehouseById () {
-//
-//        ResponseEntity<WarehouseProductListDTO> responseEntity = this.testRestTemplate.exchange(
-//                "/api/v1/fresh-products/warehouse?querytype=1",
-//                HttpMethod.GET,
-//                this.getDefaultRequestEntity(),
-//                WarehouseProductListDTO.class);
-//
-//        Assertions.assertThat(responseEntity.getBody()).isInstanceOf(warehouseProductListDTO.getClass());
-//    }
+    @Test
+    void shouldReturnIncorrectProductQuantityFromWarehouseById () throws Exception {
 
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/fresh-products/warehouse/1")
+                .header("Authorization", this.token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andReturn();
 
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+
+        WarehouseProductListDTO warehouseProductListResponse = objectMapper.readValue(contentAsString, WarehouseProductListDTO.class);
+
+        Assert.assertNotEquals(java.util.Optional.ofNullable(warehouseProductListResponse.getWarehouses().get(0).getTotalQuantity()), 12L);
+    }
+
+    @Test
+    void shouldReturnAllProductFromWarehouseById () throws Exception {
+
+        MvcResult mvcResult = this.mockMvc.perform(get("/api/v1/fresh-products/warehouse/1")
+                .header("Authorization", this.token))
+                .andDo(print())
+                .andReturn();
+
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+
+        objectMapper.readValue(contentAsString, WarehouseProductListDTO.class);
+
+    }
 }
