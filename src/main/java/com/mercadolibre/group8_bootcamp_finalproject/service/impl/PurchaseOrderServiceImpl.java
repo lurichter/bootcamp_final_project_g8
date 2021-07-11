@@ -150,7 +150,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
 
     private void checkQuantityInBatches(ProductQuantityRequestDTO productDTO){
         Product product = verifyIfProductExists(productDTO.getProductId());
-        Integer sum = productQuantityInBatches(productDTO.getProductId());
+        Integer sum = productQuantityInBatchesWithDueDateValid(productDTO.getProductId());
         if(productDTO.getQuantity() > sum){
             throw new ProductQuantityOutStockNotFoundException("Insufficient Quantity (" +productDTO.getQuantity()+ ") to " + product.getName());
         }
@@ -273,11 +273,11 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         return batch.getDueDate().plusWeeks(-3).compareTo(LocalDate.now()) >= 0;
     }
 
-    private Integer productQuantityInBatches(Long productId){
+    private Integer productQuantityInBatchesWithDueDateValid(Long productId){
         Product product = verifyIfProductExists(productId);
         List<Batch> batches = batchRepository.findAllByProduct(productId);
         if(batches.size()>0){
-            return batches.stream().mapToInt(Batch::getQuantity).sum();
+            return batches.stream().filter(b->b.getDueDate().plusWeeks(-3).compareTo(LocalDate.now()) >= 0).mapToInt(Batch::getQuantity).sum();
         }else{
             throw new BatchNotFoundException("Batch with product " + product.getName() + " not found");
         }
