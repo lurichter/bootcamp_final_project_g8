@@ -1,7 +1,7 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.PurchaseOrderServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/orders")
@@ -25,7 +24,7 @@ public class PurchaseOrderController {
     }
 
     @GetMapping(path = "/{idOrder}")
-    public ResponseEntity<Set<ProductDTO>> getOrders(@PathVariable Long idOrder) {
+    public ResponseEntity<ProductListDTO> getOrders(@PathVariable Long idOrder) {
         return ResponseEntity.ok(purchaseOrderServiceImpl.getAllProductsFromPurchaseOrder(idOrder));
     }
 
