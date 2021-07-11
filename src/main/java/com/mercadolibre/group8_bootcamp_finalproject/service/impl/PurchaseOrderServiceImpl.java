@@ -4,6 +4,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantityRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
@@ -39,7 +40,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
     }
 
-    public Set<ProductDTO> getAllProductsFromPurchaseOrder(Long orderId){
+    public ProductListDTO getAllProductsFromPurchaseOrder(Long orderId){
         verifyIfPurchaseOrderExists(orderId);
         List<PurchaseOrderItem> purchaseOrderItems = purchaseOrderItemRepository.findAllByPurchaseOrder(orderId);
         List<Product> productsFromPurchaseOrder = new ArrayList<>();
@@ -47,7 +48,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
             Batch batch = verifyIfBatchExists(purchaseOrderItem.getBatch().getId());
             productsFromPurchaseOrder.add(verifyIfProductExists(batch.getProduct().getId()));
         }
-        return ProductMapper.convertProductListToProductDTOList(productsFromPurchaseOrder);
+        return ProductListDTO.builder().products(ProductMapper.convertProductListToProductDTOList(productsFromPurchaseOrder)).build();
     }
 
     //@Transactional
