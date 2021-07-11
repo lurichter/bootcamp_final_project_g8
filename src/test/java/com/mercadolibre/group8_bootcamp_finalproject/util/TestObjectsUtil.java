@@ -22,7 +22,7 @@ public class TestObjectsUtil {
     private List<Users> users = new ArrayList<Users>();
     private List<Operator> operators = new ArrayList<Operator>();
     private List<Seller> sellers = new ArrayList<Seller>();
-    private List<Warehouse> warehouses = new ArrayList<Warehouse>();;
+    private List<Warehouse> warehouses = new ArrayList<Warehouse>();
     private List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
     private ProductCategory freshProductCategory;
     private ProductCategory frozenProductCategory;
@@ -146,6 +146,7 @@ public class TestObjectsUtil {
         seller.setProducts(new ArrayList<>(Arrays.asList(freshProduct1, freshProduct2)));
 
         Batch freshBatch1 = Batch.builder()
+                .id(1L)
                 .number("MELI0001")
                 .quantity(20000)
                 .currentTemperature(10.0)
@@ -157,6 +158,7 @@ public class TestObjectsUtil {
                 .build();
 
         Batch freshBatch2 = Batch.builder()
+                .id(2L)
                 .number("MELI0002")
                 .quantity(20000)
                 .currentTemperature(10.0)
@@ -168,6 +170,7 @@ public class TestObjectsUtil {
                 .build();
 
         InboundOrder freshInboundOrder = InboundOrder.builder()
+                .id(1L)
                 .dateTime(LocalDateTime.now())
                 .operator(operator1)
                 .batches(new ArrayList<>(Arrays.asList(freshBatch1, freshBatch2)))

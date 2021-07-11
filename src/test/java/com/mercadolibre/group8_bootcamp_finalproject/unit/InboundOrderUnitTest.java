@@ -16,9 +16,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.mockito.internal.matchers.GreaterThan;
-
-import static org.hamcrest.Matchers.is;
 import static org.mockito.AdditionalMatchers.*;
 import java.util.*;
 
@@ -193,6 +190,36 @@ public class InboundOrderUnitTest {
         Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
                 .isInstanceOf(WarehouseSectionCapabilityException.class)
                 .hasMessage("Bad Request Exception. WarehouseSection current capability is less than all quantity products from batch stock");
+    }
+
+    @Test
+    public void returnExceptionWhenCreateInboundOrderWithBatchIdInRequestDTO () {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.createInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageStartingWith("Bad Request Exception. The batches")
+                .hasMessageEndingWith("to create need to have a null identifier. If you want to update a batch please use the PUT method.");
+
+    }
+
+    @Test
+    public void returnInboundOrderResponseDTOWhenUpdateInboundOrderWithValidInboundOrder() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(2L);
+        List<Long> batchIds = new ArrayList<Long>(Arrays.asList(1L, 2L));
+
+        InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
+        List<Batch> batches = this.testObjects.getFreshBatches();
+
+        BDDMockito.doReturn(Optional.of(inboundOrder)).when(inboundOrderRepository).findById(inboundOrder.getId());
+        BDDMockito.doReturn(batches).when(batchRepository).findAllById(batchIds);
+
+
     }
 
 
