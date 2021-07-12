@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -53,7 +54,8 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
 
     //@Transactional
     public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId){
-        verifyIfPurchaseOrderExists(purchaseOrderId);
+        PurchaseOrder purchaseOrderToCheck = verifyIfPurchaseOrderExists(purchaseOrderId);
+        checkIfPurchaseOrderWasOpenedUpToOneHourBefore(purchaseOrderToCheck);
         PurchaseOrderDTO purchaseOrderDTO = purchaseOrderRequestDTO.getPurchaseOrder();
         List<ProductQuantityRequestDTO> products = purchaseOrderDTO.getProducts();
 
@@ -62,6 +64,12 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         PurchaseOrder purchaseOrder = getPurchaseOrder(purchaseOrderId);
         Double totalPrice = purchaseOrder.getPurchaseOrderItems().stream().mapToDouble(PurchaseOrderItem::getTotalPrice).sum();
         return PurchaseOrderPriceResponseDTO.builder().totalPrice(totalPrice).build();
+    }
+
+    private void checkIfPurchaseOrderWasOpenedUpToOneHourBefore(PurchaseOrder purchaseOrder){
+        if(purchaseOrder.getDateTime().isBefore(LocalDateTime.now().minusHours(1))){
+            throw new PurchaseOrderLongToBeChanged("Purchase Order was opened too long to be changed");
+        }
     }
 
     private PurchaseOrder createPurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
@@ -288,8 +296,12 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         return price * quantity;
     }
 
-    private void verifyIfPurchaseOrderExists(Long orderId){
-        if (!purchaseOrderRepository.existsById(orderId)){
+    private PurchaseOrder verifyIfPurchaseOrderExists(Long orderId){
+        Optional<PurchaseOrder> purchaseOrderO = purchaseOrderRepository.findById(orderId);
+        if (purchaseOrderO.isPresent()){
+            return purchaseOrderO.get();
+        }
+        else{
             throw new NotFoundException("Purchase order not found");
         }
     }
