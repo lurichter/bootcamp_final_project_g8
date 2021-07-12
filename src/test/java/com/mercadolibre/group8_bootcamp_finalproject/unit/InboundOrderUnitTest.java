@@ -353,4 +353,69 @@ public class InboundOrderUnitTest {
                 .hasMessageEndingWith("already had a purchase order.");
     }
 
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithInvalidProduct() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setProductId(3L);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessageStartingWith("Not Found Exception. The products")
+                .hasMessageEndingWith("was not found.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateOrderWithInvalidWarehouseOperator() {
+
+        Operator operator = this.testObjects.getOperators().get(1);
+        BDDMockito.doReturn(operator).when(operatorService).getLoggedUOperator();
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(OperatorNotInWarehouseException.class)
+                .hasMessage("Bad Request Exception. The operator is not in the Warehouse.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithProductCategoryNotAllowedInWarehouseSection() {
+
+        Product freshProduct = this.testObjects.getFreshProducts().get(0);
+        Product frozenProduct = this.testObjects.getFrozenProducts().get(0);
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setProductId(frozenProduct.getId());
+
+        BDDMockito.doReturn(Arrays.asList(freshProduct, frozenProduct)).when(productRepository).findAllById(Arrays.asList(freshProduct.getId(), frozenProduct.getId()));
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Bad Request Exception. Product category is invalid to Warehouse Section Category.");
+    }
+
+    @Test
+    public void returnExceptionWhenCreateUpdateOrderWithQuantityBiggerThanWarehouseSectionAvailability() {
+
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setQuantity(100000);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(WarehouseSectionCapabilityException.class)
+                .hasMessage("Bad Request Exception. WarehouseSection current capability is less than all quantity products from batch stock");
+    }
+
 }
