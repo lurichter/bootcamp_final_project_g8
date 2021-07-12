@@ -70,7 +70,7 @@ class BatchControllerIT extends ControllerTest{
 				.andExpect(jsonPath("$.batchStock[0].sectionId").value(1))
 				.andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE"))
 				.andExpect(jsonPath("$.batchStock[0].currentQuantity").value(12))
-				.andExpect(jsonPath("$.batchStock[0].dueDate").value("2021-12-27"));
+				.andExpect(jsonPath("$.batchStock[0].dueDate").value("2022-12-27"));
 	}
 
 	@Test
@@ -82,8 +82,8 @@ class BatchControllerIT extends ControllerTest{
 				.accept(MediaType.ALL))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.productId").value(1))
-				.andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE2"))
-				.andExpect(jsonPath("$.batchStock[1].batchNumber").value("TESTE"));
+				.andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE3"))
+				.andExpect(jsonPath("$.batchStock[1].batchNumber").value("TESTE2"));
 	}
 
 	@Test
@@ -96,7 +96,7 @@ class BatchControllerIT extends ControllerTest{
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.productId").value(1))
 				.andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE2"))
-				.andExpect(jsonPath("$.batchStock[1].batchNumber").value("TESTE"));
+				.andExpect(jsonPath("$.batchStock[1].batchNumber").value("TESTE3"));
 	}
 
 	@Test

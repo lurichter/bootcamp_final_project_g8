@@ -91,11 +91,11 @@ public class DueDateIntegrationTest extends ControllerTest{
                 .accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.batchStock[0].sectionId").value(1))
-                .andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE4"))
-                .andExpect(jsonPath("$.batchStock[0].productId").value(2))
+                .andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE3"))
+                .andExpect(jsonPath("$.batchStock[0].productId").value(1))
                 .andExpect(jsonPath("$.batchStock[0].productCategory").value("Fresh"))
-                .andExpect(jsonPath("$.batchStock[0].dueDate").value("2022-07-12"))
-                .andExpect(jsonPath("$.batchStock[0].quantity").value(23));
+                .andExpect(jsonPath("$.batchStock[0].dueDate").value("2022-08-02"))
+                .andExpect(jsonPath("$.batchStock[0].quantity").value(13));
     }
 
     @Test
@@ -110,7 +110,6 @@ public class DueDateIntegrationTest extends ControllerTest{
     }
 
     @Test
-
     void shouldReturnBatchNotFoundExceptionWhenNoBatchIsFoundedWithTheDueDateRangeAndCategorySpecified() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get
                 ("/api/v1/fresh-products/due-date/list/{daysQuantity}", 100)

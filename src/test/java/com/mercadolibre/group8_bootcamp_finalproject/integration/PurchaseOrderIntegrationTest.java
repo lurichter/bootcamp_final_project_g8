@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.util.LoginUtil;
 import com.mercadolibre.group8_bootcamp_finalproject.util.PurchaseOrderCreator;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtilUpdated;
@@ -43,11 +44,6 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
     @InjectMocks
     ProductListDTO productListDTO;
 
-    private String loginRequest = "{\n" +
-            "    \"username\" : \"operador1@mercadolivre.com\",\n" +
-            "    \"password\" : \"123456\"\n" +
-            "}";
-
     @BeforeEach
     void setup() throws Exception{
         testObjectsUtil = new TestObjectsUtilUpdated();
@@ -55,17 +51,7 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
         this.mockMvc = webAppContextSetup(webApplicationContext)
                 .apply(springSecurity()).build();
 
-        MvcResult mvcResult = mockMvc.perform(
-                post("/api/v1/sign-in")
-                        .characterEncoding("UTF-8")
-                        .content(this.loginRequest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept("application/json;charset=UTF-8"))
-                .andReturn();
-
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-
-        token = jsonParser.parseMap(mvcResult.getResponse().getContentAsString()).get("token").toString();
+        token = LoginUtil.loginAsOperator(mockMvc);
 
         Set<ProductDTO> productDTOS = this.testObjectsUtil.getProductDTOS();
 
@@ -117,7 +103,6 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
 
     @Test
     void shouldReturnPriceFromNewPurchaseOrder() throws Exception {
-
         this.mockMvc
                 .perform(post("/api/v1/fresh-products/orders")
                         .header("authorization", this.token)
@@ -125,14 +110,13 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
                 .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderRequest()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.totalPrice").value(5.49))
+                .andExpect(jsonPath("$.totalPrice").value(3.1))
                 .andDo(print())
                 .andReturn();
     }
 
     @Test
     void shouldReturnProductOutStockNotFoundException() throws Exception {
-
         this.mockMvc
                 .perform(post("/api/v1/fresh-products/orders")
                         .header("authorization", this.token)
@@ -144,14 +128,14 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
 
     @Test
     void shouldReturnPriceFromUpdatedPurchaseOrder() throws Exception {
-
         this.mockMvc
-                .perform(put("/api/v1/fresh-products/orders/{idOrder}", 1)
+                .perform(put("/api/v1/fresh-products/orders/{idOrder}", 4)
                         .header("authorization", this.token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderUpdateRequest()))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.totalPrice").value(42.58))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.totalPrice").value(15.5))
                 .andDo(print())
                 .andReturn();
     }

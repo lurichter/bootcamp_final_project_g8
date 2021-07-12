@@ -36,7 +36,6 @@ public class PurchaseOrderCreator {
         return new PurchaseOrderDTO(1L, createOrderStatus(), createValidProductsUpdateDTO());
     }
 
-
     public static OrderStatusDTO createOrderStatus(){
         return OrderStatusDTO.builder().statusCode(OrderStatusEnum.OPEN).build();
     }
