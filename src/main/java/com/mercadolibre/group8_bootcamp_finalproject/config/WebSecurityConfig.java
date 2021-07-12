@@ -20,6 +20,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/v1/sign-in").permitAll()
                 .antMatchers(HttpMethod.GET, "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .antMatchers( "/h2-console/**").permitAll()
+                .antMatchers( "/ping", "/fake").permitAll()
                 //                .antMatchers("**").permitAll() // PARA TESTE, REMOVER DPS
                 .anyRequest().authenticated();
     }

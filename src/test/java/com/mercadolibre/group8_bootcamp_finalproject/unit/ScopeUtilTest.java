@@ -10,9 +10,9 @@ public class ScopeUtilTest {
 	private static void setFinalStatic(Field field, Object newValue) throws IllegalAccessException, NoSuchFieldException {
 		field.setAccessible(true);
 
-		Field modifiersField = Field.class.getDeclaredField("modifiers");
-		modifiersField.setAccessible(true);
-		modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+		//Field modifiersField = Field.class.getDeclaredField("modifiers");
+		//modifiersField.setAccessible(true);
+		//modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
 		field.set(null, newValue);
 	}

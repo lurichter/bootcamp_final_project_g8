@@ -1,13 +1,12 @@
 package com.mercadolibre.group8_bootcamp_finalproject.integration;
 
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.BatchNotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.util.LoginUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -15,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -31,11 +29,6 @@ public class DueDateIntegrationTest extends ControllerTest{
 
     String token;
 
-    String loginRequest = "{\n" +
-            "    \"username\" : \"operador1@mercadolivre.com\",\n" +
-            "    \"password\" : \"123456\"\n" +
-            "}";
-
     @BeforeEach
     void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext)
@@ -43,18 +36,7 @@ public class DueDateIntegrationTest extends ControllerTest{
 
         badRequestResponse = "Bad Request Exception. There are no batches with the due date between the given range";
 
-        MvcResult mvcResult = mockMvc.perform(
-                post("/api/v1/sign-in")
-                        .characterEncoding("UTF-8")
-                        .content(loginRequest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept("application/json;charset=UTF-8"))
-                .andReturn();
-
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-
-        token = jsonParser.parseMap(mvcResult.getResponse().getContentAsString()).get("token").toString();
-
+        token = LoginUtil.loginAsOperator(mockMvc);
     }
 
     @Test
@@ -109,11 +91,11 @@ public class DueDateIntegrationTest extends ControllerTest{
                 .accept(MediaType.ALL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.batchStock[0].sectionId").value(1))
-                .andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE4"))
-                .andExpect(jsonPath("$.batchStock[0].productId").value(2))
+                .andExpect(jsonPath("$.batchStock[0].batchNumber").value("TESTE3"))
+                .andExpect(jsonPath("$.batchStock[0].productId").value(1))
                 .andExpect(jsonPath("$.batchStock[0].productCategory").value("Fresh"))
-                .andExpect(jsonPath("$.batchStock[0].dueDate").value("2022-07-12"))
-                .andExpect(jsonPath("$.batchStock[0].quantity").value(23));
+                .andExpect(jsonPath("$.batchStock[0].dueDate").value("2022-08-02"))
+                .andExpect(jsonPath("$.batchStock[0].quantity").value(13));
     }
 
     @Test
@@ -128,7 +110,6 @@ public class DueDateIntegrationTest extends ControllerTest{
     }
 
     @Test
-
     void shouldReturnBatchNotFoundExceptionWhenNoBatchIsFoundedWithTheDueDateRangeAndCategorySpecified() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get
                 ("/api/v1/fresh-products/due-date/list/{daysQuantity}", 100)
@@ -142,4 +123,3 @@ public class DueDateIntegrationTest extends ControllerTest{
     }
 
 }
-

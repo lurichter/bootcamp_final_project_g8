@@ -3,6 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseTotalProductDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.util.LoginUtil;
 import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,30 +43,14 @@ public class WarehouseControllerIntegrationTest extends ControllerTest {
     @InjectMocks
     WarehouseTotalProductDTO warehouseTotalProductDTO;
 
-    private String loginRequest = "{\n" +
-            "    \"username\" : \"operador1@mercadolivre.com\",\n" +
-            "    \"password\" : \"123456\"\n" +
-            "}";
-
     @BeforeEach
     void setup() throws Exception {
         this.mockMvc = webAppContextSetup(webApplicationContext)
                 .apply(springSecurity()).build();
 
-        MvcResult mvcResult = mockMvc.perform(
-                post("/api/v1/sign-in")
-                        .characterEncoding("UTF-8")
-                        .content(this.loginRequest)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept("application/json;charset=UTF-8"))
-                .andReturn();
+        token = LoginUtil.loginAsOperator(this.mockMvc);
 
-        JacksonJsonParser jsonParser = new JacksonJsonParser();
-
-        token = jsonParser.parseMap(mvcResult.getResponse().getContentAsString()).get("token").toString();
-
-         // mocking test
-
+        // mocking test
         this.warehouseProductListDTO.setProductId(1L);
 
         this.warehouseTotalProductDTO.setWarehouseCode(1L);

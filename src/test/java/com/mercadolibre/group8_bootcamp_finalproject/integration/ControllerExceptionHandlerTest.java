@@ -3,6 +3,7 @@ package com.mercadolibre.group8_bootcamp_finalproject.integration;
 import com.mercadolibre.group8_bootcamp_finalproject.controller.PingController;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiError;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ApiException;
+import com.mercadolibre.group8_bootcamp_finalproject.exceptions.UnauthorizedException;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.HttpMethod;
@@ -61,6 +62,19 @@ class ControllerExceptionHandlerTest extends ControllerTest {
 
 		// Then
 		assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+	}
+
+	@Test
+	public void testUnauthorizedException() {
+		// Given
+		doThrow(new UnauthorizedException()).when(pingController)
+				.ping();
+
+		// When
+		ResponseEntity<ApiError> responseEntity = this.testRestTemplate.exchange("/ping", HttpMethod.GET, this.getDefaultRequestEntity(), ApiError.class);
+
+		// Then
+		assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
 	}
 
 }
