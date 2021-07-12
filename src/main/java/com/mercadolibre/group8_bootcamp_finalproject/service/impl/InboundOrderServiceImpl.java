@@ -183,7 +183,7 @@ public class InboundOrderServiceImpl implements InboundOrderService {
         ProductCategory productCategory = warehouseSection.getProductCategory();
 
         for (Product product : productList) {
-            if (!product.getProductCategory().getId().equals(productCategory.getId())) {
+            if (!product.getProductCategory().getName().equals(productCategory.getName())) {
                 throw new BadRequestException("Product category is invalid to Warehouse Section Category. productId: "
                         + product.getId() +
                         ", WarehouseSection: " + warehouseSection.getId());
