@@ -15,7 +15,7 @@ import java.time.LocalTime;
 import java.util.*;
 
 @Getter
-public class TestObjectsUtil {
+public class TestObjectsUtilUpdated {
 
     private List<Users> users = new ArrayList<Users>();
     private List<Operator> operators = new ArrayList<Operator>();
@@ -39,7 +39,7 @@ public class TestObjectsUtil {
     private Set<ProductDTO> frozenPoductDTOS = new HashSet<>();
     private Set<ProductDTO> productDTOS = new HashSet<>();
 
-    public TestObjectsUtil() {
+    public TestObjectsUtilUpdated() {
 
         Users userOperator1 = Users.builder()
                 .id(1L)

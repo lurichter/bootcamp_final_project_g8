@@ -1,7 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Product;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,17 +22,17 @@ public class ProductServiceImpl implements IProductService {
 
     private final ProductCategoryRepository productCategoryRepository;
 
-    public Set<ProductDTO> getAllProducts(){
+    public ProductListDTO getAllProducts(){
         List<Product> products = productRepository.findAll();
         verifyIfListIsEmpty(products);
-        return ProductMapper.convertProductListToProductDTOList(products);
+        return ProductListDTO.builder().products(ProductMapper.convertProductListToProductDTOList(products)).build();
     }
 
-    public Set<ProductDTO> getAllProductsByCategory(ProductCategoryEnum category){
+    public ProductListDTO getAllProductsByCategory(ProductCategoryEnum category){
         ProductCategory productCategory = productCategoryRepository.findByName(category);
         List<Product> products = productRepository.findAllByProductCategory(productCategory.getId());
         verifyIfListIsEmpty(products);
-        return ProductMapper.convertProductListToProductDTOList(products);
+        return ProductListDTO.builder().products(ProductMapper.convertProductListToProductDTOList(products)).build();
     }
 
     private void verifyIfListIsEmpty(List<Product> products){
@@ -42,5 +40,7 @@ public class ProductServiceImpl implements IProductService {
             throw new ProductNotFoundException("Product List not found");
         }
     }
+
+
 
 }
