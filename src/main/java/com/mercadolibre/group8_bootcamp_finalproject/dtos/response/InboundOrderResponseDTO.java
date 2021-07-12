@@ -25,7 +25,7 @@ public class InboundOrderResponseDTO {
             BatchResponseDTO batchResponseDTO = BatchResponseDTO.builder()
                     .batchId(batch.getId())
                     .batchNumber(batch.getNumber())
-                    .productId(batch.getProduct().getId().intValue())
+                    .productId(batch.getProduct().getId())
                     .currentTemperature(batch.getCurrentTemperature())
                     .minimumTemperature(batch.getProduct().getMinTemperature())
                     .quantity(batch.getQuantity())
