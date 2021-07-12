@@ -31,6 +31,7 @@ public class TestObjectsUtil {
     private List<WarehouseSection> freshWarehouseSections = new ArrayList<WarehouseSection>();
     private List<WarehouseSection> frozenWarehouseSections = new ArrayList<WarehouseSection>();
     private List<Product> freshProducts = new ArrayList<Product>();
+    private List<Product> frozenProducts = new ArrayList<Product>();
     private List<Batch> freshBatches = new ArrayList<Batch>();
     private List<InboundOrder> freshInboundOrders = new ArrayList<InboundOrder>();
     private List<PurchaseOrder> freshPurchaseOrders = new ArrayList<PurchaseOrder>();
@@ -162,7 +163,18 @@ public class TestObjectsUtil {
                 .productCategory(freshCategory)
                 .build();
 
-        seller.setProducts(new ArrayList<>(Arrays.asList(freshProduct1, freshProduct2)));
+        Product frozenProduct1 = Product.builder()
+                .id(3L)
+                .name("Açaí congelado")
+                .description("Açaí congelado 500g")
+                .minTemperature(-3.0)
+                .maxTemperature(0.0)
+                .price(22.10)
+                .seller(seller)
+                .productCategory(frozenCategory)
+                .build();
+
+        seller.setProducts(new ArrayList<>(Arrays.asList(freshProduct1, freshProduct2, frozenProduct1)));
 
         Batch freshBatch1 = Batch.builder()
                 .id(1L)
@@ -289,6 +301,7 @@ public class TestObjectsUtil {
         this.frozenWarehouseSections.add(frozenWarehouseSection);
         this.freshProducts.add(freshProduct1);
         this.freshProducts.add(freshProduct2);
+        this.frozenProducts.add(frozenProduct1);
         this.freshBatches.add(freshBatch1);
         this.freshBatches.add(freshBatch2);
         this.freshBatches.add(freshBatch3);

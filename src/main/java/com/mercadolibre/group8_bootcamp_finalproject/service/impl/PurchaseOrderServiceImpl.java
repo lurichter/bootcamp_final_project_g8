@@ -12,6 +12,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IPurchaseOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,7 +32,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
 
     private final BuyerRepository buyerRepository;
 
-    //@Transactional
+    @Transactional
     public PurchaseOrderPriceResponseDTO savePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO){
         PurchaseOrder purchaseOrder = createPurchaseOrder(purchaseOrderRequestDTO);
         purchaseOrder = purchaseOrderRepository.save(purchaseOrder);
@@ -51,7 +52,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         return ProductListDTO.builder().products(ProductMapper.convertProductListToProductDTOList(productsFromPurchaseOrder)).build();
     }
 
-    //@Transactional
+    @Transactional
     public PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId){
         PurchaseOrder purchaseOrderToCheck = verifyIfPurchaseOrderExists(purchaseOrderId);
         checkIfPurchaseOrderWasOpenedUpToOneHourBefore(purchaseOrderToCheck);
