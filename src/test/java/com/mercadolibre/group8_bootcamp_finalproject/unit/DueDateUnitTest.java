@@ -134,12 +134,12 @@ public class DueDateUnitTest {
 
         BDDMockito.doReturn(batchStockDueDateList)
                 .when(this.batchRepository).findAllByWarehouseSectionWhereDueDateLessThanParam
-                (this.operatorId, dueDateFilter(3), sortAsc);
+                (this.operatorId, dueDateFilter(1), sortAsc);
 
         Assertions
                 .assertThatThrownBy(() ->
                         this.dueDateService.listBatchesOrderedByDueDate
-                                (3, null, new String[]{"dueDate_asc"}))
+                                (-1000, null, new String[]{"dueDate_asc"}))
                 .isInstanceOf(BatchNotFoundException.class)
                 .hasMessage("Bad Request Exception. There are no batches with the due date between the given range.");
     }
@@ -150,12 +150,12 @@ public class DueDateUnitTest {
 
         BDDMockito.doReturn(batchStockDueDateList)
                 .when(this.batchRepository).findAllByWarehouseSectionWhereDueDateLessThanParam
-                (this.operatorId, dueDateFilter(35), sortAsc);
+                (this.operatorId, dueDateFilter(3), sortAsc);
 
         Assertions
                 .assertThatThrownBy(() ->
                         this.dueDateService.listBatchesOrderedByDueDate
-                                (35, ProductCategoryEnum.FS, new String[]{"dueDate_asc"}))
+                                (3, ProductCategoryEnum.FS, new String[]{"dueDate_asc"}))
                 .isInstanceOf(BatchNotFoundException.class)
                 .hasMessage("Bad Request Exception. There are no batches with the due date between the given range and the category selected.");
     }

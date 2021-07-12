@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class TestBatchStockUtil {
 
-    TestObjectsUtil testObjects = new TestObjectsUtil();
+    TestObjectsUtil2 testObjects = new TestObjectsUtil2();
 
     private BatchStockDueDateListDTO batchStockDueDateListFresh = new BatchStockDueDateListDTO();
     private BatchStockDueDateListDTO batchStockDueDateListFrozen = new BatchStockDueDateListDTO();
@@ -105,7 +105,8 @@ public class TestBatchStockUtil {
         batchStockDueDate2.add(0, batchStockDueDateDTO6);
         batchStockDueDate2.add(1, batchStockDueDateDTO4);
 
-        List<BatchStockDueDateDTO> batchStockDueDateOneDayAhead = new ArrayList<>(batchStockDueDateDTO2);
+        List<BatchStockDueDateDTO> batchStockDueDateOneDayAhead = new ArrayList<>();
+        batchStockDueDateOneDayAhead.add(batchStockDueDateDTO2);
 
         this.batchStockDueDateListFresh.setBatchStock(freshBatchStockDueDate);
         this.batchStockDueDateListFrozen.setBatchStock(frozenBatchStockDueDate);
@@ -114,7 +115,4 @@ public class TestBatchStockUtil {
         this.batchStockDueDateList2.setBatchStock(batchStockDueDate2);
         this.batchStockDueDateListOneDayAhead.setBatchStock(batchStockDueDateOneDayAhead);
     }
-
-
-
 }
