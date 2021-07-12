@@ -29,7 +29,6 @@ public class DueDateServiceImpl implements IDueDateService {
 
         List<BatchStockDueDateDTO> batchStockDueDate =
                 batchRepository.findAllByWarehouseSectionWhereDueDateLessThanParam(operatorId, dueDateFilter(daysQuantity), SortUtil.sortStringToSort(order));
-
         if (category != null) return new BatchStockDueDateListDTO(filterByCategory(batchStockDueDate, category));
 
         if (batchStockDueDate.isEmpty()) throw new BatchNotFoundException("There are no batches with the due date between the given range.");
