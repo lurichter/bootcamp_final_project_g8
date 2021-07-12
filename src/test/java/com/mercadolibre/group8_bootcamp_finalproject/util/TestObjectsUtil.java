@@ -26,13 +26,17 @@ public class TestObjectsUtil {
     private ProductCategory frozenProductCategory;
     private List<WarehouseSection> freshWarehouseSections = new ArrayList<WarehouseSection>();
     private List<WarehouseSection> frozenWarehouseSections = new ArrayList<WarehouseSection>();
+    private List<Product> products = new ArrayList<Product>();
     private List<Product> freshProducts = new ArrayList<Product>();
+    private List<Product> frozenProducts = new ArrayList<>();
     private List<Batch> freshBatches = new ArrayList<Batch>();
     private List<InboundOrder> freshInboundOrders = new ArrayList<InboundOrder>();
     private List<WarehouseSectionDTO> freshWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
     private List<BatchDTO> freshBatchDTOS = new ArrayList<BatchDTO>();
     private List<InboundOrderDTO> freshInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
     private List<InboundOrderRequestDTO> freshInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
+    private Set<ProductDTO> freshPoductDTOS = new HashSet<>();
+    private Set<ProductDTO> frozenPoductDTOS = new HashSet<>();
     private Set<ProductDTO> productDTOS = new HashSet<>();
 
     public TestObjectsUtil() {
@@ -142,6 +146,28 @@ public class TestObjectsUtil {
                 .productCategory(freshCategory)
                 .build();
 
+        Product frozenProduct1 = Product.builder()
+                .id(3L)
+                .name("Torta de frango Catupiry congelada 700g")
+                .description("Torta congelada com recheio de grango com Catupiry(original) cremoso")
+                .minTemperature(-3.0)
+                .maxTemperature(4.0)
+                .price(22.4)
+                .seller(seller)
+                .productCategory(frozenCategory)
+                .build();
+
+        Product frozenProduct2 = Product.builder()
+                .id(4L)
+                .name("Pão de alho tradicional 300g")
+                .description("Pacote com 6 unidades de pão de alho congelados")
+                .minTemperature(-3.0)
+                .maxTemperature(4.0)
+                .price(8.99)
+                .seller(seller)
+                .productCategory(frozenCategory)
+                .build();
+
         seller.setProducts(new ArrayList<>(Arrays.asList(freshProduct1, freshProduct2)));
 
         Batch freshBatch1 = Batch.builder()
@@ -214,7 +240,7 @@ public class TestObjectsUtil {
                 .inboundOrder(freshInboundOrderDTO)
                 .build();
 
-        ProductDTO productDTO1 = ProductDTO.builder()
+        ProductDTO freshProductDTO1 = ProductDTO.builder()
                 .id(freshProduct1.getId())
                 .name(freshProduct1.getName())
                 .description(freshProduct1.getDescription())
@@ -223,7 +249,7 @@ public class TestObjectsUtil {
                 .price(freshProduct1.getPrice())
                 .build();
 
-        ProductDTO productDTO2 = ProductDTO.builder()
+        ProductDTO freshProductDTO2 = ProductDTO.builder()
                 .id(freshProduct2.getId())
                 .name(freshProduct2.getName())
                 .description(freshProduct2.getDescription())
@@ -231,6 +257,26 @@ public class TestObjectsUtil {
                 .maxTemperature(freshProduct2.getMaxTemperature())
                 .price(freshProduct2.getPrice())
                 .build();
+
+        ProductDTO frozenProductDTO1 = ProductDTO.builder()
+                .id(frozenProduct1.getId())
+                .name(frozenProduct1.getName())
+                .description(frozenProduct1.getDescription())
+                .minTemperature(frozenProduct1.getMinTemperature())
+                .maxTemperature(frozenProduct1.getMaxTemperature())
+                .price(frozenProduct1.getPrice())
+                .build();
+
+        ProductDTO frozenProductDTO2 = ProductDTO.builder()
+                .id(frozenProduct2.getId())
+                .name(frozenProduct2.getName())
+                .description(frozenProduct2.getDescription())
+                .minTemperature(frozenProduct2.getMinTemperature())
+                .maxTemperature(frozenProduct2.getMaxTemperature())
+                .price(frozenProduct2.getPrice())
+                .build();
+
+
 
         this.users.add(userOperator1);
         this.users.add(userOperator2);
@@ -246,6 +292,10 @@ public class TestObjectsUtil {
         this.frozenWarehouseSections.add(frozenWarehouseSection);
         this.freshProducts.add(freshProduct1);
         this.freshProducts.add(freshProduct2);
+        this.frozenProducts.add(frozenProduct1);
+        this.frozenProducts.add(frozenProduct2);
+        this.products.addAll(freshProducts);
+        this.products.addAll(frozenProducts);
         this.freshBatches.add(freshBatch1);
         this.freshBatches.add(freshBatch2);
         this.freshInboundOrders.add(freshInboundOrder);
@@ -254,8 +304,12 @@ public class TestObjectsUtil {
         this.freshBatchDTOS.add(freshBatchDTO2);
         this.freshInboundOrderDTOS.add(freshInboundOrderDTO);
         this.freshInboundOrderRequestDTOS.add(freshInboundOrderRequestDTO);
-        this.productDTOS.add(productDTO1);
-        this.productDTOS.add(productDTO2);
+        this.freshPoductDTOS.add(freshProductDTO1);
+        this.freshPoductDTOS.add(freshProductDTO2);
+        this.frozenPoductDTOS.add(frozenProductDTO1);
+        this.frozenPoductDTOS.add(frozenProductDTO2);
+        this.productDTOS.addAll(freshPoductDTOS);
+        this.productDTOS.addAll(frozenPoductDTOS);
 
     }
 
