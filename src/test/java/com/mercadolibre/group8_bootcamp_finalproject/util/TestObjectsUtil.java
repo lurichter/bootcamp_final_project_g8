@@ -4,7 +4,6 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDueDateDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import lombok.Getter;
@@ -19,40 +18,38 @@ import java.util.List;
 @Getter
 public class TestObjectsUtil {
 
-    private List<Users> users = new ArrayList<Users>();
-    private List<Operator> operators = new ArrayList<Operator>();
-    private List<Seller> sellers = new ArrayList<Seller>();
-    private List<Warehouse> warehouses = new ArrayList<Warehouse>();;
-    private List<WarehouseOperator> warehouseOperators = new ArrayList<WarehouseOperator>();
-    private ProductCategory freshProductCategory;
-    private ProductCategory frozenProductCategory;
-    private ProductCategory chilledProductCategory;
-    private List<WarehouseSection> freshWarehouseSections = new ArrayList<WarehouseSection>();
-    private List<WarehouseSection> frozenWarehouseSections = new ArrayList<WarehouseSection>();
-    private List<WarehouseSection> chilledWarehouseSections = new ArrayList<WarehouseSection>();
-    private List<Product> freshProducts = new ArrayList<Product>();
-    private List<Product> frozenProducts = new ArrayList<Product>();
-    private List<Product> chilledProducts = new ArrayList<Product>();
-    private List<Batch> freshBatches = new ArrayList<Batch>();
-    private List<Batch> frozenBatches = new ArrayList<Batch>();
-    private List<Batch> chilledBatches = new ArrayList<Batch>();
-    private List<InboundOrder> freshInboundOrders = new ArrayList<InboundOrder>();
-    private List<InboundOrder> frozenInboundOrders = new ArrayList<InboundOrder>();
-    private List<InboundOrder> chilledInboundOrders = new ArrayList<InboundOrder>();
-    private List<WarehouseSectionDTO> freshWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
-    private List<WarehouseSectionDTO> frozenWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
-    private List<WarehouseSectionDTO> chilledWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
-    private List<BatchDTO> freshBatchDTOS = new ArrayList<BatchDTO>();
-    private List<BatchDTO> frozenBatchDTOS = new ArrayList<BatchDTO>();
-    private List<BatchDTO> chilledBatchDTOS = new ArrayList<BatchDTO>();
-    private List<InboundOrderDTO> freshInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
-    private List<InboundOrderDTO> frozenInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
-    private List<InboundOrderDTO> chilledInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
-    private List<InboundOrderRequestDTO> freshInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
-    private List<InboundOrderRequestDTO> frozenInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
-    private List<InboundOrderRequestDTO> chilledInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
-    private List<BatchStockDueDateDTO> batchStockDueDate1 = new ArrayList<>();
-    private List<BatchStockDueDateDTO> batchStockDueDate2 = new ArrayList<>();
+    private final List<Users> users = new ArrayList<>();
+    private final List<Operator> operators = new ArrayList<>();
+    private final List<Seller> sellers = new ArrayList<>();
+    private final List<Warehouse> warehouses = new ArrayList<>();
+    private final List<WarehouseOperator> warehouseOperators = new ArrayList<>();
+    private final ProductCategory freshProductCategory;
+    private final ProductCategory frozenProductCategory;
+    private final ProductCategory chilledProductCategory;
+    private final List<WarehouseSection> freshWarehouseSections = new ArrayList<>();
+    private final List<WarehouseSection> frozenWarehouseSections = new ArrayList<>();
+    private final List<WarehouseSection> chilledWarehouseSections = new ArrayList<>();
+    private final List<Product> freshProducts = new ArrayList<>();
+    private final List<Product> frozenProducts = new ArrayList<>();
+    private final List<Product> chilledProducts = new ArrayList<>();
+    private final List<Batch> freshBatches = new ArrayList<>();
+    private final List<Batch> frozenBatches = new ArrayList<>();
+    private final List<Batch> chilledBatches = new ArrayList<>();
+    private final List<InboundOrder> freshInboundOrders = new ArrayList<>();
+    private final List<InboundOrder> frozenInboundOrders = new ArrayList<>();
+    private final List<InboundOrder> chilledInboundOrders = new ArrayList<>();
+    private final List<WarehouseSectionDTO> freshWarehouseSectionDTOS = new ArrayList<>();
+    private final List<WarehouseSectionDTO> frozenWarehouseSectionDTOS = new ArrayList<>();
+    private final List<WarehouseSectionDTO> chilledWarehouseSectionDTOS = new ArrayList<>();
+    private final List<BatchDTO> freshBatchDTOS = new ArrayList<>();
+    private final List<BatchDTO> frozenBatchDTOS = new ArrayList<>();
+    private final List<BatchDTO> chilledBatchDTOS = new ArrayList<>();
+    private final List<InboundOrderDTO> freshInboundOrderDTOS = new ArrayList<>();
+    private final List<InboundOrderDTO> frozenInboundOrderDTOS = new ArrayList<>();
+    private final List<InboundOrderDTO> chilledInboundOrderDTOS = new ArrayList<>();
+    private final List<InboundOrderRequestDTO> freshInboundOrderRequestDTOS = new ArrayList<>();
+    private final List<InboundOrderRequestDTO> frozenInboundOrderRequestDTOS = new ArrayList<>();
+    private final List<InboundOrderRequestDTO> chilledInboundOrderRequestDTOS = new ArrayList<>();
 
     public TestObjectsUtil() {
 
@@ -228,7 +225,7 @@ public class TestObjectsUtil {
                 .currentTemperature(10.0)
                 .manufacturingDate(LocalDate.now().minusDays(7))
                 .manufacturingTime(LocalTime.now())
-                .dueDate(LocalDate.now().plusDays(14))
+                .dueDate(LocalDate.now().plusDays(1))
                 .product(freshProduct2)
                 .warehouseSection(freshWarehouseSection)
                 .build();
@@ -261,7 +258,7 @@ public class TestObjectsUtil {
                 .currentTemperature(3.0)
                 .manufacturingDate(LocalDate.now().minusDays(7))
                 .manufacturingTime(LocalTime.now())
-                .dueDate(LocalDate.now().plusDays(20))
+                .dueDate(LocalDate.now().plusDays(10))
                 .product(frozenProduct1)
                 .warehouseSection(frozenWarehouseSection)
                 .build();
@@ -321,13 +318,13 @@ public class TestObjectsUtil {
                 .build();
 
         BatchDTO freshBatchDTO2 = BatchDTO.builder()
-                .batchNumber(freshBatch1.getNumber())
-                .productId(freshBatch1.getProduct().getId())
-                .currentTemperature(freshBatch1.getCurrentTemperature())
-                .quantity(freshBatch1.getQuantity())
-                .manufacturingDate(freshBatch1.getManufacturingDate())
-                .manufacturingTime(freshBatch1.getManufacturingTime())
-                .dueDate(freshBatch1.getDueDate())
+                .batchNumber(freshBatch2.getNumber())
+                .productId(freshBatch2.getProduct().getId())
+                .currentTemperature(freshBatch2.getCurrentTemperature())
+                .quantity(freshBatch2.getQuantity())
+                .manufacturingDate(freshBatch2.getManufacturingDate())
+                .manufacturingTime(freshBatch2.getManufacturingTime())
+                .dueDate(freshBatch2.getDueDate())
                 .build();
 
         BatchDTO frozenBatchDTO1 = BatchDTO.builder()
@@ -396,15 +393,6 @@ public class TestObjectsUtil {
         InboundOrderRequestDTO chilledInboundOrderRequestDTO = InboundOrderRequestDTO.builder()
                 .inboundOrder(chilledInboundOrderDTO)
                 .build();
-
-//        BatchStockDueDateDTO batchStockDueDateDTO1 = BatchStockDueDateDTO.builder()
-//                .quantity()
-//                .dueDate()
-//                .productId()
-//                .sectionId()
-//                .batchNumber()
-//                .productCategory()
-//                .build();
 
         this.users.add(user1);
         this.users.add(user2);
