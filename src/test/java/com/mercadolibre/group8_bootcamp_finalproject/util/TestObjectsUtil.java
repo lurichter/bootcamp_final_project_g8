@@ -4,6 +4,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseTotalProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
@@ -39,6 +40,9 @@ public class TestObjectsUtil {
     private List<BatchDTO> freshBatchDTOS = new ArrayList<BatchDTO>();
     private List<InboundOrderDTO> freshInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
     private List<InboundOrderRequestDTO> freshInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
+
+    // added by victor
+    private List<WarehouseTotalProductDTO> warehouseTotalProductDTOS = new ArrayList<>();
 
     public TestObjectsUtil() {
 
@@ -299,6 +303,7 @@ public class TestObjectsUtil {
         this.freshInboundOrderDTOS.add(freshInboundOrderDTO);
         this.freshInboundOrderRequestDTOS.add(freshInboundOrderRequestDTO);
 
+        this.warehouseTotalProductDTOS.add(WarehouseTotalProductDTO.builder().warehouseCode(this.warehouses.get(0).getId()).totalQuantity(22L).build());
 
     }
 
