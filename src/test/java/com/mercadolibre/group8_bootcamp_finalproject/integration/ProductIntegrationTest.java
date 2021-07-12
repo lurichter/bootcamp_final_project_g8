@@ -1,9 +1,9 @@
 package com.mercadolibre.group8_bootcamp_finalproject.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
+import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtilUpdated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 public class ProductIntegrationTest extends ControllerTest{
 
-    private TestObjectsUtil testObjectsUtil;
+    private TestObjectsUtilUpdated testObjectsUtil;
 
     private MockMvc mockMvc;
 
@@ -46,7 +46,7 @@ public class ProductIntegrationTest extends ControllerTest{
     @BeforeEach
     void setup() throws Exception {
 
-        testObjectsUtil = new TestObjectsUtil();
+        testObjectsUtil = new TestObjectsUtilUpdated();
 
         this.mockMvc = webAppContextSetup(webApplicationContext)
                 .apply(springSecurity()).build();
@@ -162,11 +162,6 @@ public class ProductIntegrationTest extends ControllerTest{
                 .header("authorization", this.token)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void shouldReturnNotFoundWhenProductListIsEmpty(){
-
     }
 
 }

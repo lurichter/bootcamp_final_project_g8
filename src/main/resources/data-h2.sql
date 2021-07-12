@@ -302,18 +302,15 @@ VALUES (23,
         -1,
         '2021-06-27',
         '12:13:19',
-        '2021-07-12',
+        '2021-09-12',
         2,
         1,
         2,
            'TESTE4');
 
-INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-08 12:13:19', 'OPEN', 1);
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-12 16:20:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-07 12:13:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-06 12:13:19', 'OPEN', 2);
-
-INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
-VALUES (2, 4.78, 1, 1);
 
 INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
 VALUES (2, 7.96, 2, 1);

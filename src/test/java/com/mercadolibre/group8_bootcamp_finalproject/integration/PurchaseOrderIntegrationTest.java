@@ -1,9 +1,12 @@
 package com.mercadolibre.group8_bootcamp_finalproject.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrderPriceResponseDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.util.PurchaseOrderCreator;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
+import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtilUpdated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,9 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-public class PurchaseOrderIntegrationTest {
+public class PurchaseOrderIntegrationTest extends ControllerTest{
 
-    private TestObjectsUtil testObjectsUtil;
+    private TestObjectsUtilUpdated testObjectsUtil;
 
     private MockMvc mockMvc;
 
@@ -34,15 +37,11 @@ public class PurchaseOrderIntegrationTest {
 
     private String token;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @InjectMocks
     ProductListDTO productListDTO;
-
-    @InjectMocks
-    PurchaseOrderPriceResponseDTO purchaseOrderPriceResponseDTO;
-
-    private String correctRequest;
-
-    private String requestWithProductsWithoutStock;
 
     private String loginRequest = "{\n" +
             "    \"username\" : \"operador1@mercadolivre.com\",\n" +
@@ -51,7 +50,7 @@ public class PurchaseOrderIntegrationTest {
 
     @BeforeEach
     void setup() throws Exception{
-        testObjectsUtil = new TestObjectsUtil();
+        testObjectsUtil = new TestObjectsUtilUpdated();
 
         this.mockMvc = webAppContextSetup(webApplicationContext)
                 .apply(springSecurity()).build();
@@ -72,34 +71,11 @@ public class PurchaseOrderIntegrationTest {
 
         productListDTO.setProducts(productDTOS);
 
-        this.correctRequest = "{\n" +
-                "   \"purchaseOrder\": {" +
-                "    \"buyer_id\" : 1,\n" +
-                "    \"orderStatus\" : {\n" +
-                "     \"statusCode\": \"OPEN\" \n},\n" +
-                "    \"products\" : [\n" +
-                "        {\"productId\": 1, \"quantity\" : 100 \n},\n" +
-                "        {\"productId\": 2, \"quantity\" : 50 \n}" +
-                "    ]\n" +
-                "}" +
-                "}";
-
-        this.requestWithProductsWithoutStock = "{\n" +
-                "   \"purchaseOrder\": {" +
-                "    \"buyer_id\" : 2,\n" +
-                "    \"orderStatus\" : {\n" +
-                "     \"statusCode\": \"OPEN\" \n},\n" +
-                "    \"products\" : [\n" +
-                "        {\"productId\": 11, \"quantity\" : 10 \n},\n" +
-                "        {\"productId\": 2, \"quantity\" : 50 \n}" +
-                "    ]\n" +
-                "}" +
-                "}";
     }
 
     @Test
     public void shouldReturnStatusCode403ForbiddenIfUserIsNotAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/v1/fresh-products//{idOrder}", 1)
+        mockMvc.perform(get("/api/v1/fresh-products/orders/{idOrder}", 1)
                 .accept(MediaType.ALL))
                 .andExpect(status().isForbidden());
     }
@@ -107,26 +83,26 @@ public class PurchaseOrderIntegrationTest {
     @Test
     void shouldReturnStatusCodeOkFromGetAllProductsFromPurchaseOrder() throws Exception {
         this.mockMvc
-                .perform(get("/api/v1/fresh-products//{idOrder}", 1)
+                .perform(get("/api/v1/fresh-products/orders/{idOrder}", 1)
                         .header("Authorization", this.token)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnBadRequestFromGetAllProductsFromPurchaseOrderWhenPurchaseOrderIdIsInvalid() throws Exception {
+    void shouldReturnNotFoundFromGetAllProductsFromPurchaseOrderWhenPurchaseOrderIdIsInvalid() throws Exception {
         this.mockMvc
-                .perform(get("/api/v1/fresh-products//{idOrder}", 200)
-                        .header("Authorization", this.token)
+                .perform(get("/api/v1/fresh-products/orders/{idOrder}", 200)
+                        .header("authorization", this.token)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturnAllProductsFromPurchaseOrder() throws Exception {
         this.mockMvc
-                .perform(get("/api/v1/fresh-products//{idOrder}", 1)
-                        .header("Authorization", this.token)
+                .perform(get("/api/v1/fresh-products/orders/{idOrder}", 1)
+                        .header("authorization", this.token)
                         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
                 .andExpect(jsonPath("$.products[0].id").value(1))
@@ -144,11 +120,14 @@ public class PurchaseOrderIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/v1/fresh-products/orders")
+                        .header("authorization", this.token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(this.correctRequest)
+                .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderRequest()))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(336.5));
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.totalPrice").value(5.49))
+                .andDo(print())
+                .andReturn();
     }
 
     @Test
@@ -156,23 +135,25 @@ public class PurchaseOrderIntegrationTest {
 
         this.mockMvc
                 .perform(post("/api/v1/fresh-products/orders")
+                        .header("authorization", this.token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestWithProductsWithoutStock)
+                .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createInvalidPurchaseOrderRequest()))
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldReturnPriceFromUpdatedPurchaseOrder() throws Exception {
 
         this.mockMvc
-                .perform(put("/api/v1/fresh-products/orders")
+                .perform(put("/api/v1/fresh-products/orders/{idOrder}", 1)
+                        .header("authorization", this.token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(this.correctRequest)
+                        .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderUpdateRequest()))
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalPrice").value(336.5));
+                .andExpect(jsonPath("$.totalPrice").value(42.58))
+                .andDo(print())
+                .andReturn();
     }
-
 
 }

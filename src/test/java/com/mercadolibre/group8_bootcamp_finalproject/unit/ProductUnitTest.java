@@ -10,6 +10,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepositor
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.ProductServiceImpl;
 import com.mercadolibre.group8_bootcamp_finalproject.util.MockitoExtension;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
+import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtilUpdated;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,7 @@ import java.util.Set;
 @ExtendWith(MockitoExtension.class)
 public class ProductUnitTest {
 
-    private TestObjectsUtil testObjectsUtil;
+    private TestObjectsUtilUpdated testObjectsUtil;
 
     @Mock
     private ProductRepository productRepository;
@@ -39,7 +40,7 @@ public class ProductUnitTest {
 
     @BeforeEach
     void setup(){
-        this.testObjectsUtil = new TestObjectsUtil();
+        this.testObjectsUtil = new TestObjectsUtilUpdated();
         List<Product> allProducts = testObjectsUtil.getProducts();
         List<Product> freshProducts = testObjectsUtil.getFreshProducts();
         List<Product> frozenProducts = testObjectsUtil.getFrozenProducts();

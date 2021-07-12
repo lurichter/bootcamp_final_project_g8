@@ -1,6 +1,5 @@
 package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.PurchaseOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.ProductQuantityRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.PurchaseOrderRequestDTO;
