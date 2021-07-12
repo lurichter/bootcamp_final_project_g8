@@ -1,19 +1,18 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ProductCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +24,8 @@ public class ProductCategory {
     private ProductCategoryEnum name;
 
     @OneToMany(mappedBy = "productCategory")
-    private Set<Product> products;
+    private List<Product> products;
 
     @OneToMany(mappedBy = "productCategory")
-    private Set<WarehouseSection> warehouseSections;
+    private List<WarehouseSection> warehouseSections;
 }

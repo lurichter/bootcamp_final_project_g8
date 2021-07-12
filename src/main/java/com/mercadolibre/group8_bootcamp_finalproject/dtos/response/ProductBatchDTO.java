@@ -2,13 +2,15 @@ package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Builder
 public class ProductBatchDTO {
-    private SectionDTO section;
     private Long productId;
     private List<BatchStockDTO> batchStock;
 }

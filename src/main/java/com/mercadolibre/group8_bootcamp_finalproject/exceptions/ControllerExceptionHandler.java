@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.PrintWriter;
@@ -28,10 +29,11 @@ public class ControllerExceptionHandler {
 	@ExceptionHandler({
 			BadRequestException.class,
 			PropertyReferenceException.class,
+			MethodArgumentTypeMismatchException.class,
 			org.springframework.dao.DuplicateKeyException.class,
+			org.springframework.web.server.ServerWebInputException.class,
 			org.springframework.web.bind.support.WebExchangeBindException.class,
-			org.springframework.http.converter.HttpMessageNotReadableException.class,
-			org.springframework.web.server.ServerWebInputException.class
+			org.springframework.http.converter.HttpMessageNotReadableException.class
 	})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
@@ -44,6 +46,38 @@ public class ControllerExceptionHandler {
 		);
 	}
 
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ApiError notFoundRequest(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.NOT_FOUND.value()
+		);
+	}
+
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ResponseBody
+	public ApiError unauthorizedRequest(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.UNAUTHORIZED.value()
+		);
+	}
+
+	@ExceptionHandler(UserIsNotAOperatorException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ResponseBody
+	public ApiError userNotAllowed(Exception ex) {
+		return new ApiError(
+				ex.getClass().getName(),
+				ex.getMessage(),
+				HttpStatus.FORBIDDEN.value()
+		);
+	}
 	@ExceptionHandler
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
@@ -61,17 +95,6 @@ public class ControllerExceptionHandler {
 					objectError.getDefaultMessage());
 		}
 		return new ValidationError(objectError.getObjectName(), objectError.getDefaultMessage());
-	}
-
-	@ExceptionHandler({NotFoundException.class})
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public ApiError notFoundRequest(Exception ex) {
-		return new ApiError(
-				ex.getClass().getName(),
-				ex.getMessage(),
-				HttpStatus.NOT_FOUND.value()
-		);
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)

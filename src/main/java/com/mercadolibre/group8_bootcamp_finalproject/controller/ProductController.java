@@ -1,51 +1,30 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.ProductDTO;
-import org.springframework.http.HttpStatus;
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductListDTO;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
+import com.mercadolibre.group8_bootcamp_finalproject.service.IProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/fresh-products/")
+@RequiredArgsConstructor
 public class ProductController {
 
+    private final IProductService productService;
+
     @GetMapping
-    public ResponseEntity<List<ProductDTO>> listAllProducts() {
-        return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
+    public ResponseEntity<ProductListDTO> listAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping(path = "/list/{productCategory}")
-    public ResponseEntity<List<ProductDTO>> listProductsByCategory(@PathVariable String productCategory) {
-        return new ResponseEntity<>(createProductsForTest(), HttpStatus.OK);
+    public ResponseEntity<ProductListDTO> listProductsByCategory(@PathVariable ProductCategoryEnum productCategory) {
+        return ResponseEntity.ok(productService.getAllProductsByCategory(productCategory));
     }
 
-    public List<ProductDTO> createProductsForTest(){
-        ProductDTO product = ProductDTO.builder()
-                .id(1L)
-                .batchNumber(24L)
-                .description("AAAAA")
-                .dueDate(LocalDateTime.now())
-                .maxTemperature(2.)
-                .minTemperature(1.)
-                .price(50.25)
-                .build();
-
-        ProductDTO product2 = ProductDTO.builder()
-                .id(2L)
-                .batchNumber(24L)
-                .description("AAAAA")
-                .dueDate(LocalDateTime.now())
-                .maxTemperature(2.)
-                .minTemperature(1.)
-                .price(50.25)
-                .build();
-
-        return Arrays.asList(product, product2);
-    }
 }

@@ -1,18 +1,17 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PurchaseOrderItem {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "item_id")
@@ -28,7 +27,12 @@ public class PurchaseOrderItem {
     @JoinColumn(name = "batch_id")
     private Batch batch;
 
-    @ManyToOne(fetch=FetchType.LAZY)
+    @ManyToOne(fetch=FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "order_id")
     private PurchaseOrder purchaseOrder;
+
+    @Override
+    public int compareTo(PurchaseOrderItem o) {
+        return this.getQuantity().compareTo(o.getQuantity());
+    }
 }

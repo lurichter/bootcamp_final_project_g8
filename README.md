@@ -1,68 +1,321 @@
-# group8-bootcamp-finalproject
+# Grupo 8 - Projeto Final MELI Bootcamp W1-BR
 
-# Spring Boot App model for Java 11
+<h3>Introdução</h3>
 
-We provide a basic model for JDK 11 / Spring based web applications.
+Todos os Documentos com os requisitos implementados (incluindo o 6 individual)
+estão na pasta `/docs` na raiz do projeto.
 
-Please address any questions and comments to [Fury Issue Tracker](https://github.com/mercadolibre/fury/issues).
 
-## Usage
+<h3>Setup</h3>
+A aplicação necessita de uma instância do banco de dados MySQL para 
+ser rodada localmente.
 
-### SCOPE
+É necessário as seguintes variáveis de ambiente configuradas de acordo com
+as configurações do banco:
 
-The suffix of each Fury **SCOPE** is used to know which properties file to use, it is identified from the last '-' of the name of the scope.
+`````
+SCOPE=local;
+LOCAL_DB_USER=root;
+LOCAL_DB_PASS=123456789;
+`````
 
-If you want to run the application from your development IDE, you need to configure the environment variable **SCOPE=local** in the app luncher.
+Configurações como a porta e URL do banco de dados podem ser modificadas
+no arquivo `application-integration_test.yml`
 
-The properties of **application.yml** are always loaded and at the same time they are complemented with **application-<SCOPE_SUFFIX>.yml** properties. If a property is in both files, the one that is configured in **application-<SCOPE_SUFFIX>.yml** has preference over the property of **application.yml**.
+<h3>Dados Iniciais</h3>
 
-For example, for the **SCOPE** 'items-loader-test' the **SCOPE_SUFFIX** would be 'test' and the loaded property files will be **application.yml** and **application-test.yml**
+Os dados iniciais DDL e DML rodam automaticamente. Tanto no perfil local quanto no
+perfil de testes.
 
-### Web Server
+No perfil de testes a aplicação roda com um banco de dados em memória `H2`.
 
-Each Spring Boot web application includes an embedded web server. For servlet stack applications, Its supports three web Servers:
-  * Tomcat (maven dependency: `spring-boot-starter-tomcat`)
-  * Jetty (maven dependency: `spring-boot-starter-jetty`)
-  * Undertow (maven dependency: `spring-boot-starter-undertow`)
 
-This project is configured with Jetty, but to exchange WebServer, it is enough to configure the dependencies mentioned above in the pom.xml file.
+<h3>Documentação</h3>
 
-### Main
+Todos os serviços necessitam de autenticação. O token de autenticação pode
+ser obtido pelo endpoint de login (exemplos abaixo). Ao obter o token é necessário
+inserir o header `Authentication : Bearer {token}` para consumir os serviços.
 
-The main class for this app is Application, where Spring context is initialized and SCOPE_SUFFIX is generated.
+<h4> Postman </h4>
+Todos os endpoints necessários para os devidos testes dos requisitos (com exceção do req06) 
+estão disponíveis no link abaixo, que contém os metadados em Raw text da coleção do Postman. Para importar basta clicar 
+em Import no client do Postman e importar via Link ou Raw text.
 
-### Error Handling
+https://www.getpostman.com/collections/a94387c0135d1901b6c3
 
-We also provide basic handling for exceptions in ControllerExceptionHandler class.
+O header de autenticação pode ser configurado na pasta pai "Final Project" da coleção
+fazendo assim com que o token seja herdado pelos demais serviços. 
 
-## Api Documentation
+(Lembrar de salvar quando trocar o token).
 
-This project uses Springfox to automate the generation of machine and human readable specifications for JSON APIs written using Spring. Springfox works by examining an application, once, at runtime to infer API semantics based on spring configurations, class structure and various compile time java Annotations.
+<h4> Swagger </h4>
+É possível ver a documentação e testar os endpoints via Swagger pelo link:
 
-You can change this configuration in SpringfoxConfig class.
+http://localhost:8082/swagger-ui.html
 
-## [Release Process](https://release-process.furycloud.io/#/)
+É possível configurar a autenticação pelo botão `Authorize`.
 
-### Usage
+<h3>Requisito 06<h4>
 
-1. Specify the correct tag for your app in your `Dockerfile` and `Dockerfile.runtime`, according to the desired Java runtime version.
+Os detalhes do Requisito 6 (individual) pode ser encontrado no
+arquivo `Req06-{nome-aluno}.pdf` em `/docs` e os exemplos para teste podem ser encontrados
+no final do próximo tópico (Requirements/Examples) do README.
 
+<h3>Requirements/Examples<h4>
+
+First is necessary authenticate w/ email and password
+
+[POST]
+````shell
+/api/v1/sign-in 
+````
+
+Eg.: 
+````json
+{
+    "username" : "operador1@mercadolivre.com",
+    "password" : "123456"
+}
+````
+
+<hr>
+
+US01 - ml-insert-batch-in-fulfillment-warehouse-01
+
+create new inbound order [POST] 
+````shell
+/api/v1/fresh-products/inboundorder
+````
+
+Eg.:
+
+````json
+{
+  "inboundOrder": {
+    "section": {
+      "sectionCode": 1,
+      "warehouseCode": 1
+    },
+    "batchStock": [
+      {
+        "batchNumber": "BATCH001",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 2,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-16"
+      },
+      {
+        "batchNumber": "BATCH002",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-17"
+      },
+      {
+        "batchNumber": "BATCH003",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-15"
+      }
+    ]
+  }
+}
+````
+
+update inbound order [PUT]
+````shell
+/api/v1/fresh-products/inboundorder
+````
+
+Eg.:
+
+````json
+{
+  "inboundOrder": {
+    "section": {
+      "sectionCode": 6,
+      "warehouseCode": 1
+    },
+    "batchStock": [
+      {
+        "batchId": 1,
+        "batchNumber": "BATCH001",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 2,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-16"
+      },
+      {
+        "batchId": 2,
+        "batchNumber": "BATCH002",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 8,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-17"
+      },
+      {
+        "batchId": 3,
+        "batchNumber": "BATCH003",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-15"
+      }
+    ]
+  }
+}
+````
+
+<hr>
+
+US02 - ml-add-products-to-cart-01
+
+ 
+List all products [GET]
+```shell
+/api/v1/fresh-products/
 ```
-# Dockerfile
-FROM hub.furycloud.io/mercadolibre/java:1.11-mini
+
+List products by category [GET]
+```shell
+/api/v1/fresh-products/list/{productCategory}
 ```
 
-You can find all available tags for your `Dockerfile` [here](https://github.com/mercadolibre/fury_java-mini#supported-tags)
+- > productCategory [Enum] : FS, RF or FF;
 
-```
-# Dockerfile.runtime
-FROM hub.furycloud.io/mercadolibre/java:1.11-runtime-mini
-```
+FS: Fresh
+RF: Chilled
+FF: Frozen
 
-You can find all available tags for your `Dockerfile.runtime` [here](https://github.com/mercadolibre/fury_java-mini-runtime#supported-tags)
+Eg.: 
+````
+/api/v1/fresh-products/list/FS
+````
 
-2. Start coding!
+New purchase order [POST]
+````shell
+/api/v1/fresh-products/orders
+````
 
-### Questions
+Eg.:
 
-[Release Process Issue Tracker](https://github.com/mercadolibre/fury_release-process/issues)
+````json
+{
+    "purchaseOrder": {
+        "buyerId": 1,
+        "orderStatus": {
+            "statusCode": "OPEN"
+        },
+        "products": [
+            {
+                "productId": 1,
+                "quantity": 100
+            },
+            {
+                "productId": 2,
+                "quantity": 50
+            }
+        ] 
+    }
+}
+````
+
+List specific purchase order [GET]
+
+````shell
+/api/v1/fresh-products/orders/{idOrder}
+````
+- > idOrder [Long] - identifier from purchase order
+  
+Update purchase order [PUT]
+
+````shell
+/api/v1/fresh-products/orders/{idOrder}
+````
+
+- > idOrder [Long] - identifier from purchase order
+
+Eg.:
+
+````json
+{
+    "purchaseOrder": {
+        "buyerId": 1,
+        "orderStatus": {
+            "statusCode": "OPEN"
+        },
+        "products": [
+            {
+                "productId": 1,
+                "quantity": 100
+            },
+            {
+                "productId": 2,
+                "quantity": 50
+            }
+        ] 
+    }
+}
+````
+
+<hr>
+
+US03 - ml-check-product-location-in-warehouse-01
+
+List product per batch [GET]
+````shell
+/api/v1/fresh-products/batch/list/{productId}?order
+````
+
+- > productId [Long]: identifier from a product;
+- > order [String] - OPTIONAL: Query param w/ default value = dueDate_desc
+- > order values: dueDate_desc or dueDate_asc
+  
+<hr>
+
+US04 - ml-check-product-stock-in-warehouses-04
+
+List all products from Warehouse [GET]
+````shell
+/api/v1/fresh-products/warehouse/{productId}
+````
+
+- > productId [Long]: identifier from some product
+  
+<hr>
+
+US05 - ml-check-batch-stock-due-date-01
+
+List products by due date [GET]
+````shell
+/api/v1/fresh-products/due-date/list/{daysQuantity}
+````
+
+- > daysQuantity [Integer] : filter by days remaining 
+- > Query param: 
+  - > productCategory: [Enum] : FS, RF or FF;
+  - > order [String] - OPTIONAL: Query param w/ default value = dueDate_desc
+  - > order values: dueDate_desc or dueDate_asc
+    
+<hr>
+
+US06 -

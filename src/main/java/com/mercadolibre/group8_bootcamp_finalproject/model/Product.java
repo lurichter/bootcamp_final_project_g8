@@ -1,18 +1,17 @@
 package com.mercadolibre.group8_bootcamp_finalproject.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Product {
 
     @Id
@@ -40,7 +39,7 @@ public class Product {
     private Seller seller;
 
     @OneToMany(mappedBy = "product", fetch=FetchType.LAZY)
-    private Set<Batch> batch;
+    private List<Batch> batch;
 
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name = "category_id")
