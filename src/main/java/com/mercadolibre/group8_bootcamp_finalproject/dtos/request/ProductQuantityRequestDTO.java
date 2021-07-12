@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.dtos.request;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.Min;
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Data
+@Builder
 public class ProductQuantityRequestDTO {
 
     @NotNull(message = "Product ID cannot be null.")

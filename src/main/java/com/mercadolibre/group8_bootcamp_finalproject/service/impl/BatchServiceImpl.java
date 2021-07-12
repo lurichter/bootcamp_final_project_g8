@@ -2,12 +2,9 @@ package com.mercadolibre.group8_bootcamp_finalproject.service.impl;
 
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductBatchDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.SectionDTO;
-import com.mercadolibre.group8_bootcamp_finalproject.exceptions.NotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotFoundException;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.ProductNotInBatchException;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Batch;
-import com.mercadolibre.group8_bootcamp_finalproject.model.WarehouseSection;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.BatchRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.ProductRepository;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IBatchService;
@@ -18,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

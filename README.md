@@ -1,68 +1,257 @@
-# group8-bootcamp-finalproject
+First is necessary authenticate w/ email and password
 
-# Spring Boot App model for Java 11
+[POST]
+````shell
+/api/v1/sign-in 
+````
 
-We provide a basic model for JDK 11 / Spring based web applications.
+Eg.: 
+````json
+{
+    "username" : "operador1@mercadolivre.com",
+    "password" : "123456"
+}
+````
 
-Please address any questions and comments to [Fury Issue Tracker](https://github.com/mercadolibre/fury/issues).
+<h3>Requirements</h3>
+<hr>
 
-## Usage
+US01 - ml-insert-batch-in-fulfillment-warehouse-01
 
-### SCOPE
+create new inbound order [POST] 
+````shell
+/api/v1/fresh-products/inboundorder
+````
 
-The suffix of each Fury **SCOPE** is used to know which properties file to use, it is identified from the last '-' of the name of the scope.
+Eg.:
 
-If you want to run the application from your development IDE, you need to configure the environment variable **SCOPE=local** in the app luncher.
+````json
+{
+  "inboundOrder": {
+    "section": {
+      "sectionCode": 1,
+      "warehouseCode": 1
+    },
+    "batchStock": [
+      {
+        "batchNumber": "BATCH001",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 2,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-16"
+      },
+      {
+        "batchNumber": "BATCH002",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-17"
+      },
+      {
+        "batchNumber": "BATCH003",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-15"
+      }
+    ]
+  }
+}
+````
 
-The properties of **application.yml** are always loaded and at the same time they are complemented with **application-<SCOPE_SUFFIX>.yml** properties. If a property is in both files, the one that is configured in **application-<SCOPE_SUFFIX>.yml** has preference over the property of **application.yml**.
+update inbound order [PUT]
+````shell
+/api/v1/fresh-products/inboundorder
+````
 
-For example, for the **SCOPE** 'items-loader-test' the **SCOPE_SUFFIX** would be 'test' and the loaded property files will be **application.yml** and **application-test.yml**
+Eg.:
 
-### Web Server
+````json
+{
+  "inboundOrder": {
+    "section": {
+      "sectionCode": 6,
+      "warehouseCode": 1
+    },
+    "batchStock": [
+      {
+        "batchId": 1,
+        "batchNumber": "BATCH001",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 2,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-16"
+      },
+      {
+        "batchId": 2,
+        "batchNumber": "BATCH002",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 8,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-17"
+      },
+      {
+        "batchId": 3,
+        "batchNumber": "BATCH003",
+        "productId": 1,
+        "currentTemperature": 15,
+        "minimumTemperature": 10,
+        "quantity": 3,
+        "manufacturingDate": "2021-07-08",
+        "manufacturingTime": "11:15:24",
+        "dueDate": "2021-07-15"
+      }
+    ]
+  }
+}
+````
 
-Each Spring Boot web application includes an embedded web server. For servlet stack applications, Its supports three web Servers:
-  * Tomcat (maven dependency: `spring-boot-starter-tomcat`)
-  * Jetty (maven dependency: `spring-boot-starter-jetty`)
-  * Undertow (maven dependency: `spring-boot-starter-undertow`)
+<hr>
 
-This project is configured with Jetty, but to exchange WebServer, it is enough to configure the dependencies mentioned above in the pom.xml file.
+US02 - ml-add-products-to-cart-01
 
-### Main
-
-The main class for this app is Application, where Spring context is initialized and SCOPE_SUFFIX is generated.
-
-### Error Handling
-
-We also provide basic handling for exceptions in ControllerExceptionHandler class.
-
-## Api Documentation
-
-This project uses Springfox to automate the generation of machine and human readable specifications for JSON APIs written using Spring. Springfox works by examining an application, once, at runtime to infer API semantics based on spring configurations, class structure and various compile time java Annotations.
-
-You can change this configuration in SpringfoxConfig class.
-
-## [Release Process](https://release-process.furycloud.io/#/)
-
-### Usage
-
-1. Specify the correct tag for your app in your `Dockerfile` and `Dockerfile.runtime`, according to the desired Java runtime version.
-
+ 
+List all products [GET]
+```shell
+/api/v1/fresh-products/
 ```
-# Dockerfile
-FROM hub.furycloud.io/mercadolibre/java:1.11-mini
+
+List products by category [GET]
+```shell
+/api/v1/fresh-products/list/{productCategory}
 ```
 
-You can find all available tags for your `Dockerfile` [here](https://github.com/mercadolibre/fury_java-mini#supported-tags)
+- > productCategory [Enum] : FS, RF or FF;
 
-```
-# Dockerfile.runtime
-FROM hub.furycloud.io/mercadolibre/java:1.11-runtime-mini
-```
+FS: Fresh
+RF: Chilled
+FF: Frozen
 
-You can find all available tags for your `Dockerfile.runtime` [here](https://github.com/mercadolibre/fury_java-mini-runtime#supported-tags)
+Eg.: 
+````json
+/api/v1/fresh-products/list/FS
+````
 
-2. Start coding!
+New purchase order [POST]
+````shell
+/api/v1/fresh-products/orders
+````
 
-### Questions
+Eg.:
 
-[Release Process Issue Tracker](https://github.com/mercadolibre/fury_release-process/issues)
+````json
+{
+    "purchaseOrder": {
+        "buyerId": 1,
+        "orderStatus": {
+            "statusCode": "OPEN"
+        },
+        "products": [
+            {
+                "productId": 1,
+                "quantity": 100
+            },
+            {
+                "productId": 2,
+                "quantity": 50
+            }
+        ] 
+    }
+}
+````
+
+List specific purchase order [GET]
+
+````shell
+/api/v1/fresh-products/orders/{idOrder}
+````
+- > idOrder [Long] - identifier from purchase order
+  
+Update purchase order [PUT]
+
+````shell
+/api/v1/fresh-products/orders/{idOrder}
+````
+
+- > idOrder [Long] - identifier from purchase order
+
+Eg.:
+
+````json
+{
+    "purchaseOrder": {
+        "buyerId": 1,
+        "orderStatus": {
+            "statusCode": "OPEN"
+        },
+        "products": [
+            {
+                "productId": 1,
+                "quantity": 100
+            },
+            {
+                "productId": 2,
+                "quantity": 50
+            }
+        ] 
+    }
+}
+````
+
+<hr>
+
+US03 - ml-check-product-location-in-warehouse-01
+
+List product per batch [GET]
+````shell
+/api/v1/fresh-products/batch/list/{productId}?order
+````
+
+- > productId [Long]: identifier from a product;
+- > order [String] - OPTIONAL: Query param w/ default value = dueDate_desc
+- > order values: dueDate_desc or dueDate_asc
+  
+<hr>
+
+US04 - ml-check-product-stock-in-warehouses-04
+
+List all products from Warehouse [GET]
+````shell
+/api/v1/fresh-products/warehouse/{productId}
+````
+
+- > productId [Long]: identifier from some product
+  
+<hr>
+
+US05 - ml-check-batch-stock-due-date-01
+
+List products by due date [GET]
+````shell
+/api/v1/fresh-products/due-date/list/{daysQuantity}
+````
+
+- > daysQuantity [Integer] : filter by days remaining 
+- > Query param: 
+  - > productCategory: [Enum] : FS, RF or FF;
+  - > order [String] - OPTIONAL: Query param w/ default value = dueDate_desc
+  - > order values: dueDate_desc or dueDate_asc
+    
+<hr>
+
+US06 -

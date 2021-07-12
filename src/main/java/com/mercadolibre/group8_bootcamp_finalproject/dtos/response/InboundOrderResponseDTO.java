@@ -3,11 +3,12 @@ package com.mercadolibre.group8_bootcamp_finalproject.dtos.response;
 import com.mercadolibre.group8_bootcamp_finalproject.model.Batch;
 import com.mercadolibre.group8_bootcamp_finalproject.model.InboundOrder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
 public class InboundOrderResponseDTO {
 
     private Long inboundOrderId;

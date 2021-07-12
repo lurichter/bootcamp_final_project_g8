@@ -26,11 +26,6 @@ public class OperatorService implements IOperatorService {
     }
 
     @Override
-    public boolean isLoggedOperatorInWarehouse(Long wareHouseId) {
-        return operatorRepository.existsByIdAndWarehouseOperatorsWarehouseId(getLoggedUserOperatorId(), wareHouseId);
-    }
-
-    @Override
     public boolean isOperatorInWarehouse(Long operatorId, Long wareHouseId) {
         return operatorRepository.existsByIdAndWarehouseOperatorsWarehouseId(operatorId, wareHouseId);
     }

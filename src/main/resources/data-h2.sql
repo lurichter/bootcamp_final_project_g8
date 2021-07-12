@@ -245,7 +245,7 @@ VALUES (12,
         10,
         '2021-06-27',
         '12:13:19',
-        '2021-12-27',
+        '2022-12-27',
         1,
         1,
         1,
@@ -264,7 +264,7 @@ VALUES (17,
         2,
         '2021-06-27',
         '12:13:19',
-        '2021-10-02',
+        '2022-10-02',
         1,
         1,
         2,
@@ -283,7 +283,7 @@ VALUES (13,
         2,
         '2021-06-27',
         '12:13:19',
-        '2021-08-02',
+        '2022-08-02',
         1,
         2,
         2,
@@ -302,18 +302,37 @@ VALUES (23,
         -1,
         '2021-06-27',
         '12:13:19',
-        '2021-07-12',
+        '2022-09-12',
         2,
         1,
         2,
-           'TESTE4');
+           'TESTE5');
 
-INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-08 12:13:19', 'OPEN', 1);
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (23,
+        -1,
+        '2021-06-27',
+        '12:13:19',
+        '2022-09-12',
+        2,
+        1,
+        2,
+        'TESTE4');
+
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-12 16:20:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-07 12:13:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-06 12:13:19', 'OPEN', 2);
 
-INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
-VALUES (2, 4.78, 1, 1);
+--Test update
+INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES (CURRENT_TIMESTAMP(), 'OPEN', 2);
 
 INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
 VALUES (2, 7.96, 2, 1);
@@ -329,3 +348,6 @@ VALUES (2, 4.78, 1, 3);
 
 INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
 VALUES (2, 6.2, 3, 3);
+
+INSERT INTO purchase_order_item (quantity, total_price, batch_id, order_id)
+VALUES (2, 13, 5, 4);
