@@ -4,10 +4,11 @@ import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategory
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
 @Builder
 @AllArgsConstructor
 public class BatchStockDueDateDTO {
