@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.unit;
 
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
@@ -17,7 +18,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import static org.mockito.AdditionalMatchers.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class InboundOrderUnitTest {
@@ -56,10 +61,20 @@ public class InboundOrderUnitTest {
         WarehouseSection frozenWarehouseSection = this.testObjects.getFrozenWarehouseSections().get(0);
         WarehouseOperator warehouseOperator = this.testObjects.getWarehouseOperators().get(0);
         InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
-        List<Batch> batches = this.testObjects.getFreshBatches();
+        List<Batch> batches = new ArrayList<Batch>();
+        batches.add(this.testObjects.getFreshBatches().get(0));
+        batches.add(this.testObjects.getFreshBatches().get(1));
+        List<Batch> purchasedBatches = new ArrayList<Batch>();
+        purchasedBatches.add(this.testObjects.getFreshBatches().get(2));
         Operator operator = this.testObjects.getOperators().get(0);
 
         BDDMockito.doReturn(operator).when(operatorService).getLoggedUOperator();
+
+        BDDMockito.doReturn(Optional.of(inboundOrder)).when(inboundOrderRepository).findById(inboundOrder.getId());
+        BDDMockito.doReturn(batches).when(batchRepository).findAllById(batches.stream().map(Batch::getId).collect(Collectors.toList()));
+        BDDMockito.doReturn(Arrays.asList(batches.get(0), purchasedBatches.get(0)))
+                .when(batchRepository)
+                .findAllById(Arrays.asList(batches.get(0).getId(), purchasedBatches.get(0).getId()));
 
         BDDMockito.doReturn(this.testObjects.getFreshProducts()).when(productRepository).findAllById(freshProductsIds);
         BDDMockito.doNothing().when(operatorService).validateOperatorInWarehouse(warehouseOperator.getOperator().getId(), warehouseOperator.getWarehouse().getId());
@@ -210,17 +225,135 @@ public class InboundOrderUnitTest {
         InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
         inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
         inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
-        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(2L);
-        List<Long> batchIds = new ArrayList<Long>(Arrays.asList(1L, 2L));
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchNumber("MELI003");
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setQuantity(30000);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setCurrentTemperature(11.0);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setManufacturingDate(LocalDate.now().minusDays(8));
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setManufacturingTime(LocalTime.now());
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setDueDate(LocalDate.now().plusDays(13));
 
-        InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
-        List<Batch> batches = this.testObjects.getFreshBatches();
+        InboundOrderResponseDTO inboundOrderResponseDTO = this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);
 
-        BDDMockito.doReturn(Optional.of(inboundOrder)).when(inboundOrderRepository).findById(inboundOrder.getId());
-        BDDMockito.doReturn(batches).when(batchRepository).findAllById(batchIds);
-
+        Assertions.assertThat(inboundOrderResponseDTO.getBatchStock())
+                .extracting(
+                        record -> record.getBatchNumber(),
+                        record -> record.getProductId(),
+                        record -> record.getCurrentTemperature(),
+                        record -> record.getQuantity(),
+                        record -> record.getManufacturingDate(),
+                        record -> record.getManufacturingTime(),
+                        record -> record.getDueDate())
+                .contains(
+                        Tuple.tuple(
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getBatchNumber(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getProductId(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getCurrentTemperature(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getQuantity(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getManufacturingDate(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getManufacturingTime(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).getDueDate()),
+                        Tuple.tuple(
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getBatchNumber(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getProductId(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getCurrentTemperature(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getQuantity(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getManufacturingDate(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getManufacturingTime(),
+                                inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).getDueDate()));
 
     }
 
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithInvalidId() {
+//        Without Id
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Not Found Exception. Inbound Order not found.");
+
+//        Invalid Id
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(2L);
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Not Found Exception. Inbound Order not found.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithDifferentWarehouseSection() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+        inboundOrderRequestDTO.getInboundOrder().setSection(this.testObjects.getFrozenWarehouseSectionDTOS().get(0));
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Bad Request Exception. Cannot update a batch warehouse section by this method.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithoutBatchId() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("Bad Request Exception. Some Batches to update have null identifier.");
+
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithInvalidBatchId() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(4L);
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageStartingWith("Bad Request Exception. The batch ids")
+                .hasMessageEndingWith("do not exist.");
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithBatchesThatDontBelongToIt() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(2L);
+
+        InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
+        inboundOrder.getBatches().remove(1);
+
+        BDDMockito.doReturn(Optional.of(inboundOrder)).when(inboundOrderRepository).findById(inboundOrder.getId());
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageStartingWith("Bad Request Exception. The batch(es)")
+                .hasMessageEndingWith("update do not belongs to the informed Inbound Order.");
+    }
+
+    @Test
+    public void returnExceptionWhenUpdateInboundOrderWithBatchesAlreadyPurchased() {
+        InboundOrderRequestDTO inboundOrderRequestDTO = this.testObjects.getFreshInboundOrderRequestDTOS().get(0);
+        inboundOrderRequestDTO.getInboundOrder().setInboundOrderId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(0).setBatchId(1L);
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().set(1, this.testObjects.getFreshBatchDTOS().get(2));
+        inboundOrderRequestDTO.getInboundOrder().getBatchStock().get(1).setBatchId(3L);
+
+        InboundOrder inboundOrder = this.testObjects.getFreshInboundOrders().get(0);
+        inboundOrder.getBatches().set(1, this.testObjects.getFreshBatches().get(2));
+
+        BDDMockito.doReturn(Optional.of(inboundOrder)).when(inboundOrderRepository).findById(inboundOrder.getId());
+
+        Assertions.assertThatThrownBy(() -> {this.inboundOrderService.updateInboundOrder(inboundOrderRequestDTO);})
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageStartingWith("Bad Request Exception. The batch(es)")
+                .hasMessageEndingWith("already had a purchase order.");
+    }
 
 }

@@ -5,6 +5,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.InboundOrderDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.WarehouseSectionDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.model.enums.ProductCategoryEnum;
 import lombok.Getter;
 
@@ -31,7 +32,10 @@ public class TestObjectsUtil {
     private List<Product> freshProducts = new ArrayList<Product>();
     private List<Batch> freshBatches = new ArrayList<Batch>();
     private List<InboundOrder> freshInboundOrders = new ArrayList<InboundOrder>();
+    private List<PurchaseOrder> freshPurchaseOrders = new ArrayList<PurchaseOrder>();
+    private List<PurchaseOrderItem> freshPurchaseOrderItems = new ArrayList<PurchaseOrderItem>();
     private List<WarehouseSectionDTO> freshWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
+    private List<WarehouseSectionDTO> frozenWarehouseSectionDTOS = new ArrayList<WarehouseSectionDTO>();
     private List<BatchDTO> freshBatchDTOS = new ArrayList<BatchDTO>();
     private List<InboundOrderDTO> freshInboundOrderDTOS = new ArrayList<InboundOrderDTO>();
     private List<InboundOrderRequestDTO> freshInboundOrderRequestDTOS = new ArrayList<InboundOrderRequestDTO>();
@@ -46,13 +50,19 @@ public class TestObjectsUtil {
 
         Users userOperator2 = Users.builder()
                 .id(2L)
-                .name("operador1@mercadolivre.com")
+                .name("operador2@mercadolivre.com")
                 .password("123456")
                 .build();
 
         Users userSeller = Users.builder()
                 .id(3L)
-                .name("vendedor1@mercadolivre.com")
+                .name("vendedor1@gmail.com")
+                .password("123456")
+                .build();
+
+        Users userBuyer = Users.builder()
+                .id(4L)
+                .name("comprador1@gmail.com")
                 .password("123456")
                 .build();
 
@@ -69,6 +79,11 @@ public class TestObjectsUtil {
         Seller seller = Seller.builder()
                 .id(1L)
                 .user(userSeller)
+                .build();
+
+        Buyer buyer = Buyer.builder()
+                .id(1L)
+                .user(userBuyer)
                 .build();
 
         Warehouse warehouse = Warehouse.builder()
@@ -119,7 +134,7 @@ public class TestObjectsUtil {
                 .productCategory(frozenCategory)
                 .build();
 
-        warehouse.setWarehouseSections(new ArrayList<>(Arrays.asList(freshWarehouseSection, freshWarehouseSection)));
+        warehouse.setWarehouseSections(new ArrayList<>(Arrays.asList(freshWarehouseSection, frozenWarehouseSection)));
 
         Product freshProduct1 = Product.builder()
                 .id(1L)
@@ -155,6 +170,7 @@ public class TestObjectsUtil {
                 .dueDate(LocalDate.now().plusDays(14))
                 .product(freshProduct1)
                 .warehouseSection(freshWarehouseSection)
+                .purchaseOrderItems(new ArrayList<PurchaseOrderItem>())
                 .build();
 
         Batch freshBatch2 = Batch.builder()
@@ -167,6 +183,20 @@ public class TestObjectsUtil {
                 .dueDate(LocalDate.now().plusDays(14))
                 .product(freshProduct2)
                 .warehouseSection(freshWarehouseSection)
+                .purchaseOrderItems(new ArrayList<PurchaseOrderItem>())
+                .build();
+
+        Batch freshBatch3 = Batch.builder()
+                .id(3L)
+                .number("MELI0003")
+                .quantity(20000)
+                .currentTemperature(10.0)
+                .manufacturingDate(LocalDate.now().minusDays(7))
+                .manufacturingTime(LocalTime.now())
+                .dueDate(LocalDate.now().plusDays(14))
+                .product(freshProduct1)
+                .warehouseSection(freshWarehouseSection)
+                .purchaseOrderItems(new ArrayList<PurchaseOrderItem>())
                 .build();
 
         InboundOrder freshInboundOrder = InboundOrder.builder()
@@ -176,13 +206,29 @@ public class TestObjectsUtil {
                 .batches(new ArrayList<>(Arrays.asList(freshBatch1, freshBatch2)))
                 .build();
 
+        PurchaseOrder freshPurchaseOrder = PurchaseOrder.builder()
+                .id(1L)
+                .orderStatusEnum(OrderStatusEnum.OPEN)
+                .buyer(buyer)
+                .build();
+
+        PurchaseOrderItem freshPurchaseOrderItem = PurchaseOrderItem.builder()
+                .id(1L)
+                .quantity(10)
+                .totalPrice(23.90)
+                .batch(freshBatch3)
+                .purchaseOrder(freshPurchaseOrder)
+                .build();
+
+        freshBatch3.getPurchaseOrderItems().add(freshPurchaseOrderItem);
+
         WarehouseSectionDTO freshWarehouseSectionDTO = WarehouseSectionDTO.builder()
                 .sectionCode(freshWarehouseSection.getId())
                 .warehouseCode(warehouse.getId())
                 .build();
 
         WarehouseSectionDTO frozenWarehouseSectionDTO = WarehouseSectionDTO.builder()
-                .sectionCode(freshWarehouseSection.getId())
+                .sectionCode(frozenWarehouseSection.getId())
                 .warehouseCode(warehouse.getId())
                 .build();
 
@@ -204,6 +250,16 @@ public class TestObjectsUtil {
                 .manufacturingDate(freshBatch2.getManufacturingDate())
                 .manufacturingTime(freshBatch2.getManufacturingTime())
                 .dueDate(freshBatch2.getDueDate())
+                .build();
+
+        BatchDTO freshBatchDTO3 = BatchDTO.builder()
+                .batchNumber(freshBatch3.getNumber())
+                .productId(freshBatch3.getProduct().getId())
+                .currentTemperature(freshBatch3.getCurrentTemperature())
+                .quantity(freshBatch3.getQuantity())
+                .manufacturingDate(freshBatch3.getManufacturingDate())
+                .manufacturingTime(freshBatch3.getManufacturingTime())
+                .dueDate(freshBatch3.getDueDate())
                 .build();
 
         InboundOrderDTO freshInboundOrderDTO = InboundOrderDTO.builder()
@@ -231,12 +287,18 @@ public class TestObjectsUtil {
         this.freshProducts.add(freshProduct2);
         this.freshBatches.add(freshBatch1);
         this.freshBatches.add(freshBatch2);
+        this.freshBatches.add(freshBatch3);
         this.freshInboundOrders.add(freshInboundOrder);
+        this.freshPurchaseOrders.add(freshPurchaseOrder);
+        this.freshPurchaseOrderItems.add(freshPurchaseOrderItem);
         this.freshWarehouseSectionDTOS.add(freshWarehouseSectionDTO);
+        this.frozenWarehouseSectionDTOS.add(frozenWarehouseSectionDTO);
         this.freshBatchDTOS.add(freshBatchDTO1);
         this.freshBatchDTOS.add(freshBatchDTO2);
+        this.freshBatchDTOS.add(freshBatchDTO3);
         this.freshInboundOrderDTOS.add(freshInboundOrderDTO);
         this.freshInboundOrderRequestDTOS.add(freshInboundOrderRequestDTO);
+
 
     }
 
