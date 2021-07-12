@@ -1,6 +1,5 @@
 package com.mercadolibre.group8_bootcamp_finalproject.unit;
 
-import com.mercadolibre.group8_bootcamp_finalproject.dtos.BatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.request.InboundOrderRequestDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.InboundOrderResponseDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
@@ -35,8 +34,6 @@ public class InboundOrderUnitTest {
     private InboudOrderRepository inboundOrderRepository;
     @Mock
     private ProductRepository productRepository;
-    @Mock
-    private OperatorRepository operatorRepository;
     @Mock
     private WarehouseSectionRepository warehouseSectionRepository;
     @Mock
