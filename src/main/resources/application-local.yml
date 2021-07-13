@@ -1,3 +1,17 @@
 # Properties file for local/dev environment
 # You need to configure the environment variable in your IDE, more info in README.md
 # Overrides application.yml default properties
+
+spring:
+  datasource:
+    host: proxysql.master.meliseginf.com:6612
+    db: gdrdb
+    username:  ${LOCAL_DB_USER}
+    password:  ${LOCAL_DB_PASS}
+    initialization-mode: always
+  jpa:
+    show-sql: true
+    hibernate:
+      sql: debug
+      ddl-auto: create-drop
+    database-platform: org.hibernate.dialect.MySQL8Dialect
