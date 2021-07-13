@@ -14,4 +14,6 @@ public interface IPurchaseOrderService {
     ProductListDTO getAllProductsFromPurchaseOrder(Long orderId);
 
     PurchaseOrderPriceResponseDTO updatePurchaseOrder(PurchaseOrderRequestDTO purchaseOrderRequestDTO, Long purchaseOrderId);
+
+    void cancelPurchaseOrder(Long purchaseOrderId);
 }

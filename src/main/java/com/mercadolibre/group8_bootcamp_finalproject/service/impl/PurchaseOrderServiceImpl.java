@@ -8,6 +8,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.PurchaseOrder
 import com.mercadolibre.group8_bootcamp_finalproject.exceptions.*;
 import com.mercadolibre.group8_bootcamp_finalproject.mapper.ProductMapper;
 import com.mercadolibre.group8_bootcamp_finalproject.model.*;
+import com.mercadolibre.group8_bootcamp_finalproject.model.enums.OrderStatusEnum;
 import com.mercadolibre.group8_bootcamp_finalproject.repository.*;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IPurchaseOrderService;
 import lombok.RequiredArgsConstructor;
@@ -359,5 +360,15 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
     private List<PurchaseOrderItem> getPurchaseOrderItemsWithProduct(Long productId, Long purchaseOrderId){
         return purchaseOrderItemRepository.findPurchaseOrderItemByBatch_ProductIdAndPurchaseOrderId(productId, purchaseOrderId);
     }
+
+    @Override
+    public void cancelPurchaseOrder(Long purchaseOrderId) {
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(purchaseOrderId).orElseThrow(
+                () -> new NotFoundException("Purchase Order not found.")
+        );
+        purchaseOrder.setOrderStatusEnum(OrderStatusEnum.CANCELED);
+        purchaseOrderRepository.save(purchaseOrder);
+    }
+
 
 }

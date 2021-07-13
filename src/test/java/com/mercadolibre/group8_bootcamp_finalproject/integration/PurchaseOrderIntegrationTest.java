@@ -110,7 +110,7 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
                 .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderRequest()))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.totalPrice").value(3.1))
+                .andExpect(jsonPath("$.totalPrice").value(5.49))
                 .andDo(print())
                 .andReturn();
     }
@@ -135,7 +135,19 @@ public class PurchaseOrderIntegrationTest extends ControllerTest{
                         .content(objectMapper.writeValueAsString(PurchaseOrderCreator.createValidPurchaseOrderUpdateRequest()))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.totalPrice").value(15.5))
+                .andExpect(jsonPath("$.totalPrice").value(46.2))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    void shouldCancelPurchaseOrder() throws Exception {
+        this.mockMvc
+                .perform(put("/api/v1/fresh-products/orders/cancel/{idOrder}", 1)
+                        .header("authorization", this.token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent())
                 .andDo(print())
                 .andReturn();
     }

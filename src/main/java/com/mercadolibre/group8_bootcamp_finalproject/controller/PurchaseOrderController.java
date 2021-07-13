@@ -33,8 +33,9 @@ public class PurchaseOrderController {
         return new ResponseEntity<>(purchaseOrderServiceImpl.updatePurchaseOrder(purchaseOrderRequestDTO, idOrder), HttpStatus.CREATED);
     }
 
-    @PutMapping(path = "/{idOrder/cancel}")
-    public ResponseEntity<PurchaseOrderPriceResponseDTO> cancelOrder(@RequestBody @Valid PurchaseOrderRequestDTO purchaseOrderRequestDTO, @PathVariable Long idOrder) {
-        return new ResponseEntity<>(purchaseOrderServiceImpl.updatePurchaseOrder(purchaseOrderRequestDTO, idOrder), HttpStatus.NO_CONTENT);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PutMapping(path = "/cancel/{idOrder}")
+    public void cancelOrder(@PathVariable Long idOrder) {
+        purchaseOrderServiceImpl.cancelPurchaseOrder(idOrder);
     }
 }
