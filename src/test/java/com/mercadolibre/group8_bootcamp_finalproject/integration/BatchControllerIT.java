@@ -114,13 +114,13 @@ class BatchControllerIT extends ControllerTest{
 
 	@Test
 	public void shouldReturnBatchStockIfBatchIsExpired() throws Exception{
-		mockMvc.perform(delete("/api/v1/fresh-products/batch/{batchId}/delete", 5)
+		mockMvc.perform(delete("/api/v1/fresh-products/batch/{batchId}/delete", 6)
 				.header("authorization", token)
 				.accept(MediaType.APPLICATION_JSON))
 
 				.andExpect(jsonPath("$.wareHouseId").value(1))
 				.andExpect(jsonPath("$.sectionId").value(1))
-				.andExpect(jsonPath("$.batch").value(5))
+				.andExpect(jsonPath("$.batchId").value(6))
 				.andExpect(jsonPath("$.batchNumber").value("TESTE5"))
 				.andExpect(jsonPath("$.currentQuantity").value(50))
 				.andExpect(jsonPath("$.dueDate").value("2021-06-12"))
