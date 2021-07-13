@@ -12,12 +12,12 @@
     </parent>
 
     <groupId>com.mercadolibre</groupId>
-    <artifactId>group8-bootcamp-finalproject</artifactId>
+    <artifactId>bootcamp-final-ismael-piloto</artifactId>
     <version>last</version>
     <packaging>jar</packaging>
 
-    <name>group8-bootcamp-finalproject</name>
-    <description>group8-bootcamp-finalproject</description>
+    <name>bootcamp-final-ismael-piloto</name>
+    <description>bootcamp-final-ismael-piloto</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
