@@ -17,9 +17,6 @@ import static java.lang.String.format;
 @Configuration
 public class SpringDocConfig {
 
-	@Value("${server.port}")
-	private int serverPort;
-
 	@Bean
 	public OpenAPI customOpenAPI(@Value("${app.title}") String appName, @Value("${app.description}") String description, @Value("${app.version}") String version) {
 		final String securitySchemeName = "bearerAuth";
@@ -27,8 +24,8 @@ public class SpringDocConfig {
 				.info(new Info().title(appName)
 				.version(version)
 				.description(description)
-				.contact(new Contact().name("group8-bootcamp-finalproject")
-						.email("stefanie.vicente@mercadolivre.com")))
+					.contact(new Contact().name("bootcamp-final-ismael-piloto")
+							.email("ismael.piloto@mercadolivre.com")))
 				.addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
 				.components(
 						new Components()
@@ -42,7 +39,7 @@ public class SpringDocConfig {
 								)
 				);
 
-		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:"+serverPort : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
+		api.addServersItem(new Server().url(isLocalScope() ? "http://localhost:8080" : format("https://%s_%s.furyapps.io", SCOPE_VALUE, appName))
 				.description(format("Scope %s", SCOPE_VALUE)));
 		return api;
 	}

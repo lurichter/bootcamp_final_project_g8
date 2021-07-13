@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class GenerateDoc extends ControllerTest {
+class GenerateDocTest extends ControllerTest {
 
 	/**
 	 * Integration test to generate swagger.yaml file for fury docs [http://furydocs.io/documentation-service]

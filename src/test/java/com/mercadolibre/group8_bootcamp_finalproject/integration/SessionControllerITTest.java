@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class SessionControllerIT extends ControllerTest {
+class SessionControllerITTest extends ControllerTest {
 
 	@Test
 	void shouldLoginAsOperator() {

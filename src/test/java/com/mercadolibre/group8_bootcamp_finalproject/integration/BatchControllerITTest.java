@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-class BatchControllerIT extends ControllerTest{
+class BatchControllerITTest extends ControllerTest{
 
 	MockMvc mockMvc;
 	String token;

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-class InboundOrderControllerIT extends ControllerTest{
+class InboundOrderControllerITTest extends ControllerTest{
 
 	MockMvc mockMvc;
 	String token;

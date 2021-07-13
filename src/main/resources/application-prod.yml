@@ -1,2 +1,12 @@
 # "prod" suffix properties file. Scopes name samples: "prod", "web-prod", "api-prod", etc.
 # Overrides application.yml default properties
+spring:
+  datasource:
+    url: jdbc:mysql://proxysql.master.meliseginf.com:6612/ipilotodb?useSSL=true&serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASS}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
