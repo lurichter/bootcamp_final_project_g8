@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.ProductBatchDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IBatchService;
 import lombok.RequiredArgsConstructor;
@@ -16,5 +17,11 @@ public class BatchController {
     @GetMapping(path = "/list/{productId}")
     public ResponseEntity<ProductBatchDTO> listProductPerBatch(@PathVariable Long productId, @RequestParam(defaultValue = "dueDate_desc") String[] order) {
         return ResponseEntity.ok(batchService.listProductBatches(productId, order));
+    }
+
+
+    @DeleteMapping(path = "/{batchId}/delete")
+    public BatchStockDTO deleteExpiredBatch(@PathVariable Long batchId){
+        return batchService.removeExpiredBatch(batchId);
     }
 }

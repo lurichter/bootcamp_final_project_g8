@@ -342,7 +342,7 @@ public class PurchaseOrderServiceImpl implements IPurchaseOrderService {
         }
     }
 
-    private Batch verifyIfBatchExists(Long batchId){
+    public Batch verifyIfBatchExists(Long batchId){
         if(batchRepository.existsById(batchId)){
             return getBatch(batchId);
         }
