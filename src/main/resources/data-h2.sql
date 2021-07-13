@@ -148,7 +148,7 @@ VALUES ('Uma unidade de cenoura tipo Extra',
         'Cenoura Extra unidade 150g',
         0.75,
         1,
-        2);
+        1);
 
 INSERT INTO product (product_description,
                      maximum_temperature,
@@ -163,7 +163,7 @@ VALUES ('Pacote com 500g de abobrinha brasileira',
         'Abobrinha Brasileira 500g',
         2.99,
         1,
-        2);
+        1);
 
 INSERT INTO product (product_description,
                      maximum_temperature,
@@ -178,7 +178,7 @@ VALUES ('Pacote com 160g de folhas de rúcula higienizadas',
         'Rúcula Hidropônica 160g',
         4.00,
         2,
-        2);
+        1);
 
 INSERT INTO product (product_description,
                      maximum_temperature,
@@ -193,7 +193,7 @@ VALUES ('Uma peça de queijo parmesão de primeira qualidade',
         'Queijo parmesão faixa azul 200g',
         22.9,
         2,
-        2);
+        1);
 
 INSERT INTO product (product_description,
                      maximum_temperature,
@@ -208,7 +208,7 @@ VALUES ('Açaí Frooty tradicional',
         'Açaí Frooty 1.5L',
         24.99,
         3,
-        2);
+        1);
 
 INSERT INTO product (product_description,
                      maximum_temperature,
@@ -223,7 +223,7 @@ VALUES ('Bandeja com 1kg de filé de peito de frango',
         'Peito de frango 1kg',
         20.99,
         3,
-        2);
+        1);
 
 INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-09-09 14:13:19', 1);
 INSERT INTO inbound_order (order_datetime, operator_id) VALUES ('2021-08-09 14:13:19', 1);
