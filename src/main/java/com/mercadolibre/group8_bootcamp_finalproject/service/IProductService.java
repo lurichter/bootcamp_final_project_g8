@@ -11,4 +11,6 @@ public interface IProductService {
     ProductListDTO getAllProducts();
 
     ProductListDTO getAllProductsByCategory(ProductCategoryEnum category);
+
+    ProductDTO updateProductPrice(Long productId, Double percentValue);
 }

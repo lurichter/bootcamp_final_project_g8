@@ -13,6 +13,7 @@ import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtil;
 import com.mercadolibre.group8_bootcamp_finalproject.util.TestObjectsUtilUpdated;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.groups.Tuple;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -194,4 +195,10 @@ public class ProductUnitTest {
         Assertions.assertThatThrownBy(() -> this.productService.getAllProductsByCategory(ProductCategoryEnum.RF)).isInstanceOf(ProductNotFoundException.class).hasMessage("Not Found Exception. Product List not found");
     }
 
+    @Test
+    void shouldReturnProductNotFoundInPriceDiscount () {
+        Assertions.assertThatThrownBy(() -> this.productService.updateProductPrice(9L, 50.0))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessage("Not Found Exception. Product not found");
+    }
 }

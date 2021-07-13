@@ -17,8 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Set;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -164,4 +163,29 @@ public class ProductIntegrationTest extends ControllerTest{
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void shouldReturnCorrectDiscountPriceFromProduct () throws Exception {
+        this.mockMvc.perform(patch("/api/v1/fresh-products/promo/{productId}/{percentValue}", "9", "50")
+            .header("Authorization", this.token)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.price").value(2.0));
+    }
+
+
+    @Test
+    void shouldReturnProductProductNotFoundDiscountPrice () throws Exception {
+        this.mockMvc.perform(patch("/api/v1/fresh-products/promo/{productId}/{percentValue}", "89", "50")
+                .header("Authorization", this.token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturnInvalidRangeFromDiscountPrice () throws Exception {
+        this.mockMvc.perform(patch("/api/v1/fresh-products/promo/{productId}/{percentValue}", "5", "101")
+                .header("Authorization", this.token)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
