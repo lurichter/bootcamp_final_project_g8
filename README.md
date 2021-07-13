@@ -1,3 +1,68 @@
+# Grupo 8 - Projeto Final MELI Bootcamp W1-BR
+
+<h3>Introdução</h3>
+
+Todos os Documentos com os requisitos implementados (incluindo o 6 individual)
+estão na pasta `/docs` na raiz do projeto.
+
+
+<h3>Setup</h3>
+A aplicação necessita de uma instância do banco de dados MySQL para 
+ser rodada localmente.
+
+É necessário as seguintes variáveis de ambiente configuradas de acordo com
+as configurações do banco:
+
+`````
+SCOPE=local;
+LOCAL_DB_USER=root;
+LOCAL_DB_PASS=123456789;
+`````
+
+Configurações como a porta e URL do banco de dados podem ser modificadas
+no arquivo `application-integration_test.yml`
+
+<h3>Dados Iniciais</h3>
+
+Os dados iniciais DDL e DML rodam automaticamente. Tanto no perfil local quanto no
+perfil de testes.
+
+No perfil de testes a aplicação roda com um banco de dados em memória `H2`.
+
+
+<h3>Documentação</h3>
+
+Todos os serviços necessitam de autenticação. O token de autenticação pode
+ser obtido pelo endpoint de login (exemplos abaixo). Ao obter o token é necessário
+inserir o header `Authentication : Bearer {token}` para consumir os serviços.
+
+<h4> Postman </h4>
+Todos os endpoints necessários para os devidos testes dos requisitos (com exceção do req06) 
+estão disponíveis no link abaixo, que contém os metadados em Raw text da coleção do Postman. Para importar basta clicar 
+em Import no client do Postman e importar via Link ou Raw text.
+
+https://www.getpostman.com/collections/a94387c0135d1901b6c3
+
+O header de autenticação pode ser configurado na pasta pai "Final Project" da coleção
+fazendo assim com que o token seja herdado pelos demais serviços. 
+
+(Lembrar de salvar quando trocar o token).
+
+<h4> Swagger </h4>
+É possível ver a documentação e testar os endpoints via Swagger pelo link:
+
+http://localhost:8082/swagger-ui.html
+
+É possível configurar a autenticação pelo botão `Authorize`.
+
+<h3>Requisito 06<h4>
+
+Os detalhes do Requisito 6 (individual) pode ser encontrado no
+arquivo `Req06-{nome-aluno}.pdf` em `/docs` e os exemplos para teste podem ser encontrados
+no final do próximo tópico (Requirements/Examples) do README.
+
+<h3>Requirements/Examples<h4>
+
 First is necessary authenticate w/ email and password
 
 [POST]
@@ -13,7 +78,6 @@ Eg.:
 }
 ````
 
-<h3>Requirements</h3>
 <hr>
 
 US01 - ml-insert-batch-in-fulfillment-warehouse-01
@@ -143,7 +207,7 @@ RF: Chilled
 FF: Frozen
 
 Eg.: 
-````json
+````
 /api/v1/fresh-products/list/FS
 ````
 
