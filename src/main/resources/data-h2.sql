@@ -327,6 +327,25 @@ VALUES (23,
         2,
         'TESTE4');
 
+INSERT INTO batch (quantity,
+                   current_temperature,
+                   manufacturing_date,
+                   manufacturing_time,
+                   due_date,
+                   product_id,
+                   section_id,
+                   inbound_order_id,
+                   batch_number)
+VALUES (50,
+        -1,
+        '2021-06-27',
+        '12:13:19',
+        '2021-06-12',
+        2,
+        1,
+        2,
+        'TESTE5');
+
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-12 16:20:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-07 12:13:19', 'OPEN', 1);
 INSERT INTO purchase_order (order_datetime, status, buyer_id) VALUES ('2021-07-06 12:13:19', 'OPEN', 2);

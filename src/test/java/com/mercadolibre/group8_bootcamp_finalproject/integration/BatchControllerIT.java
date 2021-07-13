@@ -12,7 +12,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -108,5 +110,31 @@ class BatchControllerIT extends ControllerTest{
 				.accept(MediaType.ALL))
 				.andExpect(status().isBadRequest())
 				.andExpect(result -> assertTrue(result.getResolvedException() instanceof SortUtilException));
+	}
+
+	@Test
+	public void shouldReturnBatchStockIfBatchIsExpired() throws Exception{
+		mockMvc.perform(delete("/api/v1/fresh-products/batch/{batchId}/delete", 5)
+				.header("authorization", token)
+				.accept(MediaType.APPLICATION_JSON))
+
+				.andExpect(jsonPath("$.wareHouseId").value(1))
+				.andExpect(jsonPath("$.sectionId").value(1))
+				.andExpect(jsonPath("$.batch").value(5))
+				.andExpect(jsonPath("$.batchNumber").value("TESTE5"))
+				.andExpect(jsonPath("$.currentQuantity").value(50))
+				.andExpect(jsonPath("$.dueDate").value("2021-06-12"))
+				.andDo(print())
+				.andReturn();
+	}
+
+	@Test
+	public void shouldReturnBadRequestIfIsNotPossibleRemoveBatch() throws Exception{
+		mockMvc.perform(delete("/api/v1/fresh-products/batch/{batchId}/delete", 1)
+		.header("authorization", token)
+		.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest())
+				.andDo(print())
+				.andReturn();
 	}
 }

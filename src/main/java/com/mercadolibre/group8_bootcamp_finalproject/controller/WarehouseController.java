@@ -1,5 +1,6 @@
 package com.mercadolibre.group8_bootcamp_finalproject.controller;
 
+import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.BatchStockDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.dtos.response.WarehouseProductListDTO;
 import com.mercadolibre.group8_bootcamp_finalproject.service.IWarehouseService;
 import com.mercadolibre.group8_bootcamp_finalproject.service.impl.WarehouseServiceImpl;
